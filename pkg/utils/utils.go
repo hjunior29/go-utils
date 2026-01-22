@@ -66,3 +66,16 @@ func Filter(slice []string, predicate func(string) bool) []string {
 	}
 	return result
 }
+
+
+// Clamp restricts a value to be within a specified range.
+// If val < min, returns min. If val > max, returns max.
+func Clamp(val, min, max int) int {
+	if val < min {
+		return min
+	}
+	if val > max {
+		return max
+	}
+	return val
+}
