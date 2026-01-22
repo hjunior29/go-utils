@@ -54,3 +54,15 @@ func Min(a, b int) int {
 	}
 	return b
 }
+
+
+// Filter returns a new slice containing only elements that satisfy the predicate.
+func Filter(slice []string, predicate func(string) bool) []string {
+	result := make([]string, 0)
+	for _, item := range slice {
+		if predicate(item) {
+			result = append(result, item)
+		}
+	}
+	return result
+}
