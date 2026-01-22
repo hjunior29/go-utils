@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"strings"
 	"unicode"
 )
@@ -103,19 +104,23 @@ func Filter[T any](slice []T, predicate func(T) bool) []T {
 
 // Clamp restricts an integer value to be within a specified range [min, max].
 // If val < min, it returns min. If val > max, it returns max.
-// It assumes min <= max.
+// It returns an error if min > max.
 // For example:
 //   Clamp(5, 0, 10) == 5
 //   Clamp(-5, 0, 10) == 0
 //   Clamp(15, 0, 10) == 10
-func Clamp(val, min, max int) int {
+//   Clamp(5, 10, 0) returns an error
+func Clamp(val, min, max int) (int, error) {
+	if min > max {
+		return 0, errors.New("min cannot be greater than max")
+	}
 	if val < min {
-		return min
+		return min, nil
 	}
 	if val > max {
-		return max
+		return max, nil
 	}
-	return val
+	return val, nil
 }
 
 // Abs returns the absolute value of an integer.
@@ -209,14 +214,4 @@ func Repeat(s string, n int) string {
 func ContainsAny(s string, runes []rune) bool {
 	runeSet := make(map[rune]struct{}, len(runes))
 	for _, r := range runes {
-		runeSet[r] = struct{}{}
-	}
-	for _, r := range s {
-		if _, ok := runeSet[r]; ok {
-			return true
-		}
-	}
-	return false
-}
-
-// StartsWithAny checks if a string starts with any of the given prefixes.
+		runeSet[r]
