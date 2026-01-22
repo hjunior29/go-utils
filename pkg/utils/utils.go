@@ -39,8 +39,10 @@ func Contains(slice []string, item string) bool {
 }
 
 // TrimAll removes all whitespace characters (spaces, tabs, newlines, etc.) from a string.
+// It uses a strings.Builder for efficient string concatenation.
 func TrimAll(s string) string {
 	var builder strings.Builder
+	builder.Grow(len(s)) // Pre-allocate capacity for efficiency
 	for _, r := range s {
 		if !unicode.IsSpace(r) {
 			builder.WriteRune(r)
@@ -68,7 +70,9 @@ func Min(a, b int) int {
 // Filter returns a new slice containing only elements from the input slice
 // that satisfy the given predicate function.
 func Filter[T any](slice []T, predicate func(T) bool) []T {
-	result := make([]T, 0)
+	// Pre-allocate result slice if possible, though exact size is unknown.
+	// A small initial capacity can still be beneficial.
+	result := make([]T, 0, len(slice)/2) // Heuristic initial capacity
 	for _, item := range slice {
 		if predicate(item) {
 			result = append(result, item)
@@ -105,15 +109,38 @@ func IsEmpty(s string) bool {
 
 // Truncate returns the first n characters of a string.
 // If the string is shorter than n, the original string is returned.
+// If n is negative, the original string is returned.
 // This function operates on runes to correctly handle multi-byte characters.
 func Truncate(s string, n int) string {
 	if n < 0 {
-		return s // Or panic, depending on desired behavior for invalid input
+		return s
 	}
 	runes := []rune(s)
 	if len(runes) <= n {
 		return s
 	}
 	return string(runes[:n])
+}
+
+// IsPalindrome checks if a string is a palindrome (reads the same forwards and backwards).
+// It handles Unicode characters correctly. Case-insensitive.
+func IsPalindrome(s string) bool {
+	s = strings.ToLower(s) // Case-insensitive comparison
+	runes := []rune(s)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		if runes[i] != runes[j] {
+			return false
+		}
+	}
+	return true
+}
+
+// Repeat returns a new string consisting of n copies of the string s.
+// If n is zero or negative, an empty string is returned.
+func Repeat(s string, n int) string {
+	if n <= 0 {
+		return ""
+	}
+	return strings.Repeat(s, n)
 }
 ```
