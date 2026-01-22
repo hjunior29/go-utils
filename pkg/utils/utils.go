@@ -1,4 +1,3 @@
-```go
 package utils
 
 import (
@@ -163,17 +162,23 @@ func Truncate(s string, n int) string {
 
 // IsPalindrome checks if a string is a palindrome (reads the same forwards and backwards).
 // It handles Unicode characters correctly and performs a case-insensitive comparison.
+// It ignores non-alphanumeric characters.
 // For example:
 //   IsPalindrome("madam") == true
 //   IsPalindrome("Madam") == true
 //   IsPalindrome("hello") == false
 //   IsPalindrome("racecar") == true
-//   IsPalindrome("A man, a plan, a canal: Panama") == false (due to punctuation and spaces)
+//   IsPalindrome("A man, a plan, a canal: Panama") == true
 func IsPalindrome(s string) bool {
-	s = strings.ToLower(s) // Case-insensitive comparison
-	runes := []rune(s)
-	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
-		if runes[i] != runes[j] {
+	var cleanedRunes []rune
+	for _, r := range s {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) {
+			cleanedRunes = append(cleanedRunes, unicode.ToLower(r))
+		}
+	}
+
+	for i, j := 0, len(cleanedRunes)-1; i < j; i, j = i+1, j-1 {
+		if cleanedRunes[i] != cleanedRunes[j] {
 			return false
 		}
 	}
@@ -191,6 +196,9 @@ func Repeat(s string, n int) string {
 	if n <= 0 {
 		return ""
 	}
+	// strings.Repeat is efficient, but for very large n, a builder might offer
+	// a slight advantage in some scenarios by pre-allocating.
+	// However, strings.Repeat is generally well-optimized.
 	return strings.Repeat(s, n)
 }
 
@@ -199,29 +207,16 @@ func Repeat(s string, n int) string {
 //   ContainsAny("hello", []rune{'a', 'e', 'i'}) == true
 //   ContainsAny("world", []rune{'a', 'e', 'i'}) == false
 func ContainsAny(s string, runes []rune) bool {
-	for _, r := range s {
-		for _, targetRune := range runes {
-			if r == targetRune {
-				return true
-			}
-		}
+	runeSet := make(map[rune]struct{}, len(runes))
+	for _, r := range runes {
+		runeSet[r] = struct{}{}
 	}
-	return false
-}
-
-// StartsWithAny checks if a string starts with any of the given prefixes.
-// For example:
-//   StartsWithAny("hello world", []string{"hi", "hello"}) == true
-//   StartsWithAny("goodbye world", []string{"hi", "hello"}) == false
-func StartsWithAny(s string, prefixes []string) bool {
-	for _, prefix := range prefixes {
-		if strings.HasPrefix(s, prefix) {
+	for _, r := range s {
+		if _, ok := runeSet[r]; ok {
 			return true
 		}
 	}
 	return false
 }
 
-// EndsWithAny checks if a string ends with any of the given suffixes.
-// For example:
-//   Ends
+// StartsWithAny checks if a string starts with any of the given prefixes.
