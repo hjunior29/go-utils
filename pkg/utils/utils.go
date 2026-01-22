@@ -215,3 +215,8 @@ func ContainsAny(s string, runes []rune) bool {
 	runeSet := make(map[rune]struct{}, len(runes))
 	for _, r := range runes {
 		runeSet[r]
+
+// CountOccurrences counts how many times a substring appears in a string.
+func CountOccurrences(s, substr string) int {
+	return strings.Count(s, substr)
+}
