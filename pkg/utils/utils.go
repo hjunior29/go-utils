@@ -8,9 +8,11 @@ import (
 
 // Reverse returns the reverse of a string.
 // It handles Unicode characters correctly by operating on runes.
-// For example:
-//   Reverse("hello") == "olleh"
-//   Reverse("你好") == "好你"
+//
+// Examples:
+//
+//	Reverse("hello") == "olleh"
+//	Reverse("你好") == "好你"
 func Reverse(s string) string {
 	runes := []rune(s)
 	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
@@ -22,10 +24,12 @@ func Reverse(s string) string {
 // Capitalize returns the string with the first letter capitalized.
 // If the string is empty, it returns an empty string.
 // It handles Unicode characters correctly.
-// For example:
-//   Capitalize("hello") == "Hello"
-//   Capitalize("你好") == "你好" (if the first character has no uppercase form)
-//   Capitalize("") == ""
+//
+// Examples:
+//
+//	Capitalize("hello") == "Hello"
+//	Capitalize("你好") == "你好" (if the first character has no uppercase form)
+//	Capitalize("") == ""
 func Capitalize(s string) string {
 	if s == "" {
 		return s
@@ -36,9 +40,11 @@ func Capitalize(s string) string {
 }
 
 // Contains checks if a slice of strings contains a specific string.
-// For example:
-//   Contains([]string{"a", "b", "c"}, "b") == true
-//   Contains([]string{"a", "b", "c"}, "d") == false
+//
+// Examples:
+//
+//	Contains([]string{"a", "b", "c"}, "b") == true
+//	Contains([]string{"a", "b", "c"}, "d") == false
 func Contains(slice []string, item string) bool {
 	for _, s := range slice {
 		if s == item {
@@ -50,8 +56,10 @@ func Contains(slice []string, item string) bool {
 
 // TrimAll removes all whitespace characters (spaces, tabs, newlines, etc.) from a string.
 // It uses a strings.Builder for efficient string concatenation.
-// For example:
-//   TrimAll("  hello \t world \n") == "helloworld"
+//
+// Examples:
+//
+//	TrimAll("  hello \t world \n") == "helloworld"
 func TrimAll(s string) string {
 	var builder strings.Builder
 	builder.Grow(len(s)) // Pre-allocate capacity for efficiency
@@ -64,9 +72,11 @@ func TrimAll(s string) string {
 }
 
 // Max returns the maximum of two integers.
-// For example:
-//   Max(5, 10) == 10
-//   Max(10, 5) == 10
+//
+// Examples:
+//
+//	Max(5, 10) == 10
+//	Max(10, 5) == 10
 func Max(a, b int) int {
 	if a > b {
 		return a
@@ -75,9 +85,11 @@ func Max(a, b int) int {
 }
 
 // Min returns the minimum of two integers.
-// For example:
-//   Min(5, 10) == 5
-//   Min(10, 5) == 5
+//
+// Examples:
+//
+//	Min(5, 10) == 5
+//	Min(10, 5) == 5
 func Min(a, b int) int {
 	if a < b {
 		return a
@@ -88,8 +100,10 @@ func Min(a, b int) int {
 // Filter returns a new slice containing only elements from the input slice
 // that satisfy the given predicate function.
 // The predicate function should return true for elements to keep and false for elements to discard.
-// For example:
-//   Filter([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == []int{2, 4}
+//
+// Examples:
+//
+//	Filter([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == []int{2, 4}
 func Filter[T any](slice []T, predicate func(T) bool) []T {
 	// Pre-allocate result slice with a heuristic initial capacity.
 	// This can improve performance by reducing reallocations.
@@ -105,11 +119,13 @@ func Filter[T any](slice []T, predicate func(T) bool) []T {
 // Clamp restricts an integer value to be within a specified range [min, max].
 // If val < min, it returns min. If val > max, it returns max.
 // It returns an error if min > max.
-// For example:
-//   Clamp(5, 0, 10) == 5
-//   Clamp(-5, 0, 10) == 0
-//   Clamp(15, 0, 10) == 10
-//   Clamp(5, 10, 0) returns an error
+//
+// Examples:
+//
+//	Clamp(5, 0, 10) == 5
+//	Clamp(-5, 0, 10) == 0
+//	Clamp(15, 0, 10) == 10
+//	Clamp(5, 10, 0) returns an error
 func Clamp(val, min, max int) (int, error) {
 	if min > max {
 		return 0, errors.New("min cannot be greater than max")
@@ -124,10 +140,12 @@ func Clamp(val, min, max int) (int, error) {
 }
 
 // Abs returns the absolute value of an integer.
-// For example:
-//   Abs(5) == 5
-//   Abs(-5) == 5
-//   Abs(0) == 0
+//
+// Examples:
+//
+//	Abs(5) == 5
+//	Abs(-5) == 5
+//	Abs(0) == 0
 func Abs(n int) int {
 	if n < 0 {
 		return -n
@@ -137,10 +155,12 @@ func Abs(n int) int {
 
 // IsEmpty checks if a string is empty or contains only whitespace.
 // It uses strings.TrimSpace to remove leading/trailing whitespace before checking.
-// For example:
-//   IsEmpty("") == true
-//   IsEmpty("   ") == true
-//   IsEmpty("hello") == false
+//
+// Examples:
+//
+//	IsEmpty("") == true
+//	IsEmpty("   ") == true
+//	IsEmpty("hello") == false
 func IsEmpty(s string) bool {
 	return strings.TrimSpace(s) == ""
 }
@@ -149,11 +169,13 @@ func IsEmpty(s string) bool {
 // If the string is shorter than n, the original string is returned.
 // If n is negative, the original string is returned.
 // This function operates on runes to correctly handle multi-byte characters.
-// For example:
-//   Truncate("hello world", 5) == "hello"
-//   Truncate("你好世界", 2) == "你好"
-//   Truncate("short", 10) == "short"
-//   Truncate("string", -1) == "string"
+//
+// Examples:
+//
+//	Truncate("hello world", 5) == "hello"
+//	Truncate("你好世界", 2) == "你好"
+//	Truncate("short", 10) == "short"
+//	Truncate("string", -1) == "string"
 func Truncate(s string, n int) string {
 	if n < 0 {
 		return s
@@ -168,12 +190,14 @@ func Truncate(s string, n int) string {
 // IsPalindrome checks if a string is a palindrome (reads the same forwards and backwards).
 // It handles Unicode characters correctly and performs a case-insensitive comparison.
 // It ignores non-alphanumeric characters.
-// For example:
-//   IsPalindrome("madam") == true
-//   IsPalindrome("Madam") == true
-//   IsPalindrome("hello") == false
-//   IsPalindrome("racecar") == true
-//   IsPalindrome("A man, a plan, a canal: Panama") == true
+//
+// Examples:
+//
+//	IsPalindrome("madam") == true
+//	IsPalindrome("Madam") == true
+//	IsPalindrome("hello") == false
+//	IsPalindrome("racecar") == true
+//	IsPalindrome("A man, a plan, a canal: Panama") == true
 func IsPalindrome(s string) bool {
 	var cleanedRunes []rune
 	for _, r := range s {
@@ -192,11 +216,13 @@ func IsPalindrome(s string) bool {
 
 // Repeat returns a new string consisting of n copies of the string s.
 // If n is zero or negative, an empty string is returned.
-// For example:
-//   Repeat("abc", 3) == "abcabcabc"
-//   Repeat("a", 5) == "aaaaa"
-//   Repeat("abc", 0) == ""
-//   Repeat("abc", -2) == ""
+//
+// Examples:
+//
+//	Repeat("abc", 3) == "abcabcabc"
+//	Repeat("a", 5) == "aaaaa"
+//	Repeat("abc", 0) == ""
+//	Repeat("abc", -2) == ""
 func Repeat(s string, n int) string {
 	if n <= 0 {
 		return ""
@@ -208,15 +234,9 @@ func Repeat(s string, n int) string {
 }
 
 // ContainsAny checks if a string contains any of the characters from a given set of runes.
-// For example:
-//   ContainsAny("hello", []rune{'a', 'e', 'i'}) == true
-//   ContainsAny("world", []rune{'a', 'e', 'i'}) == false
-func ContainsAny(s string, runes []rune) bool {
-	runeSet := make(map[rune]struct{}, len(runes))
-	for _, r := range runes {
-		runeSet[r]
-
-// CountOccurrences counts how many times a substring appears in a string.
-func CountOccurrences(s, substr string) int {
-	return strings.Count(s, substr)
-}
+//
+// Examples:
+//
+//	ContainsAny("hello", []rune{'a', 'e', 'i'}) == true
+//	ContainsAny("world", []rune{'a', 'e', 'i'}) == false
+func ContainsAny(s
