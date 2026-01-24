@@ -227,9 +227,6 @@ func Repeat(s string, n int) string {
 	if n <= 0 {
 		return ""
 	}
-	// strings.Repeat is efficient, but for very large n, a builder might offer
-	// a slight advantage in some scenarios by pre-allocating.
-	// However, strings.Repeat is generally well-optimized.
 	return strings.Repeat(s, n)
 }
 
@@ -239,4 +236,9 @@ func Repeat(s string, n int) string {
 //
 //	ContainsAny("hello", []rune{'a', 'e', 'i'}) == true
 //	ContainsAny("world", []rune{'a', 'e', 'i'}) == false
-func ContainsAny(s
+func ContainsAny(s string, chars []rune) bool {
+	if len(s) == 0 || len(chars) == 0 {
+		return false
+	}
+	for _, r := range s {
+		for _, c
