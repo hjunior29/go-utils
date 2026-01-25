@@ -240,5 +240,4 @@ func ContainsAny(s string, chars []rune) bool {
 	if len(s) == 0 || len(chars) == 0 {
 		return false
 	}
-	for _, r := range s {
-		for _, c
+	// Create a map for efficient lookup of characters to check.
