@@ -241,3 +241,8 @@ func ContainsAny(s string, chars []rune) bool {
 		return false
 	}
 	// Create a map for efficient lookup of characters to check.
+
+// CountOccurrences counts how many times a substring appears in a string.
+func CountOccurrences(s, substr string) int {
+	return strings.Count(s, substr)
+}
