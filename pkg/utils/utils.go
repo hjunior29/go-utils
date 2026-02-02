@@ -241,3 +241,49 @@ func ContainsAny(s string, chars []rune) bool {
 		return false
 	}
 	// Create a map for efficient lookup of characters to check.
+	charSet := make(map[rune]struct{}, len(chars))
+	for _, char := range chars {
+		charSet[char] = struct{}{}
+	}
+
+	for _, r := range s {
+		if _, ok := charSet[r]; ok {
+			return true
+		}
+	}
+	return false
+}
+
+// Slugify converts a string into a URL-friendly slug.
+// It converts the string to lowercase, replaces spaces and non-alphanumeric characters with hyphens,
+// and trims leading/trailing hyphens. Multiple hyphens are reduced to a single hyphen.
+//
+// Examples:
+//
+//	Slugify("Hello World!") == "hello-world"
+//	Slugify(" A New Topic  ") == "a-new-topic"
+//	Slugify("Another_Example-Here") == "another-example-here"
+//	Slugify("123-456") == "123-456"
+func Slugify(s string) string {
+	s = strings.ToLower(s)
+	var builder strings.Builder
+	var lastCharIsHyphen bool
+
+	for i, r := range s {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) {
+			builder.WriteRune(r)
+			lastCharIsHyphen = false
+		} else if !lastCharIsHyphen {
+			// Only add a hyphen if it's not a duplicate and not at the beginning
+			if builder.Len() > 0 && i < len(s) {
+				builder.WriteRune('-')
+				lastCharIsHyphen = true
+			}
+		}
+	}
+
+	// Trim leading and trailing hyphens
+	result := builder.String()
+	result = strings.Trim(result, "-")
+	return result
+}
