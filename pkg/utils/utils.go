@@ -287,3 +287,32 @@ func Slugify(s string) string {
 	result = strings.Trim(result, "-")
 	return result
 }
+// ValidateLength checks if a string's length is within a specified range.
+// It returns an error if the length is less than minLength or greater than maxLength.
+// If minLength is negative or maxLength is negative, it's considered invalid.
+// If minLength > maxLength, it's considered invalid.
+//
+// Examples:
+//
+//	ValidateLength("hello", 3, 5) == nil
+//	ValidateLength("hi", 3, 5) returns an error
+//	ValidateLength("hello world", 3, 5) returns an error
+//	ValidateLength("test", -1, 5) returns an error
+//	ValidateLength("test", 5, -1) returns an error
+//	ValidateLength("test", 5, 3) returns an error
+func ValidateLength(s string, minLength, maxLength int) error {
+	if minLength < 0 || maxLength < 0 {
+		return errors.New("minLength and maxLength must be non-negative")
+	}
+	if minLength > maxLength {
+		return errors.New("minLength cannot be greater than maxLength")
+	}
+	length := len([]rune(s)) // Use runes to handle multi-byte characters
+	if length < minLength {
+		return errors.New("string is too short")
+	}
+	if length > maxLength {
+		return errors.New("string is too long")
+	}
+	return nil
+}
