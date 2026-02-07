@@ -345,3 +345,26 @@ func ToTitleCase(s string) string {
 	}
 	return string(runes)
 }
+
+// SafeClamp restricts an integer value to be within a specified range [min, max].
+// If val < min, it returns min. If val > max, it returns max.
+// It returns an error if min > max.
+//
+// Examples:
+//
+//	SafeClamp(5, 0, 10) == (5, nil)
+//	SafeClamp(-5, 0, 10) == (0, nil)
+//	SafeClamp(15, 0, 10) == (10, nil)
+//	SafeClamp(5, 10, 0) returns (0, error)
+func SafeClamp(val, min, max int) (int, error) {
+	if min > max {
+		return 0, errors.New("min cannot be greater than max")
+	}
+	if val < min {
+		return min, nil
+	}
+	if val > max {
+		return max, nil
+	}
+	return val, nil
+}
