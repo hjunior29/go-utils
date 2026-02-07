@@ -368,3 +368,25 @@ func SafeClamp(val, min, max int) (int, error) {
 	}
 	return val, nil
 }
+
+// SafeTruncate returns the first n characters of a string.
+// If the string is shorter than n, the original string is returned.
+// If n is negative, an error is returned.
+// This function operates on runes to correctly handle multi-byte characters.
+//
+// Examples:
+//
+//	SafeTruncate("hello world", 5) == ("hello", nil)
+//	SafeTruncate("你好世界", 2) == ("你好", nil)
+//	SafeTruncate("short", 10) == ("short", nil)
+//	SafeTruncate("string", -1) returns ("", error)
+func SafeTruncate(s string, n int) (string, error) {
+	if n < 0 {
+		return "", errors.New("n cannot be negative")
+	}
+	runes := []rune(s)
+	if len(runes) <= n {
+		return s, nil
+	}
+	return string(runes[:n]), nil
+}
