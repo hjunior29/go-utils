@@ -407,3 +407,32 @@ func SafeIndex(s, substr string) (int, error) {
 	}
 	return index, nil
 }
+
+// FastRepeat returns a new string consisting of n copies of the string s.
+// It is optimized for cases where n is large by pre-allocating the builder capacity.
+// If n is zero or negative, an empty string is returned.
+//
+// Examples:
+//
+//	FastRepeat("abc", 3) == "abcabcabc"
+//	FastRepeat("a", 5) == "aaaaa"
+//	FastRepeat("abc", 0) == ""
+//	FastRepeat("abc", -2) == ""
+func FastRepeat(s string, n int) string {
+	if n <= 0 {
+		return ""
+	}
+	if n == 1 {
+		return s
+	}
+
+	// Pre-allocate capacity for the strings.Builder for efficiency.
+	// This is especially beneficial for large values of n.
+	var builder strings.Builder
+	builder.Grow(len(s) * n)
+
+	for i := 0; i < n; i++ {
+		builder.WriteString(s)
+	}
+	return builder.String()
+}
