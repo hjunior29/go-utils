@@ -436,3 +436,29 @@ func FastRepeat(s string, n int) string {
 	}
 	return builder.String()
 }
+
+// Swap returns a new string with the characters at the given indices swapped.
+// It handles Unicode characters correctly by operating on runes.
+// If either index is out of bounds, or if the indices are the same,
+// the original string is returned without modification.
+//
+// @param s The input string.
+// @param i The index of the first character to swap.
+// @param j The index of the second character to swap.
+// @return A new string with the characters at indices i and j swapped,
+//         or the original string if indices are invalid.
+//
+// Examples:
+//
+//	Swap("hello", 1, 3) == "hlelo"
+//	Swap("你好", 0, 1) == "好你"
+//	Swap("abc", 0, 0) == "abc"
+//	Swap("abc", 0, 5) == "abc"
+func Swap(s string, i, j int) string {
+	runes := []rune(s)
+	if i < 0 || j < 0 || i >= len(runes) || j >= len(runes) || i == j {
+		return s
+	}
+	runes[i], runes[j] = runes[j], runes[i]
+	return string(runes)
+}
