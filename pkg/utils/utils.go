@@ -462,3 +462,20 @@ func Swap(s string, i, j int) string {
 	runes[i], runes[j] = runes[j], runes[i]
 	return string(runes)
 }
+
+// SafeSplit splits a string around each instance of the separator, returning a slice of substrings.
+// If the separator is an empty string, Split splits after each UTF-8 sequence.
+// It returns an error if the separator is empty and the string is not empty.
+//
+// Examples:
+//
+//	SafeSplit("a,b,c", ",") == ([]string{"a", "b", "c"}, nil)
+//	SafeSplit("a,b,c", "") returns ("", error) // separator is empty and string is not empty
+//	SafeSplit("", ",") == ([]string{""}, nil)
+//	SafeSplit("", "") == ([]string{}, nil)
+func SafeSplit(s, sep string) ([]string, error) {
+	if sep == "" && s != "" {
+		return nil, errors.New("separator cannot be empty if string is not empty")
+	}
+	return strings.Split(s, sep), nil
+}
