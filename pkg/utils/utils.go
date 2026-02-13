@@ -479,3 +479,18 @@ func SafeSplit(s, sep string) ([]string, error) {
 	}
 	return strings.Split(s, sep), nil
 }
+
+// ContainsGeneric checks if a slice of any comparable type contains a specific item.
+//
+// Examples:
+//
+//	ContainsGeneric([]int{1, 2, 3}, 2) == true
+//	ContainsGeneric([]string{"a", "b", "c"}, "d") == false
+func ContainsGeneric[T comparable](slice []T, item T) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
+}
