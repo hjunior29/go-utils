@@ -494,3 +494,37 @@ func ContainsGeneric[T comparable](slice []T, item T) bool {
 	}
 	return false
 }
+
+// NormalizeSpaces replaces multiple whitespace characters in a string with a single space.
+// It also trims leading and trailing whitespace.
+//
+// Examples:
+//
+//	NormalizeSpaces("  hello   world  ") == "hello world"
+//	NormalizeSpaces("a\t\nb") == "a b"
+//	NormalizeSpaces("single") == "single"
+//	NormalizeSpaces("") == ""
+func NormalizeSpaces(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	var builder strings.Builder
+	var lastCharIsSpace bool
+
+	for _, r := range s {
+		if unicode.IsSpace(r) {
+			if !lastCharIsSpace {
+				builder.WriteRune(' ')
+				lastCharIsSpace = true
+			}
+		} else {
+			builder.WriteRune(r)
+			lastCharIsSpace = false
+		}
+	}
+
+	// Trim leading and trailing spaces
+	result := builder.String()
+	return strings.TrimSpace(result)
+}
