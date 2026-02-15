@@ -528,3 +528,21 @@ func NormalizeSpaces(s string) string {
 	result := builder.String()
 	return strings.TrimSpace(result)
 }
+
+// Wrap returns a new string where the input string `s` is wrapped by `prefix` and `suffix`.
+// If either `prefix` or `suffix` is empty, it's treated as if it were not provided.
+//
+// @param s The string to wrap.
+// @param prefix The string to prepend.
+// @param suffix The string to append.
+// @return A new string with `s` wrapped by `prefix` and `suffix`.
+//
+// Examples:
+//
+//	Wrap("world", "hello ", "!") == "hello world!"
+//	Wrap("text", "", "...") == "text..."
+//	Wrap("content", "[", "]") == "[content]"
+//	Wrap("data", "", "") == "data"
+func Wrap(s, prefix, suffix string) string {
+	return prefix + s + suffix
+}
