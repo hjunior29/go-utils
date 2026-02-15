@@ -1,17 +1,17 @@
-# Aura Utils
+# Go Utils
 
 A collection of Go utility functions for common operations.
 
 ## Installation
 
 ```bash
-go get github.com/hjunior29/aura-utils
+go get github.com/hjunior29/go-utils
 ```
 
 ## Usage
 
 ```go
-import "github.com/hjunior29/aura-utils/pkg/utils"
+import "github.com/hjunior29/go-utils/pkg/utils"
 
 // String utilities
 reversed := utils.Reverse("hello")     // "olleh"
@@ -27,4 +27,4 @@ min := utils.Min(5, 10) // 5
 
 ## License
 
-MIT
+[MIT](LICENSE)
