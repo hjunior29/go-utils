@@ -546,3 +546,26 @@ func NormalizeSpaces(s string) string {
 func Wrap(s, prefix, suffix string) string {
 	return prefix + s + suffix
 }
+
+// SafeWrap returns a new string where the input string `s` is wrapped by `prefix` and `suffix`.
+// If either `prefix` or `suffix` is empty, it's treated as if it were not provided.
+// It returns an error if both prefix and suffix are empty and the input string `s` is also empty.
+//
+// @param s The string to wrap.
+// @param prefix The string to prepend.
+// @param suffix The string to append.
+// @return A new string with `s` wrapped by `prefix` and `suffix`, or an error if inputs are invalid.
+//
+// Examples:
+//
+//	SafeWrap("world", "hello ", "!") == ("hello world!", nil)
+//	SafeWrap("text", "", "...") == ("text...", nil)
+//	SafeWrap("content", "[", "]") == ("[content]", nil)
+//	SafeWrap("data", "", "") == ("data", nil)
+//	SafeWrap("", "", "") returns ("", errors.New("cannot wrap an empty string with empty prefix and suffix"))
+func SafeWrap(s, prefix, suffix string) (string, error) {
+	if s == "" && prefix == "" && suffix == "" {
+		return "", errors.New("cannot wrap an empty string with empty prefix and suffix")
+	}
+	return prefix + s + suffix, nil
+}
