@@ -569,3 +569,36 @@ func SafeWrap(s, prefix, suffix string) (string, error) {
 	}
 	return prefix + s + suffix, nil
 }
+
+// CountLines counts the number of lines in a string.
+// A line is considered to be terminated by a newline character (\n).
+// An empty string has 0 lines. A string with no newline characters has 1 line.
+//
+// Examples:
+//
+//	CountLines("hello\nworld") == 2
+//	CountLines("hello") == 1
+//	CountLines("") == 0
+//	CountLines("\n") == 1
+//	CountLines("line1\nline2\n") == 2
+func CountLines(s string) int {
+	if s == "" {
+		return 0
+	}
+	count := 1 // Start with 1 line assuming at least one non-empty string
+	for _, r := range s {
+		if r == '\n' {
+			count++
+		}
+	}
+	// If the string ends with a newline, the last increment might have counted an extra "empty" line
+	// after the final newline. strings.Split handles this by not including an empty string at the end.
+	// For consistency, we'll mimic that behavior by checking if the string ends with a newline.
+	if strings.HasSuffix(s, "\n") && count > 1 {
+		// If it ends with a newline and we counted more than one line,
+		// the last increment was for an empty line after the final newline.
+		// We should not count this empty line.
+		return count - 1
+	}
+	return count
+}
