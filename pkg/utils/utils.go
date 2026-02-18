@@ -602,3 +602,23 @@ func CountLines(s string) int {
 	}
 	return count
 }
+
+// BeforeFirst returns the substring before the first occurrence of the separator.
+// If the separator is not found, the entire string is returned.
+// If the separator is empty, an empty string is returned.
+//
+// Examples:
+//
+//	BeforeFirst("hello world", " ") == "hello"
+//	BeforeFirst("hello", "x") == "hello"
+//	BeforeFirst("hello", "") == ""
+func BeforeFirst(s, sep string) string {
+	if sep == "" {
+		return ""
+	}
+	index := strings.Index(s, sep)
+	if index == -1 {
+		return s
+	}
+	return s[:index]
+}
