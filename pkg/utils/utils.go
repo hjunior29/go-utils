@@ -622,3 +622,27 @@ func BeforeFirst(s, sep string) string {
 	}
 	return s[:index]
 }
+
+// SafeBeforeFirst returns the substring before the first occurrence of the separator.
+// If the separator is not found, the entire string is returned.
+// If the separator is empty, an empty string is returned.
+// It returns an error if the separator is empty and the string is not empty.
+//
+// Examples:
+//
+//	SafeBeforeFirst("hello world", " ") == ("hello", nil)
+//	SafeBeforeFirst("hello", "x") == ("hello", nil)
+//	SafeBeforeFirst("hello", "") == ("", errors.New("separator cannot be empty if string is not empty"))
+func SafeBeforeFirst(s, sep string) (string, error) {
+	if sep == "" && s != "" {
+		return "", errors.New("separator cannot be empty if string is not empty")
+	}
+	if sep == "" {
+		return "", nil
+	}
+	index := strings.Index(s, sep)
+	if index == -1 {
+		return s, nil
+	}
+	return s[:index], nil
+}
