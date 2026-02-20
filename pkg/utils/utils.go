@@ -646,3 +646,26 @@ func SafeBeforeFirst(s, sep string) (string, error) {
 	}
 	return s[:index], nil
 }
+
+// FastContains checks if a slice of strings contains a specific string.
+// This version is optimized for performance by using a map for lookups,
+// which provides O(1) average time complexity for checking existence,
+// compared to O(n) for a linear scan.
+//
+// Examples:
+//
+//	FastContains([]string{"a", "b", "c"}, "b") == true
+//	FastContains([]string{"a", "b", "c"}, "d") == false
+func FastContains(slice []string, item string) bool {
+	if len(slice) == 0 {
+		return false
+	}
+	// Use a map for O(1) average time complexity lookups.
+	// This is more efficient than a linear scan for larger slices.
+	set := make(map[string]struct{}, len(slice))
+	for _, s := range slice {
+		set[s] = struct{}{}
+	}
+	_, ok := set[item]
+	return ok
+}
