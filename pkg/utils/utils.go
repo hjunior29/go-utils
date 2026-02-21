@@ -669,3 +669,23 @@ func FastContains(slice []string, item string) bool {
 	_, ok := set[item]
 	return ok
 }
+
+// AfterLast returns the substring after the last occurrence of the separator.
+// If the separator is not found, an empty string is returned.
+// If the separator is empty, the original string is returned.
+//
+// Examples:
+//
+//	AfterLast("hello world", " ") == "world"
+//	AfterLast("hello", "x") == ""
+//	AfterLast("hello", "") == "hello"
+func AfterLast(s, sep string) string {
+	if sep == "" {
+		return s
+	}
+	index := strings.LastIndex(s, sep)
+	if index == -1 {
+		return ""
+	}
+	return s[index+len(sep):]
+}
