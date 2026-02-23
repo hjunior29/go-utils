@@ -706,3 +706,23 @@ func FastReverse(s string) string {
 	}
 	return string(runes)
 }
+
+// ContainsAnyGeneric checks if a slice of any type contains a specific item.
+// This function leverages Go generics to work with slices of any type that supports equality comparison.
+//
+// @param slice The slice to search within.
+// @param item The item to search for in the slice.
+// @return true if the item is found in the slice, false otherwise.
+//
+// Examples:
+//
+//	ContainsAnyGeneric([]int{1, 2, 3}, 2) == true
+//	ContainsAnyGeneric([]string{"a", "b", "c"}, "d") == false
+func ContainsAnyGeneric[T comparable](slice []T, item T) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
+}
