@@ -689,3 +689,20 @@ func AfterLast(s, sep string) string {
 	}
 	return s[index+len(sep):]
 }
+
+// FastReverse returns the reverse of a string.
+// It handles Unicode characters correctly by operating on runes.
+// This version is optimized for performance by pre-allocating the rune slice capacity.
+//
+// Examples:
+//
+//	FastReverse("hello") == "olleh"
+//	FastReverse("你好") == "好你"
+func FastReverse(s string) string {
+	runes := make([]rune, len([]rune(s))) // Pre-allocate rune slice capacity
+	copy(runes, []rune(s))
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+	return string(runes)
+}
