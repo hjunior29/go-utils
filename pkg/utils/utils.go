@@ -726,3 +726,26 @@ func ContainsAnyGeneric[T comparable](slice []T, item T) bool {
 	}
 	return false
 }
+
+// ValidateRange checks if an integer value is within a specified range [min, max].
+// It returns an error if the value is less than min or greater than max.
+// It returns an error if min > max.
+//
+// Examples:
+//
+//	ValidateRange(5, 0, 10) == nil
+//	ValidateRange(-5, 0, 10) returns an error
+//	ValidateRange(15, 0, 10) returns an error
+//	ValidateRange(5, 10, 0) returns an error
+func ValidateRange(val, min, max int) error {
+	if min > max {
+		return errors.New("min cannot be greater than max")
+	}
+	if val < min {
+		return errors.New("value is less than minimum")
+	}
+	if val > max {
+		return errors.New("value is greater than maximum")
+	}
+	return nil
+}
