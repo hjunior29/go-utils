@@ -749,3 +749,18 @@ func ValidateRange(val, min, max int) error {
 	}
 	return nil
 }
+
+// MapGeneric applies a function to each element of a slice and returns a new slice with the results.
+// The function `f` takes an element of type T and returns an element of type U.
+//
+// Examples:
+//
+//	MapGeneric([]int{1, 2, 3}, func(n int) string { return strconv.Itoa(n) }) == []string{"1", "2", "3"}
+//	MapGeneric([]string{"a", "b", "c"}, func(s string) int { return len(s) }) == []int{1, 1, 1}
+func MapGeneric[T any, U any](slice []T, f func(T) U) []U {
+	result := make([]U, len(slice))
+	for i, v := range slice {
+		result[i] = f(v)
+	}
+	return result
+}
