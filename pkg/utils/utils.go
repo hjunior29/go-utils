@@ -764,3 +764,28 @@ func MapGeneric[T any, U any](slice []T, f func(T) U) []U {
 	}
 	return result
 }
+
+// CountWords counts the number of words in a string.
+// Words are defined as sequences of non-whitespace characters separated by whitespace.
+// It trims leading/trailing whitespace before counting.
+//
+// @param s The input string.
+// @return The number of words in the string.
+//
+// Examples:
+//
+//	CountWords("hello world") == 2
+//	CountWords("  leading and trailing spaces  ") == 4
+//	CountWords("singleword") == 1
+//	CountWords("a\t\nb") == 3
+//	CountWords("") == 0
+//	CountWords("   ") == 0
+func CountWords(s string) int {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return 0
+	}
+	// Split by one or more whitespace characters
+	words := strings.Fields(s)
+	return len(words)
+}
