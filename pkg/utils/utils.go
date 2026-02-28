@@ -789,3 +789,18 @@ func CountWords(s string) int {
 	words := strings.Fields(s)
 	return len(words)
 }
+
+// ValidateNotEmpty checks if a string is not empty and does not consist solely of whitespace.
+// It returns an error if the string is empty or contains only whitespace.
+//
+// Examples:
+//
+//	ValidateNotEmpty("hello") == nil
+//	ValidateNotEmpty("  ") returns an error
+//	ValidateNotEmpty("") returns an error
+func ValidateNotEmpty(s string) error {
+	if strings.TrimSpace(s) == "" {
+		return errors.New("string cannot be empty or contain only whitespace")
+	}
+	return nil
+}
