@@ -804,3 +804,28 @@ func ValidateNotEmpty(s string) error {
 	}
 	return nil
 }
+
+// Compare returns an integer indicating the comparison between two strings.
+// It returns:
+//   - -1 if s1 < s2
+//   - 0 if s1 == s2
+//   - 1 if s1 > s2
+//
+// @param s1 The first string to compare.
+// @param s2 The second string to compare.
+// @return An integer representing the comparison result.
+//
+// Examples:
+//
+//	Compare("apple", "banana") == -1
+//	Compare("banana", "apple") == 1
+//	Compare("cherry", "cherry") == 0
+func Compare(s1, s2 string) int {
+	if s1 < s2 {
+		return -1
+	}
+	if s1 > s2 {
+		return 1
+	}
+	return 0
+}
