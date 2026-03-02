@@ -829,3 +829,23 @@ func Compare(s1, s2 string) int {
 	}
 	return 0
 }
+
+// ValidateOneOf checks if a string value is present in a given slice of allowed string values.
+// It returns an error if the value is not found in the slice.
+//
+// Examples:
+//
+//	ValidateOneOf("red", []string{"red", "green", "blue"}) == nil
+//	ValidateOneOf("yellow", []string{"red", "green", "blue"}) returns an error
+//	ValidateOneOf("red", []string{}) returns an error
+func ValidateOneOf(val string, allowed []string) error {
+	if len(allowed) == 0 {
+		return errors.New("allowed values list cannot be empty")
+	}
+	for _, item := range allowed {
+		if val == item {
+			return nil
+		}
+	}
+	return errors.New("value is not one of the allowed options")
+}
