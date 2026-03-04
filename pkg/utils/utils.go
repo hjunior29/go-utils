@@ -849,3 +849,51 @@ func ValidateOneOf(val string, allowed []string) error {
 	}
 	return errors.New("value is not one of the allowed options")
 }
+
+// ValidateISBN10 checks if a string is a valid ISBN-10 number.
+// An ISBN-10 consists of 10 digits, where the last digit can be 'X' representing 10.
+// The check digit calculation is: (10*d1 + 9*d2 + ... + 2*d9 + 1*d10) mod 11 == 0.
+// It returns an error if the string is not a valid ISBN-10.
+//
+// Examples:
+//
+//	ValidateISBN10("0321714113") == nil
+//	ValidateISBN10("0439023521") == nil
+//	ValidateISBN10("032171411X") == nil
+//	ValidateISBN10("0321714114") returns an error (invalid check digit)
+//	ValidateISBN10("12345") returns an error (incorrect length)
+//	ValidateISBN10("ABCDEFGHIJ") returns an error (non-digit characters)
+func ValidateISBN10(isbn string) error {
+	isbn = strings.ReplaceAll(isbn, "-", "") // Remove hyphens
+
+	if len(isbn) != 10 {
+		return errors.New("invalid ISBN-10 length")
+	}
+
+	sum := 0
+	for i := 0; i < 9; i++ {
+		digit := int(isbn[i] - '0')
+		if digit < 0 || digit > 9 {
+			return errors.New("invalid character in ISBN-10")
+		}
+		sum += digit * (10 - i)
+	}
+
+	lastChar := isbn[9]
+	var lastDigit int
+	if lastChar == 'X' || lastChar == 'x' {
+		lastDigit = 10
+	} else {
+		lastDigit = int(lastChar - '0')
+		if lastDigit < 0 || lastDigit > 9 {
+			return errors.New("invalid last character in ISBN-10")
+		}
+	}
+	sum += lastDigit
+
+	if sum%11 != 0 {
+		return errors.New("invalid ISBN-10 check digit")
+	}
+
+	return nil
+}
