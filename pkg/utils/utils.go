@@ -897,3 +897,19 @@ func ValidateISBN10(isbn string) error {
 
 	return nil
 }
+
+// Count returns the number of occurrences of a substring within a string.
+//
+// Examples:
+//
+//	Count("ababab", "ab") == 3
+//	Count("aaaaa", "a") == 5
+//	Count("hello", "l") == 2
+//	Count("world", "x") == 0
+//	Count("abc", "") == 4 // Empty string matches at the beginning, between each character, and at the end.
+func Count(s, substr string) int {
+	if substr == "" {
+		return len([]rune(s)) + 1
+	}
+	return strings.Count(s, substr)
+}
