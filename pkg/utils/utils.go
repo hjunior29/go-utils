@@ -913,3 +913,30 @@ func Count(s, substr string) int {
 	}
 	return strings.Count(s, substr)
 }
+
+// ExtractNumber returns the first sequence of digits found in a string.
+// If no digits are found, it returns an empty string.
+//
+// @param s The input string to search within.
+// @return The first sequence of digits found in the string, or an empty string if none exist.
+//
+// Examples:
+//
+//	ExtractNumber("abc123def456") == "123"
+//	ExtractNumber("no digits here") == ""
+//	ExtractNumber("123") == "123"
+//	ExtractNumber(" leading 1 digit") == "1"
+func ExtractNumber(s string) string {
+	var builder strings.Builder
+	foundDigit := false
+	for _, r := range s {
+		if unicode.IsDigit(r) {
+			builder.WriteRune(r)
+			foundDigit = true
+		} else if foundDigit {
+			// Stop once we encounter a non-digit after finding at least one digit
+			break
+		}
+	}
+	return builder.String()
+}
