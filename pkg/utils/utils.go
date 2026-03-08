@@ -967,3 +967,22 @@ func SafeExtractNumber(s string) (string, error) {
 	}
 	return builder.String(), nil
 }
+
+// ValidateURL checks if a string is a valid URL.
+// It uses Go's built-in net/url.Parse function for validation.
+// It returns an error if the URL is invalid or if it cannot be parsed.
+//
+// Examples:
+//
+//	ValidateURL("https://www.google.com") == nil
+//	ValidateURL("http://localhost:8080/path?query=test") == nil
+//	ValidateURL("invalid-url") returns an error
+//	ValidateURL("ftp://example.com") == nil
+//	ValidateURL("://missing.scheme.com") returns an error
+func ValidateURL(urlStr string) error {
+	_, err := url.ParseRequestURI(urlStr)
+	if err != nil {
+		return err
+	}
+	return nil
+}
