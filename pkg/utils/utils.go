@@ -986,3 +986,29 @@ func ValidateURL(urlStr string) error {
 	}
 	return nil
 }
+
+// SafeCompare returns an integer indicating the comparison between two strings.
+// It returns:
+//   - -1 if s1 < s2
+//   - 0 if s1 == s2
+//   - 1 if s1 > s2
+// It returns an error if there's an issue during comparison (though standard string comparison in Go rarely errors).
+//
+// @param s1 The first string to compare.
+// @param s2 The second string to compare.
+// @return An integer representing the comparison result, or an error if comparison fails.
+//
+// Examples:
+//
+//	SafeCompare("apple", "banana") == (-1, nil)
+//	SafeCompare("banana", "apple") == (1, nil)
+//	SafeCompare("cherry", "cherry") == (0, nil)
+func SafeCompare(s1, s2 string) (int, error) {
+	if s1 < s2 {
+		return -1, nil
+	}
+	if s1 > s2 {
+		return 1, nil
+	}
+	return 0, nil
+}
