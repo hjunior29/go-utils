@@ -1012,3 +1012,25 @@ func SafeCompare(s1, s2 string) (int, error) {
 	}
 	return 0, nil
 }
+
+// ValidateEmail checks if a string is a valid email address.
+// It uses a regular expression for basic email format validation.
+// Note: This is a basic check and doesn't cover all RFC 5322 complexities.
+//
+// Examples:
+//
+//	ValidateEmail("test@example.com") == nil
+//	ValidateEmail("invalid-email") returns an error
+//	ValidateEmail("user+alias@domain.co.uk") == nil
+//	ValidateEmail("@domain.com") returns an error
+//	ValidateEmail("user@domain.") returns an error
+func ValidateEmail(email string) error {
+	// A common regex for basic email validation.
+	// It checks for a username part, followed by '@', then a domain part.
+	// The domain part must contain at least one dot.
+	const emailRegex = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	if !regexp.MustCompile(emailRegex).MatchString(email) {
+		return errors.New("invalid email format")
+	}
+	return nil
+}
