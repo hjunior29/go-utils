@@ -1034,3 +1034,39 @@ func ValidateEmail(email string) error {
 	}
 	return nil
 }
+
+// SafeNormalizeSpaces replaces multiple whitespace characters in a string with a single space.
+// It also trims leading and trailing whitespace.
+// It returns an error if the input string is nil, though Go strings are not nilable. This signature
+// is for consistency with other Safe* functions that might encounter nilable inputs.
+//
+// Examples:
+//
+//	SafeNormalizeSpaces("  hello   world  ") == ("hello world", nil)
+//	SafeNormalizeSpaces("a\t\nb") == ("a b", nil)
+//	SafeNormalizeSpaces("single") == ("single", nil)
+//	SafeNormalizeSpaces("") == ("", nil)
+func SafeNormalizeSpaces(s string) (string, error) {
+	if s == "" {
+		return "", nil
+	}
+
+	var builder strings.Builder
+	var lastCharIsSpace bool
+
+	for _, r := range s {
+		if unicode.IsSpace(r) {
+			if !lastCharIsSpace {
+				builder.WriteRune(' ')
+				lastCharIsSpace = true
+			}
+		} else {
+			builder.WriteRune(r)
+			lastCharIsSpace = false
+		}
+	}
+
+	// Trim leading and trailing spaces
+	result := builder.String()
+	return strings.TrimSpace(result), nil
+}
