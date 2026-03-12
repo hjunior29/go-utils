@@ -1070,3 +1070,22 @@ func SafeNormalizeSpaces(s string) (string, error) {
 	result := builder.String()
 	return strings.TrimSpace(result), nil
 }
+
+// IsURL checks if a string is a valid URL.
+// It uses Go's built-in net/url.Parse function for validation.
+// It returns an error if the URL is invalid or if it cannot be parsed.
+//
+// Examples:
+//
+//	IsURL("https://www.google.com") == nil
+//	IsURL("http://localhost:8080/path?query=test") == nil
+//	IsURL("invalid-url") returns an error
+//	IsURL("ftp://example.com") == nil
+//	IsURL("://missing.scheme.com") returns an error
+func IsURL(urlStr string) error {
+	_, err := url.ParseRequestURI(urlStr)
+	if err != nil {
+		return err
+	}
+	return nil
+}
