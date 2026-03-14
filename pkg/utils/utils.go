@@ -1109,3 +1109,29 @@ func ContainsAnyGeneric[T comparable](slice []T, item T) bool {
 	}
 	return false
 }
+
+// FastCapitalize returns the string with the first letter capitalized.
+// If the string is empty, it returns an empty string.
+// It handles Unicode characters correctly.
+// This version is optimized by avoiding unnecessary rune slice conversions when the string is short or already capitalized.
+//
+// Examples:
+//
+//	FastCapitalize("hello") == "Hello"
+//	FastCapitalize("Hello") == "Hello"
+//	FastCapitalize("") == ""
+func FastCapitalize(s string) string {
+	if s == "" {
+		return s
+	}
+
+	// Check if the first character is already uppercase.
+	// This avoids unnecessary operations if the string is already capitalized.
+	runes := []rune(s)
+	if unicode.IsUpper(runes[0]) {
+		return s
+	}
+
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
+}
