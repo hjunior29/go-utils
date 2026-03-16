@@ -1160,3 +1160,28 @@ func SplitOnce(s, sep string) []string {
 	}
 	return []string{s[:index], s[index+len(sep):]}
 }
+
+// IsAlpha checks if a string contains only alphabetic characters.
+// It returns true if the string is not empty and all characters are letters.
+// It returns false otherwise, including for empty strings.
+//
+// @param s The input string to check.
+// @return true if the string contains only alphabetic characters, false otherwise.
+//
+// Examples:
+//
+//	IsAlpha("HelloWorld") == true
+//	IsAlpha("Hello World") == false // Contains a space
+//	IsAlpha("Hello123") == false   // Contains digits
+//	IsAlpha("") == false           // Empty string
+func IsAlpha(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, r := range s {
+		if !unicode.IsLetter(r) {
+			return false
+		}
+	}
+	return true
+}
