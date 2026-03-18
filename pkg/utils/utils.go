@@ -1185,3 +1185,38 @@ func IsAlpha(s string) bool {
 	}
 	return true
 }
+
+// SafeCountLines counts the number of lines in a string.
+// A line is considered to be terminated by a newline character (\n).
+// An empty string has 0 lines. A string with no newline characters has 1 line.
+// It returns an error if the input string is nil (though Go strings are not nilable,
+// this signature is for consistency with other Safe* functions).
+//
+// Examples:
+//
+//	SafeCountLines("hello\nworld") == (2, nil)
+//	SafeCountLines("hello") == (1, nil)
+//	SafeCountLines("") == (0, nil)
+//	SafeCountLines("\n") == (1, nil)
+//	SafeCountLines("line1\nline2\n") == (2, nil)
+func SafeCountLines(s string) (int, error) {
+	if s == "" {
+		return 0, nil
+	}
+	count := 1 // Start with 1 line assuming at least one non-empty string
+	for _, r := range s {
+		if r == '\n' {
+			count++
+		}
+	}
+	// If the string ends with a newline, the last increment might have counted an extra "empty" line
+	// after the final newline. strings.Split handles this by not including an empty string at the end.
+	// For consistency, we'll mimic that behavior by checking if the string ends with a newline.
+	if strings.HasSuffix(s, "\n") && count > 1 {
+		// If it ends with a newline and we counted more than one line,
+		// the last increment was for an empty line after the final newline.
+		// We should not count this empty line.
+		return count - 1, nil
+	}
+	return count, nil
+}
