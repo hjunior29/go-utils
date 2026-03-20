@@ -1220,3 +1220,16 @@ func SafeCountLines(s string) (int, error) {
 	}
 	return count, nil
 }
+
+// Unquote returns the unquoted version of a string, interpreting 1-byte C-style escape sequences.
+// It returns an error if the string is not a valid quoted string.
+//
+// Examples:
+//
+//	Unquote(`"hello"`) == ("hello", nil)
+//	Unquote(`"hello\nworld"`) == ("hello\nworld", nil)
+//	Unquote(`"invalid escape\z"`) returns ("", error)
+//	Unquote(`"unclosed string`) returns ("", error)
+func Unquote(s string) (string, error) {
+	return strconv.Unquote(s)
+}
