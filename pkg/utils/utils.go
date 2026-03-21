@@ -1233,3 +1233,40 @@ func SafeCountLines(s string) (int, error) {
 func Unquote(s string) (string, error) {
 	return strconv.Unquote(s)
 }
+
+// NormalizeSpaces replaces multiple whitespace characters in a string with a single space.
+// It also trims leading and trailing whitespace.
+//
+// @param s The input string.
+// @return A new string with normalized spaces.
+//
+// Examples:
+//
+//	NormalizeSpaces("  hello   world  ") == "hello world"
+//	NormalizeSpaces("a\t\nb") == "a b"
+//	NormalizeSpaces("single") == "single"
+//	NormalizeSpaces("") == ""
+func NormalizeSpaces(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	var builder strings.Builder
+	var lastCharIsSpace bool
+
+	for _, r := range s {
+		if unicode.IsSpace(r) {
+			if !lastCharIsSpace {
+				builder.WriteRune(' ')
+				lastCharIsSpace = true
+			}
+		} else {
+			builder.WriteRune(r)
+			lastCharIsSpace = false
+		}
+	}
+
+	// Trim leading and trailing spaces
+	result := builder.String()
+	return strings.TrimSpace(result)
+}
