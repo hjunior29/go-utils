@@ -2,6 +2,9 @@ package utils
 
 import (
 	"errors"
+	"net/url"
+	"regexp"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -287,6 +290,7 @@ func Slugify(s string) string {
 	result = strings.Trim(result, "-")
 	return result
 }
+
 // ValidateLength checks if a string's length is within a specified range.
 // It returns an error if the length is less than minLength or greater than maxLength.
 // If minLength is negative or maxLength is negative, it's considered invalid.
@@ -446,7 +450,8 @@ func FastRepeat(s string, n int) string {
 // @param i The index of the first character to swap.
 // @param j The index of the second character to swap.
 // @return A new string with the characters at indices i and j swapped,
-//         or the original string if indices are invalid.
+//
+//	or the original string if indices are invalid.
 //
 // Examples:
 //
@@ -992,6 +997,7 @@ func ValidateURL(urlStr string) error {
 //   - -1 if s1 < s2
 //   - 0 if s1 == s2
 //   - 1 if s1 > s2
+//
 // It returns an error if there's an issue during comparison (though standard string comparison in Go rarely errors).
 //
 // @param s1 The first string to compare.
@@ -1088,26 +1094,6 @@ func IsURL(urlStr string) error {
 		return err
 	}
 	return nil
-}
-
-// ContainsAnyGeneric checks if a slice of any type contains a specific item.
-// This function leverages Go generics to work with slices of any type that supports equality comparison.
-//
-// @param slice The slice to search within.
-// @param item The item to search for in the slice.
-// @return true if the item is found in the slice, false otherwise.
-//
-// Examples:
-//
-//	ContainsAnyGeneric([]int{1, 2, 3}, 2) == true
-//	ContainsAnyGeneric([]string{"a", "b", "c"}, "d") == false
-func ContainsAnyGeneric[T comparable](slice []T, item T) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
 }
 
 // FastCapitalize returns the string with the first letter capitalized.
@@ -1232,43 +1218,6 @@ func SafeCountLines(s string) (int, error) {
 //	Unquote(`"unclosed string`) returns ("", error)
 func Unquote(s string) (string, error) {
 	return strconv.Unquote(s)
-}
-
-// NormalizeSpaces replaces multiple whitespace characters in a string with a single space.
-// It also trims leading and trailing whitespace.
-//
-// @param s The input string.
-// @return A new string with normalized spaces.
-//
-// Examples:
-//
-//	NormalizeSpaces("  hello   world  ") == "hello world"
-//	NormalizeSpaces("a\t\nb") == "a b"
-//	NormalizeSpaces("single") == "single"
-//	NormalizeSpaces("") == ""
-func NormalizeSpaces(s string) string {
-	if s == "" {
-		return ""
-	}
-
-	var builder strings.Builder
-	var lastCharIsSpace bool
-
-	for _, r := range s {
-		if unicode.IsSpace(r) {
-			if !lastCharIsSpace {
-				builder.WriteRune(' ')
-				lastCharIsSpace = true
-			}
-		} else {
-			builder.WriteRune(r)
-			lastCharIsSpace = false
-		}
-	}
-
-	// Trim leading and trailing spaces
-	result := builder.String()
-	return strings.TrimSpace(result)
 }
 
 // TakeWhile returns a new slice containing elements from the input slice
