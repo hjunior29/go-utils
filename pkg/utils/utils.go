@@ -1291,3 +1291,25 @@ func DropWhile[T any](slice []T, predicate func(T) bool) []T {
 	// Return the slice from the first element that satisfied the predicate to the end
 	return slice[firstFalseIndex:]
 }
+
+// IsEmail checks if a string is a valid email address.
+// It uses a regular expression for basic email format validation.
+// Note: This is a basic check and doesn't cover all RFC 5322 complexities.
+//
+// Examples:
+//
+//	IsEmail("test@example.com") == nil
+//	IsEmail("invalid-email") returns an error
+//	IsEmail("user+alias@domain.co.uk") == nil
+//	IsEmail("@domain.com") returns an error
+//	IsEmail("user@domain.") returns an error
+func IsEmail(email string) error {
+	// A common regex for basic email validation.
+	// It checks for a username part, followed by '@', then a domain part.
+	// The domain part must contain at least one dot.
+	const emailRegex = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	if !regexp.MustCompile(emailRegex).MatchString(email) {
+		return errors.New("invalid email format")
+	}
+	return nil
+}
