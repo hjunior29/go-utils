@@ -1313,3 +1313,24 @@ func IsEmail(email string) error {
 	}
 	return nil
 }
+
+// RemoveNonNumeric removes all non-digit characters from a string.
+// It iterates through the string, building a new string containing only digits.
+//
+// @param s The input string to process.
+// @return A new string containing only the numeric characters from the input string.
+//
+// Examples:
+//
+//	RemoveNonNumeric("abc123def456") == "123456"
+//	RemoveNonNumeric("no digits here") == ""
+//	RemoveNonNumeric("123") == "123"
+func RemoveNonNumeric(s string) string {
+	var builder strings.Builder
+	for _, r := range s {
+		if unicode.IsDigit(r) {
+			builder.WriteRune(r)
+		}
+	}
+	return builder.String()
+}
