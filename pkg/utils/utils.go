@@ -1334,3 +1334,24 @@ func RemoveNonNumeric(s string) string {
 	}
 	return builder.String()
 }
+
+// RemoveNonAlphaNumeric removes all characters that are not alphanumeric from a string.
+// It iterates through the string, building a new string containing only letters and digits.
+//
+// @param s The input string to process.
+// @return A new string containing only the alphanumeric characters from the input string.
+//
+// Examples:
+//
+//	RemoveNonAlphaNumeric("abc 123 !@# def 456") == "abc123def456"
+//	RemoveNonAlphaNumeric("no alphanumeric here") == "noalphanumerichere"
+//	RemoveNonAlphaNumeric("12345") == "12345"
+func RemoveNonAlphaNumeric(s string) string {
+	var builder strings.Builder
+	for _, r := range s {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) {
+			builder.WriteRune(r)
+		}
+	}
+	return builder.String()
+}
