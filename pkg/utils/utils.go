@@ -1355,3 +1355,24 @@ func RemoveNonAlphaNumeric(s string) string {
 	}
 	return builder.String()
 }
+
+// ValidatePattern checks if a string matches a given regular expression pattern.
+// It returns an error if the string does not match the pattern.
+// It also returns an error if the provided pattern is invalid.
+//
+// Examples:
+//
+//	ValidatePattern("123-456-7890", `^\d{3}-\d{3}-\d{4}$`) == nil
+//	ValidatePattern("1234567890", `^\d{3}-\d{3}-\d{4}$`) returns an error
+//	ValidatePattern("abc", `^\d+$`) returns an error
+//	ValidatePattern("123", `(`) returns an error (invalid regex pattern)
+func ValidatePattern(s, pattern string) error {
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		return err // Return error if the regex pattern itself is invalid
+	}
+	if !re.MatchString(s) {
+		return errors.New("string does not match the provided pattern")
+	}
+	return nil
+}
