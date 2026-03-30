@@ -1376,3 +1376,28 @@ func ValidatePattern(s, pattern string) error {
 	}
 	return nil
 }
+
+// Intersect returns a new slice containing elements that are present in both input slices.
+// It uses generics to work with slices of any comparable type.
+//
+// Examples:
+//
+//	Intersect([]int{1, 2, 3, 4}, []int{3, 4, 5, 6}) == []int{3, 4}
+//	Intersect([]string{"a", "b", "c"}, []string{"b", "c", "d"}) == []string{"b", "c"}
+//	Intersect([]int{1, 2}, []int{3, 4}) == []int{}
+func Intersect[T comparable](slice1, slice2 []T) []T {
+	// Use a map to store elements of the first slice for efficient lookup.
+	set1 := make(map[T]struct{}, len(slice1))
+	for _, item := range slice1 {
+		set1[item] = struct{}{}
+	}
+
+	var result []T
+	// Iterate over the second slice and check if elements exist in the map.
+	for _, item := range slice2 {
+		if _, ok := set1[item]; ok {
+			result = append(result, item)
+		}
+	}
+	return result
+}
