@@ -1401,3 +1401,34 @@ func Intersect[T comparable](slice1, slice2 []T) []T {
 	}
 	return result
 }
+
+// Union returns a new slice containing all unique elements from both input slices.
+// It uses generics to work with slices of any comparable type.
+// The order of elements in the resulting slice is not guaranteed.
+//
+// Examples:
+//
+//	Union([]int{1, 2, 3}, []int{3, 4, 5}) == []int{1, 2, 3, 4, 5} (order may vary)
+//	Union([]string{"a", "b"}, []string{"b", "c", "d"}) == []string{"a", "b", "c", "d"} (order may vary)
+//	Union([]int{1, 2}, []int{3, 4}) == []int{1, 2, 3, 4} (order may vary)
+func Union[T comparable](slice1, slice2 []T) []T {
+	// Use a map to store all unique elements encountered.
+	set := make(map[T]struct{}, len(slice1)+len(slice2))
+
+	// Add elements from the first slice to the set.
+	for _, item := range slice1 {
+		set[item] = struct{}{}
+	}
+
+	// Add elements from the second slice to the set.
+	for _, item := range slice2 {
+		set[item] = struct{}{}
+	}
+
+	// Convert the set back to a slice.
+	result := make([]T, 0, len(set))
+	for item := range set {
+		result = append(result, item)
+	}
+	return result
+}
