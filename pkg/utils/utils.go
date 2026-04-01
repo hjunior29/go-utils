@@ -1432,3 +1432,20 @@ func Union[T comparable](slice1, slice2 []T) []T {
 	}
 	return result
 }
+
+// Exclude returns a new slice containing elements from the input slice
+// that do NOT satisfy the given predicate function.
+// The predicate function should return true for elements to exclude and false for elements to keep.
+//
+// Examples:
+//
+//	Exclude([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == []int{1, 3, 5}
+func Exclude[T any](slice []T, predicate func(T) bool) []T {
+	result := make([]T, 0, len(slice)/2) // Pre-allocate result slice with a heuristic initial capacity.
+	for _, item := range slice {
+		if !predicate(item) { // Keep elements for which the predicate is false
+			result = append(result, item)
+		}
+	}
+	return result
+}
