@@ -1484,3 +1484,28 @@ func Unzip[T any](slices [][]T) [][]T {
 
 	return result
 }
+
+// SplitOnceAfter splits a string into two parts at the first occurrence of the separator,
+// returning the part before the separator and the part after it (including the separator).
+// If the separator is not found, it returns the original string and an empty string.
+// If the separator is empty, it returns an empty string and the original string.
+//
+// @param s The string to split.
+// @param sep The separator string.
+// @return A slice containing two strings: the part before the separator and the part after (including the separator).
+//
+// Examples:
+//
+//	SplitOnceAfter("hello,world", ",") == []string{"hello", ",world"}
+//	SplitOnceAfter("helloworld", ",") == []string{"helloworld", ""}
+//	SplitOnceAfter("hello,world", "") == []string{"", "hello,world"}
+func SplitOnceAfter(s, sep string) []string {
+	if sep == "" {
+		return []string{"", s}
+	}
+	index := strings.Index(s, sep)
+	if index == -1 {
+		return []string{s, ""}
+	}
+	return []string{s[:index], s[index:]}
+}
