@@ -1533,3 +1533,28 @@ func ValidateHex(s string) error {
 	}
 	return nil
 }
+
+// Diff returns the elements that are in slice1 but not in slice2.
+// It uses generics to work with slices of any comparable type.
+//
+// Examples:
+//
+//	Diff([]int{1, 2, 3, 4}, []int{3, 4, 5, 6}) == []int{1, 2}
+//	Diff([]string{"a", "b", "c"}, []string{"b", "c", "d"}) == []string{"a"}
+//	Diff([]int{1, 2}, []int{3, 4}) == []int{1, 2}
+func Diff[T comparable](slice1, slice2 []T) []T {
+	// Use a map to store elements of the second slice for efficient lookup.
+	set2 := make(map[T]struct{}, len(slice2))
+	for _, item := range slice2 {
+		set2[item] = struct{}{}
+	}
+
+	var result []T
+	// Iterate over the first slice and add elements not found in the map.
+	for _, item := range slice1 {
+		if _, ok := set2[item]; !ok {
+			result = append(result, item)
+		}
+	}
+	return result
+}
