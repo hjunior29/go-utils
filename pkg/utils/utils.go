@@ -1600,3 +1600,24 @@ func FastTrimAll(s string) string {
 	}
 	return builder.String()
 }
+
+// FilterGeneric returns a new slice containing only elements from the input slice
+// that satisfy the given predicate function.
+// The predicate function should return true for elements to keep and false for elements to discard.
+// This generic version works with slices of any type.
+//
+// Examples:
+//
+//	FilterGeneric([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == []int{2, 4}
+//	FilterGeneric([]string{"apple", "banana", "cherry"}, func(s string) bool { return len(s) > 5 }) == []string{"banana", "cherry"}
+func FilterGeneric[T any](slice []T, predicate func(T) bool) []T {
+	// Pre-allocate result slice with a heuristic initial capacity.
+	// This can improve performance by reducing reallocations.
+	result := make([]T, 0, len(slice)/2)
+	for _, item := range slice {
+		if predicate(item) {
+			result = append(result, item)
+		}
+	}
+	return result
+}
