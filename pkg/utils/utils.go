@@ -1621,3 +1621,24 @@ func FilterGeneric[T any](slice []T, predicate func(T) bool) []T {
 	}
 	return result
 }
+
+// Unique returns a new slice containing only the unique elements from the input slice.
+// It uses generics to work with slices of any comparable type.
+// The order of elements in the resulting slice is not guaranteed.
+//
+// Examples:
+//
+//	Unique([]int{1, 2, 2, 3, 4, 4, 4, 5}) == []int{1, 2, 3, 4, 5} (order may vary)
+//	Unique([]string{"a", "b", "a", "c", "b"}) == []string{"a", "b", "c"} (order may vary)
+func Unique[T comparable](slice []T) []T {
+	set := make(map[T]struct{}, len(slice))
+	for _, item := range slice {
+		set[item] = struct{}{}
+	}
+
+	result := make([]T, 0, len(set))
+	for item := range set {
+		result = append(result, item)
+	}
+	return result
+}
