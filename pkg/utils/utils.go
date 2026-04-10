@@ -1642,3 +1642,34 @@ func Unique[T comparable](slice []T) []T {
 	}
 	return result
 }
+
+// SafeSplitOnce splits a string into two parts at the first occurrence of the separator.
+// It returns the part before the separator and the part after the separator.
+// If the separator is not found, it returns the original string and an empty string.
+// If the separator is empty, it returns an empty string and the original string.
+// It returns an error if the separator is empty and the string is not empty,
+// as this behavior is ambiguous and handled by strings.Split.
+//
+// @param s The string to split.
+// @param sep The separator string.
+// @return A slice containing two strings: the part before the separator and the part after, or an error.
+//
+// Examples:
+//
+//	SafeSplitOnce("hello,world", ",") == ([]string{"hello", "world"}, nil)
+//	SafeSplitOnce("helloworld", ",") == ([]string{"helloworld", ""}, nil)
+//	SafeSplitOnce("hello,world", "") == ([]string{"", "hello,world"}, nil)
+//	SafeSplitOnce("a,b,c", "") returns ("", errors.New("separator cannot be empty if string is not empty"))
+func SafeSplitOnce(s, sep string) ([]string, error) {
+	if sep == "" && s != "" {
+		return nil, errors.New("separator cannot be empty if string is not empty")
+	}
+	if sep == "" {
+		return []string{"", s}, nil
+	}
+	index := strings.Index(s, sep)
+	if index == -1 {
+		return []string{s, ""}, nil
+	}
+	return []string{s[:index], s[index+len(sep):]}, nil
+}
