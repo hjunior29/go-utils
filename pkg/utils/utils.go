@@ -1728,3 +1728,22 @@ func SafeBetween(s, start, end string) (string, error) {
 	}
 	return s[startIndex : startIndex+endIndex], nil
 }
+
+// IsBlank checks if a string is empty, or contains only whitespace characters.
+//
+// @param s The string to check.
+// @return true if the string is blank, false otherwise.
+//
+// Examples:
+//
+//	IsBlank("") == true
+//	IsBlank("   ") == true
+//	IsBlank("hello") == false
+func IsBlank(s string) bool {
+	for _, r := range s {
+		if !unicode.IsSpace(r) {
+			return false
+		}
+	}
+	return true
+}
