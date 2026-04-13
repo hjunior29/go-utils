@@ -1700,3 +1700,31 @@ func Between(s, start, end string) string {
 	}
 	return s[startIndex : startIndex+endIndex]
 }
+
+// SafeBetween returns the string between the first and last occurrences of a specified substring.
+// If the start substring is not found, or the end substring is not found after the start,
+// it returns an empty string and a nil error.
+// If the start or end substrings are empty, it may lead to unexpected behavior or empty results,
+// but no error is returned unless the substrings are invalid in a way that `strings.Index` would error (which is rare).
+//
+// Examples:
+//
+//	SafeBetween("hello [world]!", "[", "]") == ("world", nil)
+//	SafeBetween("no delimiters here", "[", "]") == ("", nil)
+//	SafeBetween("start middle end", "start", "end") == (" middle ", nil)
+//	SafeBetween("start", "start", "end") == ("", nil)
+//	SafeBetween("end", "start", "end") == ("", nil)
+func SafeBetween(s, start, end string) (string, error) {
+	startIndex := strings.Index(s, start)
+	if startIndex == -1 {
+		return "", nil
+	}
+	// Adjust startIndex to be after the start delimiter
+	startIndex += len(start)
+
+	endIndex := strings.Index(s[startIndex:], end)
+	if endIndex == -1 {
+		return "", nil
+	}
+	return s[startIndex : startIndex+endIndex], nil
+}
