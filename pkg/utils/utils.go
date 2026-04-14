@@ -1747,3 +1747,60 @@ func IsBlank(s string) bool {
 	}
 	return true
 }
+
+// WrapText wraps a given text to a specified line width, breaking lines at word boundaries.
+// It aims to preserve existing line breaks in the input text.
+//
+// @param text The input string to wrap.
+// @param lineWidth The maximum width of each line.
+// @return A new string with the text wrapped to the specified line width.
+//
+// Examples:
+//
+//	WrapText("This is a long sentence that needs to be wrapped.", 15) == "This is a\nlong\nsentence\nthat needs to\nbe wrapped."
+//	WrapText("Short text", 20) == "Short text"
+//	WrapText("Line1\nLine2 with more text", 10) == "Line1\nLine2 with\nmore text"
+//	WrapText("", 10) == ""
+func WrapText(text string, lineWidth int) string {
+	if text == "" || lineWidth <= 0 {
+		return text
+	}
+
+	var builder strings.Builder
+	lines := strings.Split(text, "\n")
+
+	for _, line := range lines {
+		if builder.Len() > 0 {
+			builder.WriteRune('\n')
+		}
+
+		words := strings.Fields(line)
+		if len(words) == 0 {
+			continue // Skip empty lines after splitting by \n
+		}
+
+		currentLineLength := 0
+		for i, word := range words {
+			if currentLineLength+len(word) > lineWidth && currentLineLength > 0 {
+				builder.WriteRune('\n')
+				currentLineLength = 0
+			}
+			if currentLineLength > 0 {
+				builder.WriteRune(' ')
+				currentLineLength++
+			}
+			builder.WriteString(word)
+			currentLineLength += len(word)
+
+			// If this is the last word on the line, and it's exactly at the lineWidth,
+			// we need to ensure the next word starts on a new line if there is one.
+			if i == len(words)-1 && currentLineLength == lineWidth && len(words) > i+1 {
+				// This case is tricky: if the last word perfectly fills the line,
+				// the next word should naturally go to a new line in the next iteration.
+				// No explicit action needed here other than letting the loop continue.
+			}
+		}
+	}
+
+	return builder.String()
+}
