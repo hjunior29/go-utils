@@ -1830,3 +1830,40 @@ func FastCapitalize(s string) string {
 	runes[0] = unicode.ToUpper(runes[0])
 	return string(runes)
 }
+
+// Mask replaces all but the last `n` characters of a string with a masking character.
+// If the string length is less than or equal to `n`, the original string is returned.
+// The masking character defaults to '*'.
+//
+// Examples:
+//
+//	Mask("1234567890", 4) == "****67890"
+//	Mask("short", 10) == "short"
+//	Mask("password", 3, '#') == "#######rd"
+//	Mask("test", 0) == "****"
+func Mask(s string, n int, maskChar ...rune) string {
+	if n < 0 {
+		n = 0 // Treat negative n as 0
+	}
+
+	runes := []rune(s)
+	length := len(runes)
+
+	if length <= n {
+		return s
+	}
+
+	var char rune
+	if len(maskChar) > 0 {
+		char = maskChar[0]
+	} else {
+		char = '*'
+	}
+
+	maskedPart := make([]rune, length-n)
+	for i := range maskedPart {
+		maskedPart[i] = char
+	}
+
+	return string(maskedPart) + string(runes[length-n:])
+}
