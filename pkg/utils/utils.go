@@ -2036,3 +2036,22 @@ func ValidateIP(ipStr string) error {
 	}
 	return nil
 }
+
+// Map applies a function to each element of a slice and returns a new slice with the results.
+// The function `f` takes an element of type T and returns an element of type U.
+//
+// @param slice The input slice of type T.
+// @param f The function to apply to each element. It takes an element of type T and returns an element of type U.
+// @return A new slice of type U containing the results of applying the function `f` to each element of the input slice.
+//
+// Examples:
+//
+//	Map([]int{1, 2, 3}, func(n int) string { return strconv.Itoa(n) }) == []string{"1", "2", "3"}
+//	Map([]string{"a", "b", "c"}, func(s string) int { return len(s) }) == []int{1, 1, 1}
+func Map[T any, U any](slice []T, f func(T) U) []U {
+	result := make([]U, len(slice))
+	for i, v := range slice {
+		result[i] = f(v)
+	}
+	return result
+}
