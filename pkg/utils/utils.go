@@ -1867,3 +1867,21 @@ func Mask(s string, n int, maskChar ...rune) string {
 
 	return string(maskedPart) + string(runes[length-n:])
 }
+
+// ReplaceAllGeneric replaces all occurrences of `old` with `new` in a slice of any comparable type.
+//
+// Examples:
+//
+//	ReplaceAllGeneric([]int{1, 2, 1, 3}, 1, 10) == []int{10, 2, 10, 3}
+//	ReplaceAllGeneric([]string{"a", "b", "a", "c"}, "a", "x") == []string{"x", "b", "x", "c"}
+func ReplaceAllGeneric[T comparable](slice []T, old, new T) []T {
+	result := make([]T, len(slice))
+	for i, item := range slice {
+		if item == old {
+			result[i] = new
+		} else {
+			result[i] = item
+		}
+	}
+	return result
+}
