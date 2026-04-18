@@ -1885,3 +1885,25 @@ func ReplaceAllGeneric[T comparable](slice []T, old, new T) []T {
 	}
 	return result
 }
+
+// ValidateIMEI checks if a string is a valid IMEI (International Mobile Equipment Identity) number.
+// An IMEI is a 15-digit number. This function performs a basic length check.
+// It returns an error if the string is not exactly 15 digits long.
+//
+// Examples:
+//
+//	ValidateIMEI("123456789012345") == nil
+//	ValidateIMEI("12345678901234") returns an error (too short)
+//	ValidateIMEI("1234567890123456") returns an error (too long)
+//	ValidateIMEI("ABCDEFGHIJKLMNO") returns an error (non-digit characters)
+func ValidateIMEI(imei string) error {
+	if len(imei) != 15 {
+		return errors.New("invalid IMEI length: must be 15 digits")
+	}
+	for _, r := range imei {
+		if !unicode.IsDigit(r) {
+			return errors.New("invalid IMEI format: must contain only digits")
+		}
+	}
+	return nil
+}
