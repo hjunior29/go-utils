@@ -1907,3 +1907,15 @@ func ValidateIMEI(imei string) error {
 	}
 	return nil
 }
+
+// Quote returns the double-quoted version of s.
+// It escapes special characters according to the rules used by JSON and Go.
+//
+// Examples:
+//
+//	Quote("hello") == `"hello"`
+//	Quote("hello\nworld") == `"hello\nworld"`
+//	Quote(`"`) == ` "\"" `
+func Quote(s string) string {
+	return strconv.Quote(s)
+}
