@@ -2055,3 +2055,38 @@ func Map[T any, U any](slice []T, f func(T) U) []U {
 	}
 	return result
 }
+
+// SplitOnceGeneric splits a slice into two parts at the first occurrence of the separator.
+// It returns the part before the separator and the part after the separator.
+// If the separator is not found, it returns the original slice and an empty slice.
+// If the separator is an empty slice, it returns an empty slice and the original slice.
+//
+// @param slice The slice to split.
+// @param sep The separator slice.
+// @return A slice containing two slices: the part before the separator and the part after.
+//
+// Examples:
+//
+//	SplitOnceGeneric([]int{1, 2, 3, 4, 5}, []int{3, 4}) == [][]int{{1, 2}, {5}}
+//	SplitOnceGeneric([]string{"a", "b", "c"}, []string{"x"}) == [][]string{{"a", "b", "c"}, {}}
+//	SplitOnceGeneric([]int{1, 2}, []int{}) == [][]int{{}, {1, 2}}
+func SplitOnceGeneric[T comparable](slice []T, sep []T) [][]T {
+	if len(sep) == 0 {
+		return [][]T{{}, slice}
+	}
+
+	for i := 0; i <= len(slice)-len(sep); i++ {
+		match := true
+		for j := 0; j < len(sep); j++ {
+			if slice[i+j] != sep[j] {
+				match = false
+				break
+			}
+		}
+		if match {
+			return [][]T{slice[:i], slice[i+len(sep):]}
+		}
+	}
+
+	return [][]T{slice, {}}
+}
