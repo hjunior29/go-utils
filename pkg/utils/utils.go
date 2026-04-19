@@ -2090,3 +2090,41 @@ func SplitOnceGeneric[T comparable](slice []T, sep []T) [][]T {
 
 	return [][]T{slice, {}}
 }
+
+// Chunk splits a slice into smaller slices of a specified size.
+// If the last chunk is smaller than the size, it will be returned as is.
+//
+// @param slice The input slice.
+// @param size The desired size of each chunk. Must be greater than 0.
+// @return A slice of slices, where each inner slice is a chunk of the original slice.
+//         Returns an error if size is less than or equal to 0.
+//
+// Examples:
+//
+//	Chunk([]int{1, 2, 3, 4, 5}, 2) == [][]int{{1, 2}, {3, 4}, {5}}
+//	Chunk([]string{"a", "b", "c", "d"}, 3) == [][]string{{"a", "b", "c"}, {"d"}}
+//	Chunk([]int{1, 2, 3}, 1) == [][]int{{1}, {2}, {3}}
+//	Chunk([]int{1, 2, 3}, 5) == [][]int{{1, 2, 3}}
+//	Chunk([]int{}, 2) == [][]int{}
+//	Chunk([]int{1, 2, 3}, 0) returns an error
+func Chunk[T any](slice []T, size int) ([][]T, error) {
+	if size <= 0 {
+		return nil, errors.New("chunk size must be greater than 0")
+	}
+
+	if len(slice) == 0 {
+		return [][]T{}, nil
+	}
+
+	numChunks := (len(slice) + size - 1) / size
+	result := make([][]T, numChunks)
+	for i := 0; i < numChunks; i++ {
+		start := i * size
+		end := start + size
+		if end > len(slice) {
+			end = len(slice)
+		}
+		result[i] = slice[start:end]
+	}
+	return result, nil
+}
