@@ -2174,3 +2174,23 @@ func ValidateCreditCard(cardNumber string) error {
 
 	return nil
 }
+
+// Deduplicate returns a new slice containing only the unique elements from the input slice.
+// It uses generics to work with slices of any comparable type.
+// The order of elements in the resulting slice is preserved from their first appearance.
+//
+// Examples:
+//
+//	Deduplicate([]int{1, 2, 2, 3, 4, 4, 4, 5}) == []int{1, 2, 3, 4, 5}
+//	Deduplicate([]string{"a", "b", "a", "c", "b"}) == []string{"a", "b", "c"}
+func Deduplicate[T comparable](slice []T) []T {
+	seen := make(map[T]struct{}, len(slice))
+	result := make([]T, 0, len(slice))
+	for _, item := range slice {
+		if _, ok := seen[item]; !ok {
+			seen[item] = struct{}{}
+			result = append(result, item)
+		}
+	}
+	return result
+}
