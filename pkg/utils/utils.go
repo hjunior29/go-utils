@@ -2317,3 +2317,23 @@ func SafeCount(s, substr string) (int, error) {
 	}
 	return strings.Count(s, substr), nil
 }
+
+// FastExclude returns a new slice containing elements from the input slice
+// that do NOT satisfy the given predicate function.
+// The predicate function should return true for elements to exclude and false for elements to keep.
+// This version is optimized by pre-allocating the result slice capacity.
+//
+// Examples:
+//
+//	FastExclude([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == []int{1, 3, 5}
+func FastExclude[T any](slice []T, predicate func(T) bool) []T {
+	// Pre-allocate result slice with a heuristic initial capacity.
+	// This can improve performance by reducing reallocations.
+	result := make([]T, 0, len(slice)/2)
+	for _, item := range slice {
+		if !predicate(item) { // Keep elements for which the predicate is false
+			result = append(result, item)
+		}
+	}
+	return result
+}
