@@ -2194,3 +2194,33 @@ func Deduplicate[T comparable](slice []T) []T {
 	}
 	return result
 }
+
+// ValidateSSN checks if a string is a valid U.S. Social Security Number (SSN).
+// A valid SSN has the format "###-##-####", where '#' represents a digit.
+// It returns an error if the string does not conform to this format.
+//
+// Examples:
+//
+//	ValidateSSN("123-45-6789") == nil
+//	ValidateSSN("123456789") returns an error (incorrect format)
+//	ValidateSSN("abc-de-fghi") returns an error (non-digit characters)
+//	ValidateSSN("123-45-678") returns an error (incorrect length)
+func ValidateSSN(ssn string) error {
+	if len(ssn) != 11 {
+		return errors.New("invalid SSN length: must be 11 characters (###-##-####)")
+	}
+
+	for i, r := range ssn {
+		switch i {
+		case 3, 6: // Hyphen positions
+			if r != '-' {
+				return errors.New("invalid SSN format: hyphens missing or misplaced")
+			}
+		default: // Digit positions
+			if !unicode.IsDigit(r) {
+				return errors.New("invalid SSN format: contains non-digit characters")
+			}
+		}
+	}
+	return nil
+}
