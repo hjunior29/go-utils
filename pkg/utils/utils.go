@@ -2128,3 +2128,49 @@ func Chunk[T any](slice []T, size int) ([][]T, error) {
 	}
 	return result, nil
 }
+
+// ValidateCreditCard checks if a string is a valid credit card number using the Luhn algorithm.
+// It returns an error if the string is not a valid credit card number.
+// The validation is basic and checks for common formats (e.g., 13-19 digits, optionally with spaces or hyphens).
+//
+// Examples:
+//
+//	ValidateCreditCard("1234-5678-9012-3456") == nil
+//	ValidateCreditCard("1234567890123456") == nil
+//	ValidateCreditCard("1234 5678 9012 345") == nil
+//	ValidateCreditCard("invalid-card") returns an error
+//	ValidateCreditCard("123456789012345") returns an error (fails Luhn check)
+func ValidateCreditCard(cardNumber string) error {
+	// Remove spaces and hyphens
+	cardNumber = strings.ReplaceAll(cardNumber, " ", "")
+	cardNumber = strings.ReplaceAll(cardNumber, "-", "")
+
+	// Basic length check for common credit card lengths
+	if len(cardNumber) < 13 || len(cardNumber) > 19 {
+		return errors.New("invalid credit card length")
+	}
+
+	sum := 0
+	alternate := false
+	for i := len(cardNumber) - 1; i >= 0; i-- {
+		digit, err := strconv.Atoi(string(cardNumber[i]))
+		if err != nil {
+			return errors.New("invalid character in credit card number")
+		}
+
+		if alternate {
+			digit *= 2
+			if digit > 9 {
+				digit = digit - 9
+			}
+		}
+		sum += digit
+		alternate = !alternate
+	}
+
+	if sum%10 != 0 {
+		return errors.New("invalid credit card number (Luhn check failed)")
+	}
+
+	return nil
+}
