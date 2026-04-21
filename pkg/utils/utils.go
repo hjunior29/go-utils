@@ -2224,3 +2224,40 @@ func ValidateSSN(ssn string) error {
 	}
 	return nil
 }
+
+// FastNormalizeSpaces replaces multiple whitespace characters in a string with a single space.
+// It also trims leading and trailing whitespace.
+// This version is optimized by pre-allocating the strings.Builder capacity and avoiding
+// unnecessary string operations.
+//
+// Examples:
+//
+//	FastNormalizeSpaces("  hello   world  ") == "hello world"
+//	FastNormalizeSpaces("a\t\nb") == "a b"
+//	FastNormalizeSpaces("single") == "single"
+//	FastNormalizeSpaces("") == ""
+func FastNormalizeSpaces(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	var builder strings.Builder
+	builder.Grow(len(s)) // Pre-allocate capacity for efficiency
+	var lastCharIsSpace bool
+
+	for _, r := range s {
+		if unicode.IsSpace(r) {
+			if !lastCharIsSpace {
+				builder.WriteRune(' ')
+				lastCharIsSpace = true
+			}
+		} else {
+			builder.WriteRune(r)
+			lastCharIsSpace = false
+		}
+	}
+
+	// Trim leading and trailing spaces
+	result := builder.String()
+	return strings.TrimSpace(result)
+}
