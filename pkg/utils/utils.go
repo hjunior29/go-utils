@@ -2295,3 +2295,25 @@ func FastUnion[T comparable](slice1, slice2 []T) []T {
 	}
 	return result
 }
+
+// SafeCount returns the number of non-overlapping instances of substr in s.
+// If substr is empty, it returns the number of Unicode code points in s plus 1.
+// It returns an error if the substring is empty and the string is not empty,
+// as this behavior is ambiguous and handled by strings.Count.
+//
+// Examples:
+//
+//	SafeCount("ababab", "ab") == (3, nil)
+//	SafeCount("aaaaa", "a") == (5, nil)
+//	SafeCount("hello", "l") == (2, nil)
+//	SafeCount("world", "x") == (0, nil)
+//	SafeCount("abc", "") == (4, nil) // Empty string matches at the beginning, between each character, and at the end.
+//	SafeCount("abc", "") == (4, nil)
+func SafeCount(s, substr string) (int, error) {
+	if substr == "" {
+		// strings.Count returns len(s) + 1 for empty substr.
+		// This counts the "gaps" between runes plus the beginning and end.
+		return len([]rune(s)) + 1, nil
+	}
+	return strings.Count(s, substr), nil
+}
