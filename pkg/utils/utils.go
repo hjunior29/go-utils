@@ -2337,3 +2337,84 @@ func FastExclude[T any](slice []T, predicate func(T) bool) []T {
 	}
 	return result
 }
+
+// LevenshteinDistance calculates the Levenshtein distance between two strings.
+// The Levenshtein distance is the minimum number of single-character edits
+// (insertions, deletions or substitutions) required to change one word into the other.
+//
+// Examples:
+//
+//	LevenshteinDistance("kitten", "sitting") == 3
+//	LevenshteinDistance("flaw", "lawn") == 2
+//	LevenshteinDistance("hello", "hello") == 0
+//	LevenshteinDistance("", "abc") == 3
+func LevenshteinDistance(s1, s2 string) int {
+	// Convert strings to runes to handle Unicode characters correctly.
+	r1 := []rune(s1)
+	r2 := []rune(s2)
+
+	n := len(r1)
+	m := len(r2)
+
+	// If one string is empty, the distance is the length of the other string.
+	if n == 0 {
+		return m
+	}
+	if m == 0 {
+		return n
+	}
+
+	// Create a matrix to store the distances.
+	// The matrix dimensions are (n+1) x (m+1).
+	matrix := make([][]int, n+1)
+	for i := range matrix {
+		matrix[i] = make([]int, m+1)
+	}
+
+	// Initialize the first row and first column.
+	// The distance from an empty string to a string of length i is i.
+	for i := 0; i <= n; i++ {
+		matrix[i][0] = i
+	}
+	for j := 0; j <= m; j++ {
+		matrix[0][j] = j
+	}
+
+	// Fill the rest of the matrix.
+	for i := 1; i <= n; i++ {
+		for j := 1; j <= m; j++ {
+			// Cost of substitution: 0 if characters are the same, 1 otherwise.
+			cost := 0
+			if r1[i-1] != r2[j-1] {
+				cost = 1
+			}
+
+			// The minimum distance is the minimum of:
+			// 1. Deletion: distance from s1[0..i-2] to s2[0..j-1] + 1
+			// 2. Insertion: distance from s1[0..i-1] to s2[0..j-2] + 1
+			// 3. Substitution: distance from s1[0..i-2] to s2[0..j-2] + cost
+			matrix[i][j] = min(
+				matrix[i-1][j]+1,      // Deletion
+				matrix[i][j-1]+1,      // Insertion
+				matrix[i-1][j-1]+cost, // Substitution
+			)
+		}
+	}
+
+	// The Levenshtein distance is the value in the bottom-right cell of the matrix.
+	return matrix[n][m]
+}
+
+// min returns the minimum of three integers.
+func min(a, b, c int) int {
+	if a < b {
+		if a < c {
+			return a
+		}
+		return c
+	}
+	if b < c {
+		return b
+	}
+	return c
+}
