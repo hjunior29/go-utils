@@ -2431,3 +2431,37 @@ func min(a, b, c int) int {
 func SafeUnquote(s string) (string, error) {
 	return strconv.Unquote(s)
 }
+
+// FastUnion returns a new slice containing all unique elements from both input slices.
+// It uses generics to work with slices of any comparable type.
+// This version is optimized by pre-allocating the map capacity and then the result slice capacity.
+// The order of elements in the resulting slice is not guaranteed.
+//
+// Examples:
+//
+//	FastUnion([]int{1, 2, 3}, []int{3, 4, 5}) == []int{1, 2, 3, 4, 5} (order may vary)
+//	FastUnion([]string{"a", "b"}, []string{"b", "c", "d"}) == []string{"a", "b", "c", "d"} (order may vary)
+//	FastUnion([]int{1, 2}, []int{3, 4}) == []int{1, 2, 3, 4} (order may vary)
+func FastUnion[T comparable](slice1, slice2 []T) []T {
+	// Use a map to store all unique elements encountered.
+	// Pre-allocate map capacity for efficiency.
+	set := make(map[T]struct{}, len(slice1)+len(slice2))
+
+	// Add elements from the first slice to the set.
+	for _, item := range slice1 {
+		set[item] = struct{}{}
+	}
+
+	// Add elements from the second slice to the set.
+	for _, item := range slice2 {
+		set[item] = struct{}{}
+	}
+
+	// Convert the set back to a slice.
+	// Pre-allocate slice capacity for efficiency.
+	result := make([]T, 0, len(set))
+	for item := range set {
+		result = append(result, item)
+	}
+	return result
+}
