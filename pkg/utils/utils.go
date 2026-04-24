@@ -2524,3 +2524,37 @@ func FastDiff[T comparable](slice1, slice2 []T) []T {
 	}
 	return result
 }
+
+// FastIntersect returns a new slice containing elements that are present in both input slices.
+// It uses generics to work with slices of any comparable type.
+// This version is optimized by pre-allocating map and slice capacities for efficiency.
+//
+// Examples:
+//
+//	FastIntersect([]int{1, 2, 3, 4}, []int{3, 4, 5, 6}) == []int{3, 4}
+//	FastIntersect([]string{"a", "b", "c"}, []string{"b", "c", "d"}) == []string{"b", "c"}
+//	FastIntersect([]int{1, 2}, []int{3, 4}) == []int{}
+func FastIntersect[T comparable](slice1, slice2 []T) []T {
+	// Use a map to store elements of the first slice for efficient lookup.
+	// Pre-allocate map capacity for efficiency.
+	set1 := make(map[T]struct{}, len(slice1))
+	for _, item := range slice1 {
+		set1[item] = struct{}{}
+	}
+
+	// Pre-allocate result slice capacity. This is a heuristic, assuming at most
+	// the smaller of the two slice lengths could be the intersection size.
+	initialCapacity := len(slice1)
+	if len(slice2) < initialCapacity {
+		initialCapacity = len(slice2)
+	}
+	result := make([]T, 0, initialCapacity)
+
+	// Iterate over the second slice and check if elements exist in the map.
+	for _, item := range slice2 {
+		if _, ok := set1[item]; ok {
+			result = append(result, item)
+		}
+	}
+	return result
+}
