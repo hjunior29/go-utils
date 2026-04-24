@@ -2465,3 +2465,31 @@ func FastUnion[T comparable](slice1, slice2 []T) []T {
 	}
 	return result
 }
+
+// ExtractURLs finds all valid URLs within a given string.
+// It uses a regular expression to identify potential URLs and then validates them using net/url.ParseRequestURI.
+//
+// @param s The input string to search for URLs.
+// @return A slice of strings, where each string is a valid URL found in the input string.
+//
+// Examples:
+//
+//	ExtractURLs("Check out https://www.example.com and http://google.com. Invalid: ftp:/missing.scheme") == []string{"https://www.example.com", "http://google.com"}
+//	ExtractURLs("No URLs here.") == []string{}
+//	ExtractURLs("Go to example.com") == []string{} // Domain names without schemes are not considered URLs by this function.
+func ExtractURLs(s string) []string {
+	// Regex to find potential URLs. This is a broad match and will be further validated.
+	// It looks for schemes like http, https, ftp, etc., followed by :// and then a domain-like structure.
+	urlRegex := regexp.MustCompile(`(https?|ftp)://[^\s/$.?#].[^\s]*`)
+
+	potentialURLs := urlRegex.FindAllString(s, -1)
+	var validURLs []string
+
+	for _, urlStr := range potentialURLs {
+		if err := ValidateURL(urlStr); err == nil {
+			validURLs = append(validURLs, urlStr)
+		}
+	}
+
+	return validURLs
+}
