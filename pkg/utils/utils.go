@@ -2607,3 +2607,59 @@ func SafeSplitOnceGeneric[T comparable](slice []T, sep []T) ([][]T, error) {
 
 	return [][]T{slice, {}}, nil // Separator not found
 }
+
+// DiffGeneric returns the elements that are in slice1 but not in slice2.
+// It uses generics to work with slices of any comparable type.
+//
+// Examples:
+//
+//	DiffGeneric([]int{1, 2, 3, 4}, []int{3, 4, 5, 6}) == []int{1, 2}
+//	DiffGeneric([]string{"a", "b", "c"}, []string{"b", "c", "d"}) == []string{"a"}
+//	DiffGeneric([]int{1, 2}, []int{3, 4}) == []int{1, 2}
+func DiffGeneric[T comparable](slice1, slice2 []T) []T {
+	// Use a map to store elements of the second slice for efficient lookup.
+	set2 := make(map[T]struct{}, len(slice2))
+	for _, item := range slice2 {
+		set2[item] = struct{}{}
+	}
+
+	var result []T
+	// Iterate over the first slice and add elements not found in the map.
+	for _, item := range slice1 {
+		if _, ok := set2[item]; !ok {
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+// FastDiffGeneric returns the elements that are in slice1 but not in slice2.
+// It uses generics to work with slices of any comparable type.
+// This version is optimized by pre-allocating map and slice capacities for efficiency.
+//
+// Examples:
+//
+//	FastDiffGeneric([]int{1, 2, 3, 4}, []int{3, 4, 5, 6}) == []int{1, 2}
+//	FastDiffGeneric([]string{"a", "b", "c"}, []string{"b", "c", "d"}) == []string{"a"}
+//	FastDiffGeneric([]int{1, 2}, []int{3, 4}) == []int{1, 2}
+func FastDiffGeneric[T comparable](slice1, slice2 []T) []T {
+	// Use a map to store elements of the second slice for efficient lookup.
+	// Pre-allocate map capacity for efficiency.
+	set2 := make(map[T]struct{}, len(slice2))
+	for _, item := range slice2 {
+		set2[item] = struct{}{}
+	}
+
+	var result []T
+	// Pre-allocate slice capacity for efficiency.
+	// This is a heuristic, assuming at most len(slice1) elements will be in the result.
+	result = make([]T, 0, len(slice1))
+
+	// Iterate over the first slice and add elements not found in the map.
+	for _, item := range slice1 {
+		if _, ok := set2[item]; !ok {
+			result = append(result, item)
+		}
+	}
+	return result
+}
