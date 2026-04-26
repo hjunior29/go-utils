@@ -2771,3 +2771,25 @@ func LongestCommonPrefix(strs []string) string {
 	}
 	return prefix
 }
+
+// PadLeft pads a string `s` on the left with `padChar` until it reaches `length`.
+// If `s` is already longer than or equal to `length`, it is returned as is.
+//
+// @param s The input string to pad.
+// @param length The desired minimum length of the string.
+// @param padChar The character to use for padding.
+// @return The padded string.
+//
+// Examples:
+//
+//	PadLeft("123", 5, '0') == "00123"
+//	PadLeft("abc", 3, 'x') == "abc"
+//	PadLeft("short", 10, '-') == "-----short"
+//	PadLeft("already long", 5, '0') == "already long"
+func PadLeft(s string, length int, padChar rune) string {
+	if len(s) >= length {
+		return s
+	}
+	padding := strings.Repeat(string(padChar), length-len(s))
+	return padding + s
+}
