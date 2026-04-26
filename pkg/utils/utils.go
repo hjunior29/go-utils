@@ -2793,3 +2793,24 @@ func PadLeft(s string, length int, padChar rune) string {
 	padding := strings.Repeat(string(padChar), length-len(s))
 	return padding + s
 }
+
+// SafeAfterLast returns the substring after the last occurrence of the separator.
+// If the separator is not found, it returns an empty string and a nil error.
+// If the separator is empty, it returns the original string and a nil error.
+// It returns an error if there's an issue with the operation, though standard string operations rarely error.
+//
+// Examples:
+//
+//	SafeAfterLast("hello world", " ") == ("world", nil)
+//	SafeAfterLast("hello", "x") == ("", nil)
+//	SafeAfterLast("hello", "") == ("hello", nil)
+func SafeAfterLast(s, sep string) (string, error) {
+	if sep == "" {
+		return s, nil
+	}
+	index := strings.LastIndex(s, sep)
+	if index == -1 {
+		return "", nil
+	}
+	return s[index+len(sep):], nil
+}
