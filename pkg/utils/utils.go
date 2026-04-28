@@ -2891,3 +2891,43 @@ func GroupBy[T any, K comparable](slice []T, keyFunc func(T) K) map[K][]T {
 	}
 	return grouped
 }
+
+// ValidateMACAddress checks if a string is a valid MAC address.
+// A MAC address consists of six groups of two hexadecimal digits, separated by colons or hyphens.
+// It returns an error if the string is not a valid MAC address.
+//
+// Examples:
+//
+//	ValidateMACAddress("00:1A:2B:3C:4D:5E") == nil
+//	ValidateMACAddress("00-1A-2B-3C-4D-5E") == nil
+//	ValidateMACAddress("001A2B3C4D5E") == nil
+//	ValidateMACAddress("00:1a:2b:3c:4d:5e") == nil // Case-insensitive
+//	ValidateMACAddress("00:1A:2B:3C:4D:5G") returns an error // Invalid character 'G'
+//	ValidateMACAddress("00:1A:2B:3C:4D") returns an error // Incorrect length
+//	ValidateMACAddress("00:1A:2B:3C:4D:5E:6F") returns an error // Too long
+func ValidateMACAddress(mac string) error {
+	// Normalize to colons for easier processing
+	mac = strings.ReplaceAll(mac, "-", ":")
+
+	// Split by colon
+	parts := strings.Split(mac, ":")
+
+	// Must have 6 parts
+	if len(parts) != 6 {
+		return errors.New("invalid MAC address format: must have 6 parts separated by colons")
+	}
+
+	for _, part := range parts {
+		// Each part must be 2 characters long
+		if len(part) != 2 {
+			return errors.New("invalid MAC address format: each part must be 2 hexadecimal digits")
+		}
+		// Each part must contain only hexadecimal characters
+		for _, r := range part {
+			if !unicode.IsDigit(r) && (r < 'a' || r > 'f') && (r < 'A' || r > 'F') {
+				return errors.New("invalid MAC address format: contains non-hexadecimal characters")
+			}
+		}
+	}
+	return nil
+}
