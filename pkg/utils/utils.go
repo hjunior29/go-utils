@@ -3005,3 +3005,25 @@ func SafeAfterFirst(s, sep string) (string, error) {
 	}
 	return s[:index], nil
 }
+
+// FastRemoveNonNumeric removes all non-digit characters from a string efficiently.
+// It pre-allocates the capacity of a strings.Builder to avoid multiple reallocations.
+//
+// @param s The input string to process.
+// @return A new string containing only the numeric characters from the input string.
+//
+// Examples:
+//
+//	FastRemoveNonNumeric("abc123def456") == "123456"
+//	FastRemoveNonNumeric("no digits here") == ""
+//	FastRemoveNonNumeric("123") == "123"
+func FastRemoveNonNumeric(s string) string {
+	var builder strings.Builder
+	builder.Grow(len(s)) // Pre-allocate capacity for efficiency
+	for _, r := range s {
+		if unicode.IsDigit(r) {
+			builder.WriteRune(r)
+		}
+	}
+	return builder.String()
+}
