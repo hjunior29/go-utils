@@ -3027,3 +3027,34 @@ func FastRemoveNonNumeric(s string) string {
 	}
 	return builder.String()
 }
+
+// ValidateGUID checks if a string is a valid GUID (Globally Unique Identifier).
+// A valid GUID has the format "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", where 'x' represents a hexadecimal digit.
+// It returns an error if the string does not conform to this format.
+//
+// Examples:
+//
+//	ValidateGUID("a1b2c3d4-e5f6-7890-1234-567890abcdef") == nil
+//	ValidateGUID("A1B2C3D4-E5F6-7890-1234-567890ABCDEF") == nil // Case-insensitive
+//	ValidateGUID("a1b2c3d4e5f678901234567890abcdef") returns an error // Missing hyphens
+//	ValidateGUID("g1b2c3d4-e5f6-7890-1234-567890abcdef") returns an error // Invalid character 'g'
+//	ValidateGUID("a1b2c3d4-e5f6-7890-1234-567890abcde") returns an error // Incorrect length
+func ValidateGUID(guid string) error {
+	if len(guid) != 36 {
+		return errors.New("invalid GUID length: must be 36 characters (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)")
+	}
+
+	for i, r := range guid {
+		switch i {
+		case 8, 13, 18, 23: // Hyphen positions
+			if r != '-' {
+				return errors.New("invalid GUID format: hyphens missing or misplaced")
+			}
+		default: // Hexadecimal digit positions
+			if !unicode.IsDigit(r) && (r < 'a' || r > 'f') && (r < 'A' || r > 'F') {
+				return errors.New("invalid GUID format: contains non-hexadecimal characters")
+			}
+		}
+	}
+	return nil
+}
