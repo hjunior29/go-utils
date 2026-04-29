@@ -2979,3 +2979,29 @@ func ValidateTimeFormat(timeStr, layout string) error {
 	}
 	return nil
 }
+
+// SafeAfterFirst returns the substring before the first occurrence of the separator.
+// If the separator is not found, it returns the entire string and a nil error.
+// If the separator is empty, it returns an empty string and a nil error.
+// It returns an error if the separator is empty and the string is not empty,
+// as this behavior is ambiguous and handled by strings.Index.
+//
+// Examples:
+//
+//	SafeAfterFirst("hello world", " ") == ("hello", nil)
+//	SafeAfterFirst("hello", "x") == ("hello", nil)
+//	SafeAfterFirst("hello", "") == ("", nil)
+//	SafeAfterFirst("a,b,c", "") returns ("", errors.New("separator cannot be empty if string is not empty"))
+func SafeAfterFirst(s, sep string) (string, error) {
+	if sep == "" && s != "" {
+		return "", errors.New("separator cannot be empty if string is not empty")
+	}
+	if sep == "" {
+		return "", nil
+	}
+	index := strings.Index(s, sep)
+	if index == -1 {
+		return s, nil
+	}
+	return s[:index], nil
+}
