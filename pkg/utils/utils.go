@@ -2962,3 +2962,20 @@ func UnionGeneric[T comparable](slice1, slice2 []T) []T {
 	}
 	return result
 }
+
+// ValidateTimeFormat checks if a string represents a time in the specified format.
+// It uses Go's time.Parse function for validation.
+// It returns an error if the string does not match the format or if the format is invalid.
+//
+// Examples:
+//
+//	ValidateTimeFormat("2023-10-27T10:00:00Z", time.RFC3339) == nil
+//	ValidateTimeFormat("10/27/2023", time.RFC3339) returns an error
+//	ValidateTimeFormat("invalid-time", time.RFC3339) returns an error
+func ValidateTimeFormat(timeStr, layout string) error {
+	_, err := time.Parse(layout, timeStr)
+	if err != nil {
+		return errors.New("invalid time format: " + err.Error())
+	}
+	return nil
+}
