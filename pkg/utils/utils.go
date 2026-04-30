@@ -3149,3 +3149,25 @@ func SafeClamp(val, min, max int) (int, error) {
 	}
 	return val, nil
 }
+
+// Zip takes two slices and combines them into a slice of pairs.
+// If the slices have different lengths, the resulting slice will have the length of the shorter slice.
+//
+// Examples:
+//
+//	Zip([]int{1, 2, 3}, []string{"a", "b", "c"}) == [][]interface{f}{ {1, "a"}, {2, "b"}, {3, "c"} }
+//	Zip([]int{1, 2}, []string{"a", "b", "c"}) == [][]interface{f}{ {1, "a"}, {2, "b"} }
+//	Zip([]int{1, 2, 3}, []string{"a", "b"}) == [][]interface{f}{ {1, "a"}, {2, "b"} }
+//	Zip([]int{}, []string{"a"}) == [][]interface{f}{}
+func Zip[T1 any, T2 any](slice1 []T1, slice2 []T2) [][]interface{} {
+	length := len(slice1)
+	if len(slice2) < length {
+		length = len(slice2)
+	}
+
+	result := make([][]interface{}, length)
+	for i := 0; i < length; i++ {
+		result[i] = []interface{}{slice1[i], slice2[i]}
+	}
+	return result
+}
