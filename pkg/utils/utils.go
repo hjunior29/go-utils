@@ -3075,3 +3075,26 @@ func SafeValidateIP(ipStr string) (bool, error) {
 	}
 	return true, nil
 }
+
+// FastRemoveNonAlphaNumeric removes all characters that are not alphanumeric from a string efficiently.
+// It iterates through the string, building a new string containing only letters and digits.
+// This version is optimized by pre-allocating the strings.Builder capacity.
+//
+// @param s The input string to process.
+// @return A new string containing only the alphanumeric characters from the input string.
+//
+// Examples:
+//
+//	FastRemoveNonAlphaNumeric("abc 123 !@# def 456") == "abc123def456"
+//	FastRemoveNonAlphaNumeric("no alphanumeric here") == "noalphanumerichere"
+//	FastRemoveNonAlphaNumeric("12345") == "12345"
+func FastRemoveNonAlphaNumeric(s string) string {
+	var builder strings.Builder
+	builder.Grow(len(s)) // Pre-allocate capacity for efficiency
+	for _, r := range s {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) {
+			builder.WriteRune(r)
+		}
+	}
+	return builder.String()
+}
