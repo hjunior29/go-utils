@@ -3098,3 +3098,31 @@ func FastRemoveNonAlphaNumeric(s string) string {
 	}
 	return builder.String()
 }
+
+// Partition splits a slice into two slices based on a predicate function.
+// The first slice contains elements for which the predicate returns true, and the second slice
+// contains elements for which the predicate returns false.
+//
+// @param slice The input slice.
+// @param predicate The function that determines which partition an element belongs to.
+// @return A slice containing two slices: the first for elements satisfying the predicate, the second for those that don't.
+//
+// Examples:
+//
+//	Partition([]int{1, 2, 3, 4, 5, 6}, func(n int) bool { return n%2 == 0 }) == [][]int{{2, 4, 6}, {1, 3, 5}}
+//	Partition([]string{"apple", "banana", "cherry"}, func(s string) bool { return len(s) > 5 }) == [][]string{{"banana", "cherry"}, {"apple"}}
+//	Partition([]int{}, func(n int) bool { return n > 0 }) == [][]int{{}, {}}
+func Partition[T any](slice []T, predicate func(T) bool) [][]T {
+	trueSlice := make([]T, 0, len(slice)/2)
+	falseSlice := make([]T, 0, len(slice)/2)
+
+	for _, item := range slice {
+		if predicate(item) {
+			trueSlice = append(trueSlice, item)
+		} else {
+			falseSlice = append(falseSlice, item)
+		}
+	}
+
+	return [][]T{trueSlice, falseSlice}
+}
