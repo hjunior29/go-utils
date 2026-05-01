@@ -3220,3 +3220,30 @@ func SafeSplitOnceGeneric[T comparable](slice []T, sep []T) ([][]T, error) {
 
 	return [][]T{slice, {}}, nil // Separator not found
 }
+
+// SafePadLeft pads a string `s` on the left with `padChar` until it reaches `length`.
+// If `s` is already longer than or equal to `length`, it is returned as is.
+// It returns an error if `padChar` is not a single character.
+//
+// @param s The input string to pad.
+// @param length The desired minimum length of the string.
+// @param padChar The character to use for padding.
+// @return The padded string, or an error if `padChar` is invalid.
+//
+// Examples:
+//
+//	SafePadLeft("123", 5, '0') == ("00123", nil)
+//	SafePadLeft("abc", 3, 'x') == ("abc", nil)
+//	SafePadLeft("short", 10, '-') == ("-----short", nil)
+//	SafePadLeft("already long", 5, '0') == ("already long", nil)
+//	SafePadLeft("abc", 5, 'xy') returns ("", error)
+func SafePadLeft(s string, length int, padChar rune) (string, error) {
+	if len([]rune(string(padChar))) != 1 {
+		return "", errors.New("padChar must be a single character")
+	}
+	if len(s) >= length {
+		return s, nil
+	}
+	padding := strings.Repeat(string(padChar), length-len(s))
+	return padding + s, nil
+}
