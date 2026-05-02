@@ -3247,3 +3247,56 @@ func SafePadLeft(s string, length int, padChar rune) (string, error) {
 	padding := strings.Repeat(string(padChar), length-len(s))
 	return padding + s, nil
 }
+
+// RemoveAccents removes diacritical marks from accented characters in a string.
+// It converts characters like 'é', 'ü', 'ñ' to 'e', 'u', 'n' respectively.
+// This function is designed to handle common Latin-script accents. For more
+// comprehensive accent removal across various languages, a dedicated library
+// or a more extensive mapping would be recommended.
+//
+// @param s The input string potentially containing accented characters.
+// @return A new string with diacritical marks removed.
+//
+// Examples:
+//
+//	RemoveAccents("résumé") == "resume"
+//	RemoveAccents("Crème brûlée") == "Creme brulee"
+//	RemoveAccents("niño") == "nino"
+//	RemoveAccents("你好") == "你好" // Non-accented characters are unchanged
+func RemoveAccents(s string) string {
+	// Use a library or a comprehensive mapping if extensive accent removal is needed.
+	// For a common subset of accents, a direct mapping can be used.
+	// This example covers a few common Latin-script accents.
+	var builder strings.Builder
+	for _, r := range s {
+		switch r {
+		case 'á', 'à', 'â', 'ä', 'å', 'ā':
+			builder.WriteRune('a')
+		case 'é', 'è', 'ê', 'ë', 'ē', 'ė':
+			builder.WriteRune('e')
+		case 'í', 'ì', 'î', 'ï', 'ī':
+			builder.WriteRune('i')
+		case 'ó', 'ò', 'ô', 'ö', 'ø', 'ō':
+			builder.WriteRune('o')
+		case 'ú', 'ù', 'û', 'ü', 'ū':
+			builder.WriteRune('u')
+		case 'ý', 'ÿ':
+			builder.WriteRune('y')
+		case 'ñ':
+			builder.WriteRune('n')
+		case 'ç':
+			builder.WriteRune('c')
+		case 'ş':
+			builder.WriteRune('s')
+		case 'ğ':
+			builder.WriteRune('g')
+		case 'æ':
+			builder.WriteRune('ae')
+		case 'œ':
+			builder.WriteRune('oe')
+		default:
+			builder.WriteRune(r)
+		}
+	}
+	return builder.String()
+}
