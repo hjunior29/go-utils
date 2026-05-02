@@ -3300,3 +3300,21 @@ func RemoveAccents(s string) string {
 	}
 	return builder.String()
 }
+
+// Every checks if all elements in a slice satisfy a given predicate function.
+// The predicate function should return true for elements that satisfy the condition.
+//
+// Examples:
+//
+//	Every([]int{2, 4, 6}, func(n int) bool { return n%2 == 0 }) == true
+//	Every([]int{1, 2, 3}, func(n int) bool { return n%2 == 0 }) == false
+//	Every([]string{"a", "b", "c"}, func(s string) bool { return s != "" }) == true
+//	Every([]int{}, func(n int) bool { return n > 0 }) == true // An empty slice vacuously satisfies the condition
+func Every[T any](slice []T, predicate func(T) bool) bool {
+	for _, item := range slice {
+		if !predicate(item) {
+			return false
+		}
+	}
+	return true
+}
