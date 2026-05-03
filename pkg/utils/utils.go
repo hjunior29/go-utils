@@ -3318,3 +3318,55 @@ func Every[T any](slice []T, predicate func(T) bool) bool {
 	}
 	return true
 }
+
+// ToCamelCase converts a string from snake_case or kebab-case to camelCase.
+// It handles strings that are already in camelCase or PascalCase by simply returning them.
+// It also handles strings that are all uppercase (like acronyms) by returning them as is.
+//
+// @param s The input string to convert.
+// @return The camelCased string.
+//
+// Examples:
+//
+//	ToCamelCase("hello_world") == "helloWorld"
+//	ToCamelCase("hello-world") == "helloWorld"
+//	ToCamelCase("HelloWorld") == "HelloWorld"
+//	ToCamelCase("helloWorld") == "helloWorld"
+//	ToCamelCase("URL") == "URL"
+//	ToCamelCase("API_KEY") == "APIKey"
+func ToCamelCase(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	// Handle already camelCase or PascalCase strings, or all caps acronyms.
+	// This regex checks if there's a lowercase letter followed by an uppercase letter,
+	// or if the string is entirely uppercase.
+	if regexp.MustCompile(`[a-z][A-Z]`).MatchString(s) || regexp.MustCompile(`^[A-Z]+$`).MatchString(s) {
+		return s
+	}
+
+	var builder strings.Builder
+	capitalizeNext := false
+
+	for i, r := range s {
+		if r == '_' || r == '-' {
+			capitalizeNext = true
+		} else {
+			if capitalizeNext {
+				builder.WriteRune(unicode.ToUpper(r))
+				capitalizeNext = false
+			} else {
+				// If it's the first character and it's uppercase, keep it uppercase.
+				// Otherwise, convert to lowercase.
+				if i == 0 && unicode.IsUpper(r) {
+					builder.WriteRune(r)
+				} else {
+					builder.WriteRune(unicode.ToLower(r))
+				}
+			}
+		}
+	}
+
+	return builder.String()
+}
