@@ -3458,3 +3458,23 @@ func FastPartition[T any](slice []T, predicate func(T) bool) [][]T {
 
 	return [][]T{trueSlice, falseSlice}
 }
+
+// ValidateWeekday checks if a string represents a valid weekday name (case-insensitive).
+// It returns an error if the string is not a recognized weekday name.
+//
+// Examples:
+//
+//	ValidateWeekday("Monday") == nil
+//	ValidateWeekday("tuesday") == nil
+//	ValidateWeekday("WEDNESDAY") == nil
+//	ValidateWeekday("Funday") returns an error
+//	ValidateWeekday("") returns an error
+func ValidateWeekday(s string) error {
+	lowerS := strings.ToLower(s)
+	switch lowerS {
+	case "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday":
+		return nil
+	default:
+		return errors.New("invalid weekday name")
+	}
+}
