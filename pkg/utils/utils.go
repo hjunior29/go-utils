@@ -3428,3 +3428,33 @@ func FastChunk[T any](slice []T, size int) ([][]T, error) {
 	}
 	return result, nil
 }
+
+// FastPartition splits a slice into two slices based on a predicate function.
+// The first slice contains elements for which the predicate returns true, and the second slice
+// contains elements for which the predicate returns false.
+// This version is optimized by pre-allocating the result slices' capacities.
+//
+// @param slice The input slice.
+// @param predicate The function that determines which partition an element belongs to.
+// @return A slice containing two slices: the first for elements satisfying the predicate, the second for those that don't.
+//
+// Examples:
+//
+//	FastPartition([]int{1, 2, 3, 4, 5, 6}, func(n int) bool { return n%2 == 0 }) == [][]int{{2, 4, 6}, {1, 3, 5}}
+//	FastPartition([]string{"apple", "banana", "cherry"}, func(s string) bool { return len(s) > 5 }) == [][]string{{"banana", "cherry"}, {"apple"}}
+//	FastPartition([]int{}, func(n int) bool { return n > 0 }) == [][]int{{}, {}}
+func FastPartition[T any](slice []T, predicate func(T) bool) [][]T {
+	// Pre-allocate slices with heuristic initial capacity.
+	trueSlice := make([]T, 0, len(slice)/2)
+	falseSlice := make([]T, 0, len(slice)/2)
+
+	for _, item := range slice {
+		if predicate(item) {
+			trueSlice = append(trueSlice, item)
+		} else {
+			falseSlice = append(falseSlice, item)
+		}
+	}
+
+	return [][]T{trueSlice, falseSlice}
+}
