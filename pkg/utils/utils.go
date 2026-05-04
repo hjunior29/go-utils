@@ -3564,3 +3564,13 @@ func ValidateLongitude(lon string) error {
 	}
 	return nil
 }
+
+
+// PadRight pads a string on the right side to reach the specified length.
+func PadRight(s string, length int, pad rune) string {
+	if len(s) >= length {
+		return s
+	}
+	padding := strings.Repeat(string(pad), length-len(s))
+	return s + padding
+}
