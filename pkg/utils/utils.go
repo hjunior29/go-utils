@@ -3574,3 +3574,27 @@ func PadRight(s string, length int, pad rune) string {
 	padding := strings.Repeat(string(pad), length-len(s))
 	return s + padding
 }
+
+// FastPadRight pads a string on the right side to reach the specified length.
+// This version is optimized by pre-allocating the padding string capacity.
+//
+// @param s The input string to pad.
+// @param length The desired minimum length of the string.
+// @param pad The character to use for padding.
+// @return The padded string.
+//
+// Examples:
+//
+//	FastPadRight("123", 5, '0') == "12300"
+//	FastPadRight("abc", 3, 'x') == "abc"
+//	FastPadRight("short", 10, '-') == "short-----"
+//	FastPadRight("already long", 5, '0') == "already long"
+func FastPadRight(s string, length int, pad rune) string {
+	if len(s) >= length {
+		return s
+	}
+	paddingLen := length - len(s)
+	// Pre-allocate padding string capacity for efficiency
+	padding := strings.Repeat(string(pad), paddingLen)
+	return s + padding
+}
