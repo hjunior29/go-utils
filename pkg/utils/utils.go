@@ -3508,3 +3508,59 @@ func ValidateSocialSecurityNumber(ssn string) error {
 	}
 	return nil
 }
+
+// ValidateLatitude checks if a string represents a valid latitude coordinate.
+// Latitude values range from -90 to +90 degrees.
+// It returns an error if the string is not a valid latitude.
+//
+// Examples:
+//
+//	ValidateLatitude("90") == nil
+//	ValidateLatitude("-90") == nil
+//	ValidateLatitude("0") == nil
+//	ValidateLatitude("45.678") == nil
+//	ValidateLatitude("91") returns an error
+//	ValidateLatitude("-91") returns an error
+//	ValidateLatitude("abc") returns an error
+//	ValidateLatitude("") returns an error
+func ValidateLatitude(lat string) error {
+	if lat == "" {
+		return errors.New("latitude cannot be empty")
+	}
+	f, err := strconv.ParseFloat(lat, 64)
+	if err != nil {
+		return errors.New("invalid latitude format: " + err.Error())
+	}
+	if f < -90.0 || f > 90.0 {
+		return errors.New("latitude must be between -90 and 90")
+	}
+	return nil
+}
+
+// ValidateLongitude checks if a string represents a valid longitude coordinate.
+// Longitude values range from -180 to +180 degrees.
+// It returns an error if the string is not a valid longitude.
+//
+// Examples:
+//
+//	ValidateLongitude("180") == nil
+//	ValidateLongitude("-180") == nil
+//	ValidateLongitude("0") == nil
+//	ValidateLongitude("45.678") == nil
+//	ValidateLongitude("181") returns an error
+//	ValidateLongitude("-181") returns an error
+//	ValidateLongitude("abc") returns an error
+//	ValidateLongitude("") returns an error
+func ValidateLongitude(lon string) error {
+	if lon == "" {
+		return errors.New("longitude cannot be empty")
+	}
+	f, err := strconv.ParseFloat(lon, 64)
+	if err != nil {
+		return errors.New("invalid longitude format: " + err.Error())
+	}
+	if f < -180.0 || f > 180.0 {
+		return errors.New("longitude must be between -180 and 180")
+	}
+	return nil
+}
