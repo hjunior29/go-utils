@@ -3667,3 +3667,55 @@ func ValidateISODate(dateStr string) error {
 	}
 	return nil
 }
+
+// ValidateMonth checks if a string represents a valid month name (case-insensitive).
+// It accepts full month names (e.g., "January") and three-letter abbreviations (e.g., "Jan").
+// It returns an error if the string is not a recognized month name or abbreviation.
+//
+// Examples:
+//
+//	ValidateMonth("January") == nil
+//	ValidateMonth("feb") == nil
+//	ValidateMonth("MARCH") == nil
+//	ValidateMonth("Apr") == nil
+//	ValidateMonth("May") == nil
+//	ValidateMonth("jun") == nil
+//	ValidateMonth("JULY") == nil
+//	ValidateMonth("Aug") == nil
+//	ValidateMonth("sept") == nil
+//	ValidateMonth("October") == nil
+//	ValidateMonth("nov") == nil
+//	ValidateMonth("DECEMBER") == nil
+//	ValidateMonth("Funday") returns an error
+//	ValidateMonth("") returns an error
+func ValidateMonth(s string) error {
+	lowerS := strings.ToLower(s)
+	switch lowerS {
+	case "january", "jan":
+		return nil
+	case "february", "feb":
+		return nil
+	case "march", "mar":
+		return nil
+	case "april", "apr":
+		return nil
+	case "may": // No common abbreviation for May
+		return nil
+	case "june", "jun":
+		return nil
+	case "july", "jul":
+		return nil
+	case "august", "aug":
+		return nil
+	case "september", "sep":
+		return nil
+	case "october", "oct":
+		return nil
+	case "november", "nov":
+		return nil
+	case "december", "dec":
+		return nil
+	default:
+		return errors.New("invalid month name or abbreviation")
+	}
+}
