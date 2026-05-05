@@ -3738,3 +3738,44 @@ func SafeReplaceAllGeneric[T comparable](slice []T, old, new T) ([]T, error) {
 	}
 	return result, nil
 }
+
+// FastChunk splits a slice into smaller slices of a specified size.
+// If the last chunk is smaller than the size, it will be returned as is.
+// This version is optimized by pre-allocating the result slice and inner slices' capacities.
+//
+// @param slice The input slice.
+// @param size The desired size of each chunk. Must be greater than 0.
+// @return A slice of slices, where each inner slice is a chunk of the original slice.
+//         Returns an error if size is less than or equal to 0.
+//
+// Examples:
+//
+//	FastChunk([]int{1, 2, 3, 4, 5}, 2) == [][]int{{1, 2}, {3, 4}, {5}}
+//	FastChunk([]string{"a", "b", "c", "d"}, 3) == [][]string{{"a", "b", "c"}, {"d"}}
+//	FastChunk([]int{1, 2, 3}, 1) == [][]int{{1}, {2}, {3}}
+//	FastChunk([]int{1, 2, 3}, 5) == [][]int{{1, 2, 3}}
+//	FastChunk([]int{}, 2) == [][]int{}
+//	FastChunk([]int{1, 2, 3}, 0) returns an error
+func FastChunk[T any](slice []T, size int) ([][]T, error) {
+	if size <= 0 {
+		return nil, errors.New("chunk size must be greater than 0")
+	}
+
+	if len(slice) == 0 {
+		return [][]T{}, nil
+	}
+
+	numChunks := (len(slice) + size - 1) / size
+	// Pre-allocate the outer slice
+	result := make([][]T, numChunks)
+	for i := range result {
+		// Pre-allocate inner slices
+		result[i] = make([]T, 0, size)
+	}
+
+	for i, item := range slice {
+		chunkIndex := i / size
+		result[chunkIndex] = append(result[chunkIndex], item)
+	}
+	return result, nil
+}
