@@ -3641,3 +3641,29 @@ func ToKebabCase(s string) string {
 
 	return builder.String()
 }
+
+// ValidateISODate checks if a string represents a valid date in ISO 8601 format (YYYY-MM-DD).
+// It returns an error if the string does not conform to this format or if the date is invalid.
+//
+// Examples:
+//
+//	ValidateISODate("2023-10-27") == nil
+//	ValidateISODate("2023-02-29") == nil // Leap year check
+//	ValidateISODate("2023-13-01") returns an error (invalid month)
+//	ValidateISODate("2023-02-30") returns an error (invalid day for month)
+//	ValidateISODate("2023/10/27") returns an error (incorrect format)
+//	ValidateISODate("23-10-27") returns an error (incorrect year format)
+//	ValidateISODate("") returns an error
+func ValidateISODate(dateStr string) error {
+	if dateStr == "" {
+		return errors.New("date string cannot be empty")
+	}
+	// Use time.Parse with the specific layout for YYYY-MM-DD.
+	// The layout string "2006-01-02" is Go's reference time format.
+	layout := "2006-01-02"
+	_, err := time.Parse(layout, dateStr)
+	if err != nil {
+		return errors.New("invalid ISO date format: " + err.Error())
+	}
+	return nil
+}
