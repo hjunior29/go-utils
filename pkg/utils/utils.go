@@ -3598,3 +3598,46 @@ func FastPadRight(s string, length int, pad rune) string {
 	padding := strings.Repeat(string(pad), paddingLen)
 	return s + padding
 }
+
+// ToKebabCase converts a string from camelCase or PascalCase to kebab-case.
+// It also handles snake_case by converting underscores to hyphens.
+// It converts the entire string to lowercase.
+//
+// @param s The input string to convert.
+// @return The kebab-cased string.
+//
+// Examples:
+//
+//	ToKebabCase("helloWorld") == "hello-world"
+//	ToKebabCase("HelloWorld") == "hello-world"
+//	ToKebabCase("hello_world") == "hello-world"
+//	ToKebabCase("APIKey") == "api-key"
+//	ToKebabCase("URL") == "url"
+func ToKebabCase(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	var builder strings.Builder
+	var lastCharWasUpper bool
+
+	for i, r := range s {
+		if r == '_' {
+			builder.WriteRune('-')
+			lastCharWasUpper = false // Reset for potential consecutive underscores or acronyms
+		} else if unicode.IsUpper(r) {
+			// If it's an uppercase letter and not the first character, and the previous character was lowercase,
+			// or if it's part of an acronym followed by another uppercase letter, insert a hyphen.
+			if i > 0 && (unicode.IsLower(rune(s[i-1])) || (lastCharWasUpper && i < len(s)-1 && unicode.IsUpper(rune(s[i+1])))) {
+				builder.WriteRune('-')
+			}
+			builder.WriteRune(unicode.ToLower(r))
+			lastCharWasUpper = true
+		} else {
+			builder.WriteRune(unicode.ToLower(r))
+			lastCharWasUpper = false
+		}
+	}
+
+	return builder.String()
+}
