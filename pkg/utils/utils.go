@@ -3719,3 +3719,22 @@ func ValidateMonth(s string) error {
 		return errors.New("invalid month name or abbreviation")
 	}
 }
+
+// SafeReplaceAllGeneric replaces all occurrences of `old` with `new` in a slice of any comparable type.
+// It returns the modified slice and a nil error, or an error if the operation fails (though standard slice operations rarely error).
+//
+// Examples:
+//
+//	SafeReplaceAllGeneric([]int{1, 2, 1, 3}, 1, 10) == ([]int{10, 2, 10, 3}, nil)
+//	SafeReplaceAllGeneric([]string{"a", "b", "a", "c"}, "a", "x") == ([]string{"x", "b", "x", "c"}, nil)
+func SafeReplaceAllGeneric[T comparable](slice []T, old, new T) ([]T, error) {
+	result := make([]T, len(slice))
+	for i, item := range slice {
+		if item == old {
+			result[i] = new
+		} else {
+			result[i] = item
+		}
+	}
+	return result, nil
+}
