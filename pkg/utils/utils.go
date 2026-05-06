@@ -3779,3 +3779,20 @@ func FastChunk[T any](slice []T, size int) ([][]T, error) {
 	}
 	return result, nil
 }
+
+// MapKeys applies a function to each key of a map and returns a new map with the transformed keys.
+// The function `f` takes a key of type K1 and returns a key of type K2.
+// The values associated with the keys remain unchanged.
+//
+// Examples:
+//
+//	MapKeys(map[string]int{"a": 1, "b": 2}, func(s string) int { return len(s) }) == map[int]int{1: 1, 1: 2}
+//	MapKeys(map[int]string{1: "one", 2: "two"}, func(n int) string { return strconv.Itoa(n * 2) }) == map[string]string{"2": "one", "4": "two"}
+func MapKeys[K1 comparable, K2 comparable, V any](m map[K1]V, f func(K1) K2) map[K2]V {
+	result := make(map[K2]V, len(m))
+	for k, v := range m {
+		newKey := f(k)
+		result[newKey] = v
+	}
+	return result
+}
