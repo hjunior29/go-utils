@@ -3796,3 +3796,30 @@ func MapKeys[K1 comparable, K2 comparable, V any](m map[K1]V, f func(K1) K2) map
 	}
 	return result
 }
+
+// SafeExtractNumber returns the first sequence of digits found in a string.
+// If no digits are found, it returns an empty string and nil error.
+//
+// @param s The input string to search within.
+// @return The first sequence of digits found in the string, or an empty string if none exist, and nil error.
+//
+// Examples:
+//
+//	SafeExtractNumber("abc123def456") == ("123", nil)
+//	SafeExtractNumber("no digits here") == ("", nil)
+//	SafeExtractNumber("123") == ("123", nil)
+//	SafeExtractNumber(" leading 1 digit") == ("1", nil)
+func SafeExtractNumber(s string) (string, error) {
+	var builder strings.Builder
+	foundDigit := false
+	for _, r := range s {
+		if unicode.IsDigit(r) {
+			builder.WriteRune(r)
+			foundDigit = true
+		} else if foundDigit {
+			// Stop once we encounter a non-digit after finding at least one digit
+			break
+		}
+	}
+	return builder.String(), nil
+}
