@@ -3891,3 +3891,52 @@ func ValidateURL(urlStr string) error {
 	}
 	return nil
 }
+
+// SafeSplitOnceGeneric splits a slice into two parts at the first occurrence of the separator.
+// It returns the part before the separator and the part after the separator.
+// If the separator is not found, it returns the original slice and an empty slice.
+// If the separator is an empty slice, it returns an empty slice and the original slice.
+// It returns an error if the separator is empty and the slice is not empty, as this behavior
+// is ambiguous and handled by strings.Split.
+//
+// @param slice The slice to split.
+// @param sep The separator slice.
+// @return A slice containing two slices: the part before the separator and the part after, or an error.
+//
+// Examples:
+//
+//	SafeSplitOnceGeneric([]int{1, 2, 3, 4, 5}, []int{3, 4}) == ([][]int{{1, 2}, {5}}, nil)
+//	SafeSplitOnceGeneric([]string{"a", "b", "c"}, []string{"x"}) == ([][]string{{"a", "b", "c"}, {}}, nil)
+//	SafeSplitOnceGeneric([]int{1, 2}, []int{}) == ([][]int{{}, {1, 2}}, nil)
+//	SafeSplitOnceGeneric([]int{}, []int{}) == ([][]int{{}, {}}, nil)
+//	SafeSplitOnceGeneric([]int{1, 2}, []int{1, 2, 3}) == ([][]int{{1, 2}, {}}, nil) // Separator not found
+func SafeSplitOnceGeneric[T comparable](slice []T, sep []T) ([][]T, error) {
+	if len(sep) == 0 {
+		if len(slice) != 0 {
+			// The behavior of splitting by an empty separator is complex.
+			// For consistency with strings.Split, we return an error if the string is not empty.
+			// If the string is empty, splitting by empty separator results in an empty slice.
+			return nil, errors.New("separator cannot be empty if slice is not empty")
+		}
+		return [][]T{{}, {}}, nil // Empty slice split by empty separator is two empty slices
+	}
+
+	if len(slice) < len(sep) {
+		return [][]T{slice, {}}, nil // Separator is longer than slice, so it cannot be found
+	}
+
+	for i := 0; i <= len(slice)-len(sep); i++ {
+		match := true
+		for j := 0; j < len(sep); j++ {
+			if slice[i+j] != sep[j] {
+				match = false
+				break
+			}
+		}
+		if match {
+			return [][]T{slice[:i], slice[i+len(sep):]}, nil
+		}
+	}
+
+	return [][]T{slice, {}}, nil // Separator not found
+}
