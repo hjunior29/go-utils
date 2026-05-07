@@ -3940,3 +3940,21 @@ func SafeSplitOnceGeneric[T comparable](slice []T, sep []T) ([][]T, error) {
 
 	return [][]T{slice, {}}, nil // Separator not found
 }
+
+// Some checks if at least one element in a slice satisfies a given predicate function.
+// The predicate function should return true for elements that satisfy the condition.
+//
+// Examples:
+//
+//	Some([]int{1, 2, 3}, func(n int) bool { return n%2 == 0 }) == true
+//	Some([]int{1, 3, 5}, func(n int) bool { return n%2 == 0 }) == false
+//	Some([]string{"", "a", "b"}, func(s string) bool { return s != "" }) == true
+//	Some([]int{}, func(n int) bool { return n > 0 }) == false // An empty slice vacuously satisfies no condition.
+func Some[T any](slice []T, predicate func(T) bool) bool {
+	for _, item := range slice {
+		if predicate(item) {
+			return true
+		}
+	}
+	return false
+}
