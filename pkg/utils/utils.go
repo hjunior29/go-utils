@@ -3958,3 +3958,21 @@ func Some[T any](slice []T, predicate func(T) bool) bool {
 	}
 	return false
 }
+
+// None checks if no elements in a slice satisfy a given predicate function.
+// The predicate function should return true for elements that satisfy the condition.
+//
+// Examples:
+//
+//	None([]int{1, 3, 5}, func(n int) bool { return n%2 == 0 }) == true
+//	None([]int{2, 4, 6}, func(n int) bool { return n%2 == 0 }) == false
+//	None([]string{"", "a", "b"}, func(s string) bool { return s == "" }) == false
+//	None([]int{}, func(n int) bool { return n > 0 }) == true // An empty slice vacuously satisfies no condition.
+func None[T any](slice []T, predicate func(T) bool) bool {
+	for _, item := range slice {
+		if predicate(item) {
+			return false
+		}
+	}
+	return true
+}
