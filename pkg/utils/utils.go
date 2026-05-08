@@ -3976,3 +3976,21 @@ func None[T any](slice []T, predicate func(T) bool) bool {
 	}
 	return true
 }
+
+// SafeMapKeys applies a function to each key of a map and returns a new map with the transformed keys.
+// The function `f` takes a key of type K1 and returns a key of type K2.
+// The values associated with the keys remain unchanged.
+// It returns an error if the transformation function `f` encounters an error (though this specific implementation does not pass errors through).
+//
+// Examples:
+//
+//	SafeMapKeys(map[string]int{"a": 1, "b": 2}, func(s string) int { return len(s) }) == (map[int]int{1: 1, 1: 2}, nil)
+//	SafeMapKeys(map[int]string{1: "one", 2: "two"}, func(n int) string { return strconv.Itoa(n * 2) }) == (map[string]string{"2": "one", "4": "two"}, nil)
+func SafeMapKeys[K1 comparable, K2 comparable, V any](m map[K1]V, f func(K1) K2) (map[K2]V, error) {
+	result := make(map[K2]V, len(m))
+	for k, v := range m {
+		newKey := f(k)
+		result[newKey] = v
+	}
+	return result, nil
+}
