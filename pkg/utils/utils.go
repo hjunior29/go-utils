@@ -4085,3 +4085,32 @@ func ToTitleCase(s string) string {
 	}
 	return string(runes)
 }
+
+// SafePadRight pads a string on the right side to reach the specified length.
+// This version is optimized by pre-allocating the padding string capacity.
+// It returns the padded string and a nil error, or an error if the `pad` character is not a single rune.
+//
+// @param s The input string to pad.
+// @param length The desired minimum length of the string.
+// @param pad The character to use for padding.
+// @return The padded string, or an error if `pad` is invalid.
+//
+// Examples:
+//
+//	SafePadRight("123", 5, '0') == ("12300", nil)
+//	SafePadRight("abc", 3, 'x') == ("abc", nil)
+//	SafePadRight("short", 10, '-') == ("short-----", nil)
+//	SafePadRight("already long", 5, '0') == ("already long", nil)
+//	SafePadRight("abc", 5, 'xy') returns ("", error)
+func SafePadRight(s string, length int, pad rune) (string, error) {
+	if len([]rune(string(pad))) != 1 {
+		return "", errors.New("pad character must be a single rune")
+	}
+	if len(s) >= length {
+		return s, nil
+	}
+	paddingLen := length - len(s)
+	// Pre-allocate padding string capacity for efficiency
+	padding := strings.Repeat(string(pad), paddingLen)
+	return s + padding, nil
+}
