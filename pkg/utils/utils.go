@@ -4173,3 +4173,65 @@ func SafeMapKeys[K1 comparable, K2 comparable, V any](m map[K1]V, f func(K1) K2)
 	}
 	return result, nil
 }
+
+// SafeValidateDomain checks if a string is a valid domain name.
+// A valid domain name consists of labels separated by dots. Each label
+// must start and end with an alphanumeric character, and can contain
+// hyphens in between. The top-level domain (TLD) must be at least two
+// characters long and consist of letters.
+// It returns an error if the string is not a valid domain name.
+//
+// Examples:
+//
+//	SafeValidateDomain("example.com") == (nil)
+//	SafeValidateDomain("sub.example.co.uk") == (nil)
+//	SafeValidateDomain("example.io") == (nil)
+//	SafeValidateDomain("example") returns (error) (missing TLD)
+//	SafeValidateDomain("example.c") returns (error) (TLD too short)
+//	SafeValidateDomain("example-.com") returns (error) (label ends with hyphen)
+//	SafeValidateDomain("-example.com") returns (error) (label starts with hyphen)
+//	SafeValidateDomain("example..com") returns (error) (empty label)
+//	SafeValidateDomain("example.c_m") returns (error) (invalid character in TLD)
+//	SafeValidateDomain("example.123") returns (error) (numeric TLD)
+//	SafeValidateDomain("") returns (error) (empty string)
+func SafeValidateDomain(domain string) error {
+	if domain == "" {
+		return errors.New("domain cannot be empty")
+	}
+
+	// Split the domain into labels.
+	labels := strings.Split(domain, ".")
+
+	// Must have at least two labels (e.g., example.com).
+	if len(labels) < 2 {
+		return errors.New("invalid domain format: must have at least two labels (e.g., example.com)")
+	}
+
+	// Validate the TLD (last label).
+	tld := labels[len(labels)-1]
+	if len(tld) < 2 {
+		return errors.New("invalid domain format: top-level domain (TLD) must be at least two characters long")
+	}
+	for _, r := range tld {
+		if !unicode.IsLetter(r) {
+			return errors.New("invalid domain format: top-level domain (TLD) must contain only letters")
+		}
+	}
+
+	// Validate each label.
+	for _, label := range labels {
+		if label == "" {
+			return errors.New("invalid domain format: labels cannot be empty")
+		}
+		if label[0] == '-' || label[len(label)-1] == '-' {
+			return errors.New("invalid domain format: labels cannot start or end with a hyphen")
+		}
+		for _, r := range label {
+			if !unicode.IsLetter(r) && !unicode.IsNumber(r) && r != '-' {
+				return errors.New("invalid domain format: labels can only contain alphanumeric characters and hyphens")
+			}
+		}
+	}
+
+	return nil
+}
