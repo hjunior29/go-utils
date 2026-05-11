@@ -4235,3 +4235,24 @@ func SafeValidateDomain(domain string) error {
 
 	return nil
 }
+
+// ValidateNumeric checks if a string contains only numeric characters (0-9).
+// It returns an error if the string is empty or contains non-numeric characters.
+//
+// Examples:
+//
+//	ValidateNumeric("12345") == nil
+//	ValidateNumeric("0") == nil
+//	ValidateNumeric("123a45") returns an error
+//	ValidateNumeric("") returns an error
+func ValidateNumeric(s string) error {
+	if s == "" {
+		return errors.New("string cannot be empty")
+	}
+	for _, r := range s {
+		if !unicode.IsDigit(r) {
+			return errors.New("string contains non-numeric characters")
+		}
+	}
+	return nil
+}
