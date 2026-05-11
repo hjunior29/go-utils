@@ -4280,3 +4280,28 @@ func ValidateHex(s string) error {
 	}
 	return nil
 }
+
+// PadLeft pads a string `s` on the left with `padChar` until it reaches `length`.
+// If `s` is already longer than or equal to `length`, it is returned as is.
+// This version is optimized for performance by pre-allocating the padding string's capacity.
+//
+// @param s The input string to pad.
+// @param length The desired minimum length of the string.
+// @param padChar The character to use for padding.
+// @return The padded string.
+//
+// Examples:
+//
+//	FastPadLeft("123", 5, '0') == "00123"
+//	FastPadLeft("abc", 3, 'x') == "abc"
+//	FastPadLeft("short", 10, '-') == "-----short"
+//	FastPadLeft("already long", 5, '0') == "already long"
+func FastPadLeft(s string, length int, padChar rune) string {
+	if len(s) >= length {
+		return s
+	}
+	paddingLen := length - len(s)
+	// Pre-allocate padding string capacity for efficiency
+	padding := strings.Repeat(string(padChar), paddingLen)
+	return padding + s
+}
