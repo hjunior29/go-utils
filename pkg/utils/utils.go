@@ -4374,3 +4374,43 @@ func FastExtractNumbers(s string) []string {
 	}
 	return numbers
 }
+
+// SafeValidateGUID checks if a string is a valid GUID (Globally Unique Identifier).
+// A valid GUID has the format "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", where 'x' represents a hexadecimal digit.
+// It returns the GUID as a string and a nil error if it is valid, otherwise an empty string and an error.
+//
+// Examples:
+//
+//	SafeValidateGUID("a1b2c3d4-e5f6-7890-1234-567890abcdef") == ("a1b2c3d4-e5f6-7890-1234-567890abcdef", nil)
+//	SafeValidateGUID("A1B2C3D4-E5F6-7890-1234-567890ABCDEF") == ("a1b2c3d4-e5f6-7890-1234-567890abcdef", nil) // Case-insensitive, returned lowercase
+//	SafeValidateGUID("g1b2c3d4-e5f6-7890-1234-567890abcdef") == ("", error) // Invalid character 'g'
+//	SafeValidateGUID("a1b2c3d4-e5f6-7890-1234-567890abcde") == ("", error) // Incorrect length
+func SafeValidateGUID(guid string) (string, error) {
+	if len(guid) != 36 {
+		return "", errors.New("invalid GUID length: must be 36 characters (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)")
+	}
+
+	var builder strings.Builder
+	builder.Grow(36) // Pre-allocate capacity for the GUID string
+
+	for i, r := range guid {
+		switch i {
+		case 8, 13, 18, 23: // Hyphen positions
+			if r != '-' {
+				return "", errors.New("invalid GUID format: hyphens missing or misplaced")
+			}
+			builder.WriteRune(r)
+		default: // Hexadecimal digit positions
+			var hexDigit rune
+			if unicode.IsDigit(r) {
+				hexDigit = r
+			} else if (r >= 'a' && r <= 'f') || (r >= 'A' && r <= 'F') {
+				hexDigit = unicode.ToLower(r) // Normalize to lowercase
+			} else {
+				return "", errors.New("invalid GUID format: contains non-hexadecimal characters")
+			}
+			builder.WriteRune(hexDigit)
+		}
+	}
+	return builder.String(), nil
+}
