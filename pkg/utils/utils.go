@@ -4305,3 +4305,36 @@ func FastPadLeft(s string, length int, padChar rune) string {
 	padding := strings.Repeat(string(padChar), paddingLen)
 	return padding + s
 }
+
+// ExtractNumbers returns all sequences of digits found in a string.
+// It iterates through the string, building a new string containing only digits.
+//
+// @param s The input string to search within.
+// @return A slice of strings, where each string is a sequence of digits found in the input string.
+//         Returns an empty slice if no digits are found.
+//
+// Examples:
+//
+//	ExtractNumbers("abc123def456ghi789") == []string{"123", "456", "789"}
+//	ExtractNumbers("no digits here") == []string{}
+//	ExtractNumbers("123") == []string{"123"}
+//	ExtractNumbers(" leading 1 digit and 2 more") == []string{"1", "2"}
+func ExtractNumbers(s string) []string {
+	var numbers []string
+	var builder strings.Builder
+	for _, r := range s {
+		if unicode.IsDigit(r) {
+			builder.WriteRune(r)
+		} else {
+			if builder.Len() > 0 {
+				numbers = append(numbers, builder.String())
+				builder.Reset()
+			}
+		}
+	}
+	// Add the last number if the string ends with digits
+	if builder.Len() > 0 {
+		numbers = append(numbers, builder.String())
+	}
+	return numbers
+}
