@@ -4414,3 +4414,24 @@ func SafeValidateGUID(guid string) (string, error) {
 	}
 	return builder.String(), nil
 }
+
+// ValidateAlphaNumeric checks if a string contains only alphanumeric characters (letters and digits).
+// It returns an error if the string is empty or contains any non-alphanumeric characters.
+//
+// Examples:
+//
+//	ValidateAlphaNumeric("HelloWorld123") == nil
+//	ValidateAlphaNumeric("Hello World") returns an error (contains a space)
+//	ValidateAlphaNumeric("Hello-World") returns an error (contains a hyphen)
+//	ValidateAlphaNumeric("") returns an error (empty string)
+func ValidateAlphaNumeric(s string) error {
+	if s == "" {
+		return errors.New("string cannot be empty")
+	}
+	for _, r := range s {
+		if !unicode.IsLetter(r) && !unicode.IsNumber(r) {
+			return errors.New("string contains non-alphanumeric characters")
+		}
+	}
+	return nil
+}
