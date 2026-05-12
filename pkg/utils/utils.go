@@ -4435,3 +4435,44 @@ func ValidateAlphaNumeric(s string) error {
 	}
 	return nil
 }
+
+// ValidatePostalCode checks if a string is a valid postal code for a given country.
+// This function is a placeholder and currently only validates basic patterns.
+// For comprehensive validation, country-specific logic would need to be implemented.
+// It returns an error if the string is not a valid postal code.
+//
+// Examples:
+//
+//	ValidatePostalCode("12345", "US") == nil
+//	ValidatePostalCode("SW1A 0AA", "UK") == nil
+//	ValidatePostalCode("K1A 0B1", "CA") == nil
+//	ValidatePostalCode("1234", "US") returns an error (invalid US format)
+//	ValidatePostalCode("ABCDE", "XX") returns an error (unsupported country code)
+func ValidatePostalCode(code string, countryCode string) error {
+	if code == "" {
+		return errors.New("postal code cannot be empty")
+	}
+
+	// Convert country code to uppercase for case-insensitive comparison
+	countryCode = strings.ToUpper(countryCode)
+
+	switch countryCode {
+	case "US": // United States (5 digits or ZIP+4)
+		if !regexp.MustCompile(`^\d{5}(-\d{4})?$`).MatchString(code) {
+			return errors.New("invalid US postal code format")
+		}
+	case "UK": // United Kingdom (complex format)
+		// Basic UK format validation: outward code (2-4 chars) + inward code (3 chars)
+		// Example: SW1A 0AA, B33 8TH, M1 1AE
+		if !regexp.MustCompile(`^[A-Z]{1,2}[0-9][A-Z0-9]?\s?[0-9][A-Z]{2}$`).MatchString(strings.ToUpper(code)) {
+			return errors.New("invalid UK postal code format")
+		}
+	case "CA": // Canada (A1A 1A1 format)
+		if !regexp.MustCompile(`^[A-Z]\d[A-Z]\s?\d[A-Z]\d$`).MatchString(strings.ToUpper(code)) {
+			return errors.New("invalid Canadian postal code format")
+		}
+	default:
+		return errors.New("unsupported country code for postal code validation")
+	}
+	return nil
+}
