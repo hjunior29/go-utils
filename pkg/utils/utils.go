@@ -4551,3 +4551,27 @@ func PadRight(s string, length int, pad rune) string {
 	padding := strings.Repeat(string(pad), length-len(s))
 	return s + padding
 }
+
+// AfterFirst returns the substring after the first occurrence of the separator.
+// If the separator is not found, an empty string is returned.
+// If the separator is empty, the original string is returned.
+//
+// @param s The input string to search within.
+// @param sep The separator string.
+// @return The substring after the first occurrence of the separator, or the original string if not found.
+//
+// Examples:
+//
+//	AfterFirst("hello world", " ") == "world"
+//	AfterFirst("hello", "x") == ""
+//	AfterFirst("hello", "") == "hello"
+func AfterFirst(s, sep string) string {
+	if sep == "" {
+		return s
+	}
+	index := strings.Index(s, sep)
+	if index == -1 {
+		return ""
+	}
+	return s[index+len(sep):]
+}
