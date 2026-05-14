@@ -4680,3 +4680,23 @@ func FastChunkGeneric[T any](slice []T, size int) ([][]T, error) {
 	}
 	return result, nil
 }
+
+// SafeValidateAlphaNumeric checks if a string contains only alphanumeric characters (letters and digits).
+// It returns the validated string and a nil error if the string is valid, otherwise an empty string and an error.
+//
+// Examples:
+//
+//	SafeValidateAlphaNumeric("HelloWorld123") == ("HelloWorld123", nil)
+//	SafeValidateAlphaNumeric("Hello World") returns ("", error)
+//	SafeValidateAlphaNumeric("") returns ("", error)
+func SafeValidateAlphaNumeric(s string) (string, error) {
+	if s == "" {
+		return "", errors.New("string cannot be empty")
+	}
+	for _, r := range s {
+		if !unicode.IsLetter(r) && !unicode.IsNumber(r) {
+			return "", errors.New("string contains non-alphanumeric characters")
+		}
+	}
+	return s, nil
+}
