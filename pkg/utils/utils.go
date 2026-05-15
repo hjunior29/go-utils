@@ -4856,3 +4856,25 @@ func FastGroupBy[T any, K comparable](slice []T, keyFunc func(T) K) map[K][]T {
 	}
 	return grouped
 }
+
+// FastUnique returns a new slice containing only the unique elements from the input slice.
+// It uses generics to work with slices of any comparable type.
+// This version is optimized by pre-allocating map and slice capacities for efficiency.
+// The order of elements in the resulting slice is not guaranteed.
+//
+// Examples:
+//
+//	FastUnique([]int{1, 2, 2, 3, 4, 4, 4, 5}) == []int{1, 2, 3, 4, 5} (order may vary)
+//	FastUnique([]string{"a", "b", "a", "c", "b"}) == []string{"a", "b", "c"} (order may vary)
+func FastUnique[T comparable](slice []T) []T {
+	set := make(map[T]struct{}, len(slice)) // Pre-allocate map capacity
+	for _, item := range slice {
+		set[item] = struct{}{}
+	}
+
+	result := make([]T, 0, len(set)) // Pre-allocate slice capacity
+	for item := range set {
+		result = append(result, item)
+	}
+	return result
+}
