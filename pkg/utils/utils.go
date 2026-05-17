@@ -4908,3 +4908,41 @@ func LongestCommonPrefix(strs []string) string {
 	}
 	return prefix
 }
+
+// ValidateColor checks if a string is a valid hexadecimal color code.
+// A valid color code starts with '#' followed by 3 or 6 hexadecimal digits (0-9, a-f, A-F).
+// It returns an error if the string is not a valid hex color code.
+//
+// Examples:
+//
+//	ValidateColor("#FFFFFF") == nil
+//	ValidateColor("#fff") == nil
+//	ValidateColor("#ff00aa") == nil
+//	ValidateColor("#F0A") == nil
+//	ValidateColor("FFFFFF") returns an error (missing '#')
+//	ValidateColor("#FFFFF") returns an error (invalid length)
+//	ValidateColor("#GGGGGG") returns an error (invalid characters)
+//	ValidateColor("") returns an error
+func ValidateColor(color string) error {
+	if color == "" {
+		return errors.New("color string cannot be empty")
+	}
+
+	if !strings.HasPrefix(color, "#") {
+		return errors.New("color must start with '#'")
+	}
+
+	hexPart := color[1:] // Remove the '#' prefix
+	length := len(hexPart)
+
+	if length != 3 && length != 6 {
+		return errors.New("color code must be 3 or 6 hexadecimal digits long")
+	}
+
+	for _, r := range hexPart {
+		if !unicode.IsDigit(r) && (r < 'a' || r > 'f') && (r < 'A' || r > 'F') {
+			return errors.New("color code contains non-hexadecimal characters")
+		}
+	}
+	return nil
+}
