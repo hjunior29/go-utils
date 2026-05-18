@@ -4982,3 +4982,51 @@ func FastExtractNumbers(s string) []string {
 	}
 	return numbers
 }
+
+// SafeValidateColor checks if a string is a valid hexadecimal color code.
+// A valid color code starts with '#' followed by 3 or 6 hexadecimal digits (0-9, a-f, A-F).
+// It returns the color code and a nil error if it's valid, otherwise an empty string and an error.
+//
+// Examples:
+//
+//	SafeValidateColor("#FFFFFF") == ("#FFFFFF", nil)
+//	SafeValidateColor("#fff") == ("#fff", nil)
+//	SafeValidateColor("#ff00aa") == ("#ff00aa", nil)
+//	SafeValidateColor("#F0A") == ("#f0a", nil) // Returned lowercase
+//	SafeValidateColor("FFFFFF") returns ("", error) (missing '#')
+//	SafeValidateColor("#FFFFF") returns ("", error) (invalid length)
+//	SafeValidateColor("#GGGGGG") returns ("", error) (invalid characters)
+//	SafeValidateColor("") returns ("", error)
+func SafeValidateColor(color string) (string, error) {
+	if color == "" {
+		return "", errors.New("color string cannot be empty")
+	}
+
+	if !strings.HasPrefix(color, "#") {
+		return "", errors.New("color must start with '#'")
+	}
+
+	hexPart := color[1:] // Remove the '#' prefix
+	length := len(hexPart)
+
+	if length != 3 && length != 6 {
+		return "", errors.New("color code must be 3 or 6 hexadecimal digits long")
+	}
+
+	var builder strings.Builder
+	builder.Grow(length + 1) // +1 for the '#'
+	builder.WriteRune('#')
+
+	for _, r := range hexPart {
+		var hexDigit rune
+		if unicode.IsDigit(r) {
+			hexDigit = r
+		} else if (r >= 'a' && r <= 'f') || (r >= 'A' && r <= 'F') {
+			hexDigit = unicode.ToLower(r) // Normalize to lowercase
+		} else {
+			return "", errors.New("color code contains non-hexadecimal characters")
+		}
+		builder.WriteRune(hexDigit)
+	}
+	return builder.String(), nil
+}
