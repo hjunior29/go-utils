@@ -5030,3 +5030,16 @@ func SafeValidateColor(color string) (string, error) {
 	}
 	return builder.String(), nil
 }
+
+// SafeLength returns the number of runes in a string.
+// It handles Unicode characters correctly.
+// It returns the length and a nil error.
+//
+// Examples:
+//
+//	SafeLength("hello") == (5, nil)
+//	SafeLength("你好") == (2, nil)
+//	SafeLength("") == (0, nil)
+func SafeLength(s string) (int, error) {
+	return len([]rune(s)), nil
+}
