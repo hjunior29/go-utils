@@ -5043,3 +5043,39 @@ func SafeValidateColor(color string) (string, error) {
 func SafeLength(s string) (int, error) {
 	return len([]rune(s)), nil
 }
+
+// FastExtractNumbers returns all sequences of digits found in a string.
+// This version is optimized by pre-allocating the strings.Builder capacity and efficiently
+// handling the extraction of digit sequences.
+//
+// @param s The input string to search within.
+// @return A slice of strings, where each string is a sequence of digits found in the input string.
+//         Returns an empty slice if no digits are found.
+//
+// Examples:
+//
+//	FastExtractNumbers("abc123def456ghi789") == []string{"123", "456", "789"}
+//	FastExtractNumbers("no digits here") == []string{}
+//	FastExtractNumbers("123") == []string{"123"}
+//	FastExtractNumbers(" leading 1 digit and 2 more") == []string{"1", "2"}
+func FastExtractNumbers(s string) []string {
+	var numbers []string
+	var builder strings.Builder
+	builder.Grow(len(s)) // Pre-allocate capacity for efficiency
+
+	for _, r := range s {
+		if unicode.IsDigit(r) {
+			builder.WriteRune(r)
+		} else {
+			if builder.Len() > 0 {
+				numbers = append(numbers, builder.String())
+				builder.Reset()
+			}
+		}
+	}
+	// Add the last number if the string ends with digits
+	if builder.Len() > 0 {
+		numbers = append(numbers, builder.String())
+	}
+	return numbers
+}
