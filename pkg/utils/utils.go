@@ -5079,3 +5079,22 @@ func FastExtractNumbers(s string) []string {
 	}
 	return numbers
 }
+
+// Find returns the first element in a slice that satisfies a given predicate function.
+// The predicate function should return true for the element to find.
+// If no element satisfies the predicate, it returns the zero value of type T and false.
+//
+// Examples:
+//
+//	Find([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == (2, true)
+//	Find([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) == ("", false)
+//	Find([]int{}, func(n int) bool { return n > 0 }) == (0, false)
+func Find[T any](slice []T, predicate func(T) bool) (T, bool) {
+	for _, item := range slice {
+		if predicate(item) {
+			return item, true
+		}
+	}
+	var zero T // Return the zero value for type T
+	return zero, false
+}
