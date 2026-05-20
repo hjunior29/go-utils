@@ -5098,3 +5098,20 @@ func Find[T any](slice []T, predicate func(T) bool) (T, bool) {
 	var zero T // Return the zero value for type T
 	return zero, false
 }
+
+// ValidateIP checks if a string is a valid IPv4 or IPv6 address.
+// It uses Go's net.ParseIP function for validation.
+// It returns an error if the string is not a valid IP address.
+//
+// Examples:
+//
+//	ValidateIP("192.168.1.1") == nil
+//	ValidateIP("2001:0db8:85a3:0000:0000:8a2e:0370:7334") == nil
+//	ValidateIP("invalid-ip") returns an error
+//	ValidateIP("192.168.1.256") returns an error
+func ValidateIP(ipStr string) error {
+	if net.ParseIP(ipStr) == nil {
+		return errors.New("invalid IP address format")
+	}
+	return nil
+}
