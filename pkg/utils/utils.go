@@ -5115,3 +5115,36 @@ func ValidateIP(ipStr string) error {
 	}
 	return nil
 }
+
+// Keys returns a slice of all keys in a map.
+// The order of keys in the returned slice is not guaranteed.
+//
+// Examples:
+//
+//	Keys(map[string]int{"a": 1, "b": 2}) == []string{"a", "b"} (order may vary)
+//	Keys(map[int]string{1: "one", 2: "two"}) == []int{1, 2} (order may vary)
+//	Keys(map[string]int{}) == []string{}
+func Keys[K comparable, V any](m map[K]V) []K {
+	keys := make([]K, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+// Values returns a slice of all values in a map.
+// The order of values in the returned slice is not guaranteed and corresponds
+// to the order of keys returned by iterating over the map.
+//
+// Examples:
+//
+//	Values(map[string]int{"a": 1, "b": 2}) == []int{1, 2} (order may vary)
+//	Values(map[int]string{1: "one", 2: "two"}) == []string{"one", "two"} (order may vary)
+//	Values(map[string]int{}) == []int{}
+func Values[K comparable, V any](m map[K]V) []V {
+	values := make([]V, 0, len(m))
+	for _, v := range m {
+		values = append(values, v)
+	}
+	return values
+}
