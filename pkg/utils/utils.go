@@ -5148,3 +5148,25 @@ func Values[K comparable, V any](m map[K]V) []V {
 	}
 	return values
 }
+
+// PadRight pads a string on the right side to reach the specified length.
+// If the input string `s` is already longer than or equal to `length`, it is returned as is.
+//
+// @param s The input string to pad.
+// @param length The desired minimum length of the string.
+// @param pad The rune character to use for padding.
+// @return The padded string.
+//
+// Examples:
+//
+//	PadRight("123", 5, '0') == "12300"
+//	PadRight("abc", 3, 'x') == "abc"
+//	PadRight("short", 10, '-') == "short-----"
+//	PadRight("already long", 5, '0') == "already long"
+func PadRight(s string, length int, pad rune) string {
+	if len(s) >= length {
+		return s
+	}
+	padding := strings.Repeat(string(pad), length-len(s))
+	return s + padding
+}
