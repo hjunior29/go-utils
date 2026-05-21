@@ -5232,3 +5232,10 @@ func ChunkGeneric[T any](slice []T, size int) ([][]T, error) {
 	}
 	return result, nil
 }
+
+
+// WordCount returns the number of words in a string.
+func WordCount(s string) int {
+	fields := strings.Fields(s)
+	return len(fields)
+}
