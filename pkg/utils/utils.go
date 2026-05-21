@@ -5170,3 +5170,26 @@ func PadRight(s string, length int, pad rune) string {
 	padding := strings.Repeat(string(pad), length-len(s))
 	return s + padding
 }
+
+// ValidateBinary checks if a string represents a valid binary number.
+// A valid binary number consists only of '0' and '1' characters.
+// It returns an error if the string is empty or contains any non-binary characters.
+//
+// Examples:
+//
+//	ValidateBinary("101010") == nil
+//	ValidateBinary("0000") == nil
+//	ValidateBinary("1") == nil
+//	ValidateBinary("101201") returns an error (contains '2')
+//	ValidateBinary("") returns an error (empty string)
+func ValidateBinary(s string) error {
+	if s == "" {
+		return errors.New("string cannot be empty")
+	}
+	for _, r := range s {
+		if r != '0' && r != '1' {
+			return errors.New("string contains non-binary characters")
+		}
+	}
+	return nil
+}
