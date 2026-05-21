@@ -5239,3 +5239,12 @@ func WordCount(s string) int {
 	fields := strings.Fields(s)
 	return len(fields)
 }
+
+
+// RemovePrefix removes the prefix from the string if present.
+func RemovePrefix(s, prefix string) string {
+	if strings.HasPrefix(s, prefix) {
+		return s[len(prefix):]
+	}
+	return s
+}
