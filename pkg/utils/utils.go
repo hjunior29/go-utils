@@ -5335,3 +5335,18 @@ func SafeRemovePrefix(s, prefix string) (string, error) {
 	}
 	return s, nil
 }
+
+// FastWordCount returns the number of words in a string.
+// This version is optimized by leveraging strings.Fields for efficient word splitting.
+//
+// Examples:
+//
+//	FastWordCount("  hello   world  ") == 2
+//	FastWordCount("a\t\nb") == 3
+//	FastWordCount("singleword") == 1
+//	FastWordCount("") == 0
+//	FastWordCount("   ") == 0
+func FastWordCount(s string) int {
+	fields := strings.Fields(s)
+	return len(fields)
+}
