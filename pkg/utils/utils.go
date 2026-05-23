@@ -5248,3 +5248,21 @@ func RemovePrefix(s, prefix string) string {
 	}
 	return s
 }
+
+// FindIndex returns the index of the first element in a slice that satisfies a given predicate function.
+// The predicate function should return true for the element to find.
+// If no element satisfies the predicate, it returns -1.
+//
+// Examples:
+//
+//	FindIndex([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == 1
+//	FindIndex([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) == -1
+//	FindIndex([]int{}, func(n int) bool { return n > 0 }) == -1
+func FindIndex[T any](slice []T, predicate func(T) bool) int {
+	for i, item := range slice {
+		if predicate(item) {
+			return i
+		}
+	}
+	return -1
+}
