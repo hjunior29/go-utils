@@ -5436,3 +5436,53 @@ func FastMap[T any, U any](slice []T, f func(T) U) []U {
 	}
 	return result
 }
+
+// FastRemoveAccents removes diacritical marks from accented characters in a string efficiently.
+// It converts characters like 'é', 'ü', 'ñ' to 'e', 'u', 'n' respectively.
+// This function is optimized by pre-allocating the strings.Builder capacity.
+//
+// @param s The input string potentially containing accented characters.
+// @return A new string with diacritical marks removed.
+//
+// Examples:
+//
+//	FastRemoveAccents("résumé") == "resume"
+//	FastRemoveAccents("Crème brûlée") == "Creme brulee"
+//	FastRemoveAccents("niño") == "nino"
+//	FastRemoveAccents("你好") == "你好" // Non-accented characters are unchanged
+func FastRemoveAccents(s string) string {
+	var builder strings.Builder
+	builder.Grow(len(s)) // Pre-allocate capacity for efficiency
+
+	for _, r := range s {
+		switch r {
+		case 'á', 'à', 'â', 'ä', 'å', 'ā':
+			builder.WriteRune('a')
+		case 'é', 'è', 'ê', 'ë', 'ē', 'ė':
+			builder.WriteRune('e')
+		case 'í', 'ì', 'î', 'ï', 'ī':
+			builder.WriteRune('i')
+		case 'ó', 'ò', 'ô', 'ö', 'ø', 'ō':
+			builder.WriteRune('o')
+		case 'ú', 'ù', 'û', 'ü', 'ū':
+			builder.WriteRune('u')
+		case 'ý', 'ÿ':
+			builder.WriteRune('y')
+		case 'ñ':
+			builder.WriteRune('n')
+		case 'ç':
+			builder.WriteRune('c')
+		case 'ş':
+			builder.WriteRune('s')
+		case 'ğ':
+			builder.WriteRune('g')
+		case 'æ':
+			builder.WriteRune('ae')
+		case 'œ':
+			builder.WriteRune('oe')
+		default:
+			builder.WriteRune(r)
+		}
+	}
+	return builder.String()
+}
