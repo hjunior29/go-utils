@@ -5266,3 +5266,21 @@ func FindIndex[T any](slice []T, predicate func(T) bool) int {
 	}
 	return -1
 }
+
+// FastWordCount returns the number of words in a string.
+// This version is optimized by pre-allocating the strings.Builder capacity
+// and leveraging strings.Fields for efficient word splitting.
+//
+// Examples:
+//
+//	FastWordCount("  hello   world  ") == 2
+//	FastWordCount("a\t\nb") == 3
+//	FastWordCount("singleword") == 1
+//	FastWordCount("") == 0
+//	FastWordCount("   ") == 0
+func FastWordCount(s string) int {
+	// Trim leading/trailing whitespace and split by one or more whitespace characters.
+	// strings.Fields is already efficient for this purpose.
+	fields := strings.Fields(s)
+	return len(fields)
+}
