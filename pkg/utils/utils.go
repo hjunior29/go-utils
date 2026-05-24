@@ -5486,3 +5486,21 @@ func FastRemoveAccents(s string) string {
 	}
 	return builder.String()
 }
+
+// FindLastIndex returns the index of the last element in a slice that satisfies a given predicate function.
+// The predicate function should return true for the element to find.
+// If no element satisfies the predicate, it returns -1.
+//
+// Examples:
+//
+//	FindLastIndex([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == 3
+//	FindLastIndex([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) == -1
+//	FindLastIndex([]int{}, func(n int) bool { return n > 0 }) == -1
+func FindLastIndex[T any](slice []T, predicate func(T) bool) int {
+	for i := len(slice) - 1; i >= 0; i-- {
+		if predicate(slice[i]) {
+			return i
+		}
+	}
+	return -1
+}
