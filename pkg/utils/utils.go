@@ -5584,3 +5584,20 @@ func FastRemoveAccents(s string) string {
 	}
 	return builder.String()
 }
+
+// Reduce applies a function against an accumulator and each element in the slice (from left to right) to reduce it to a single value.
+// The function `f` takes the accumulator and the current element, and returns the new accumulator value.
+// The initial value of the accumulator is provided by `initial`.
+//
+// Examples:
+//
+//	Reduce([]int{1, 2, 3, 4, 5}, 0, func(acc, n int) int { return acc + n }) == 15
+//	Reduce([]string{"a", "b", "c"}, "", func(acc, s string) string { return acc + s }) == "abc"
+//	Reduce([]int{}, 0, func(acc, n int) int { return acc + n }) == 0
+func Reduce[T any, U any](slice []T, initial U, f func(U, T) U) U {
+	accumulator := initial
+	for _, item := range slice {
+		accumulator = f(accumulator, item)
+	}
+	return accumulator
+}
