@@ -5789,3 +5789,29 @@ func ToTitleCase(s string) string {
 	}
 	return string(runes)
 }
+
+// Difference returns a new slice containing elements that are in slice1 but not in slice2.
+// It uses generics to work with slices of any comparable type.
+// The order of elements in the resulting slice is preserved from slice1.
+//
+// Examples:
+//
+//	Difference([]int{1, 2, 3, 4}, []int{3, 4, 5, 6}) == []int{1, 2}
+//	Difference([]string{"a", "b", "c"}, []string{"b", "c", "d"}) == []string{"a"}
+//	Difference([]int{1, 2}, []int{3, 4}) == []int{1, 2}
+func Difference[T comparable](slice1, slice2 []T) []T {
+	// Use a map to store elements of the second slice for efficient lookup.
+	set2 := make(map[T]struct{}, len(slice2))
+	for _, item := range slice2 {
+		set2[item] = struct{}{}
+	}
+
+	var result []T
+	// Iterate over the first slice and add elements not found in the map.
+	for _, item := range slice1 {
+		if _, ok := set2[item]; !ok {
+			result = append(result, item)
+		}
+	}
+	return result
+}
