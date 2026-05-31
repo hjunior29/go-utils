@@ -5861,3 +5861,38 @@ func ValidateAlphaNumeric(s string) error {
 	}
 	return nil
 }
+
+// UnzipGeneric takes a slice of slices and returns a slice of slices where each inner slice
+// contains elements at the same index from the original inner slices.
+// It assumes all inner slices have the same length. If the input is empty or
+// contains empty inner slices, it returns an empty slice.
+//
+// Examples:
+//
+//	UnzipGeneric([][]int{{1, 2, 3}, {4, 5, 6}}) == [][]int{{1, 4}, {2, 5}, {3, 6}}
+//	UnzipGeneric([][]string{{"a", "b"}, {"c", "d"}}) == [][]string{{"a", "c"}, {"b", "d"}}
+//	UnzipGeneric([][]int{}) == [][]int{}
+//	UnzipGeneric([][]int{{}}) == [][]int{}
+func UnzipGeneric[T any](slices [][]T) [][]T {
+	if len(slices) == 0 || len(slices[0]) == 0 {
+		return [][]T{}
+	}
+
+	numOuter := len(slices)
+	numInner := len(slices[0])
+
+	// Initialize the result slice with the correct dimensions.
+	result := make([][]T, numInner)
+	for i := range result {
+		result[i] = make([]T, numOuter)
+	}
+
+	// Populate the result slice by transposing the input.
+	for i := 0; i < numOuter; i++ {
+		for j := 0; j < numInner; j++ {
+			result[j][i] = slices[i][j]
+		}
+	}
+
+	return result
+}
