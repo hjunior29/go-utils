@@ -6076,3 +6076,22 @@ func SafeSubstring(s string, start, end int) (string, error) {
 	}
 	return string(runes[start:end]), nil
 }
+
+// Keys returns a slice of all keys in a map.
+// The order of keys in the returned slice is not guaranteed.
+//
+// @param m The input map.
+// @return A slice containing all keys from the input map.
+//
+// Examples:
+//
+//	Keys(map[string]int{"a": 1, "b": 2}) == []string{"a", "b"} (order may vary)
+//	Keys(map[int]string{1: "one", 2: "two"}) == []int{1, 2} (order may vary)
+//	Keys(map[string]int{}) == []string{}
+func Keys[K comparable, V any](m map[K]V) []K {
+	keys := make([]K, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
+}
