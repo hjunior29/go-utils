@@ -6045,3 +6045,34 @@ func FastGroupBy[T any, K comparable](slice []T, keyFunc func(T) K) map[K][]T {
 	}
 	return grouped
 }
+
+// SafeSubstring returns a substring of s from index start and excluding index end.
+// If start or end is out of bounds, it returns an error.
+// If end is less than start, it returns an error.
+// If the input string is empty, it returns an empty string and nil error.
+//
+// Examples:
+//
+//	SafeSubstring("hello", 0, 2) == ("he", nil)
+//	SafeSubstring("hello", 1, 4) == ("ell", nil)
+//	SafeSubstring("hello", 0, 5) == ("hello", nil)
+//	SafeSubstring("hello", 0, 6) returns ("", error) // end out of bounds
+//	SafeSubstring("hello", -1, 2) returns ("", error) // start out of bounds
+//	SafeSubstring("hello", 3, 2) returns ("", error) // end < start
+func SafeSubstring(s string, start, end int) (string, error) {
+	if s == "" {
+		return "", nil
+	}
+	runes := []rune(s)
+	length := len(runes)
+	if start < 0 || start >= length {
+		return "", errors.New("start index out of bounds")
+	}
+	if end < 0 || end > length {
+		return "", errors.New("end index out of bounds")
+	}
+	if end < start {
+		return "", errors.New("end index cannot be less than start index")
+	}
+	return string(runes[start:end]), nil
+}
