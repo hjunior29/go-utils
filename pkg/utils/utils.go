@@ -6121,3 +6121,35 @@ func ValidateBinary(s string) error {
 	}
 	return nil
 }
+
+// Between returns the string between the first and last occurrences of a specified substring.
+// If the start substring is not found, or the end substring is not found after the start,
+// an empty string is returned. If the start or end substrings are empty, it may lead to
+// unexpected behavior or empty results.
+//
+// @param s The input string to search within.
+// @param start The starting substring delimiter.
+// @param end The ending substring delimiter.
+// @return The string found between the start and end delimiters, or an empty string if not found.
+//
+// Examples:
+//
+//	Between("hello [world]!", "[", "]") == "world"
+//	Between("no delimiters here", "[", "]") == ""
+//	Between("start middle end", "start", "end") == " middle "
+//	Between("start", "start", "end") == ""
+//	Between("end", "start", "end") == ""
+func Between(s, start, end string) string {
+	startIndex := strings.Index(s, start)
+	if startIndex == -1 {
+		return ""
+	}
+	// Adjust startIndex to be after the start delimiter
+	startIndex += len(start)
+
+	endIndex := strings.Index(s[startIndex:], end)
+	if endIndex == -1 {
+		return ""
+	}
+	return s[startIndex : startIndex+endIndex]
+}
