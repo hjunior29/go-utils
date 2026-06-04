@@ -6153,3 +6153,286 @@ func Between(s, start, end string) string {
 	}
 	return s[startIndex : startIndex+endIndex]
 }
+
+// GroupBy applies a function to each element of a slice and groups them into a map based on the generated key.
+// The key-generating function `keyFunc` takes an element of type T and returns a key of type K.
+// Elements with the same key are collected into a slice associated with that key in the resulting map.
+//
+// @param slice The input slice of elements of type T.
+// @param keyFunc A function that takes an element of type T and returns a key of type K.
+// @return A map where keys are of type K and values are slices of type T, grouping elements by their generated keys.
+//
+// Examples:
+//
+//	GroupBy([]int{1, 2, 3, 4, 5, 6}, func(n int) string { if n%2 == 0 { return "even" } return "odd" }) returns map[string][]int{"odd": {1, 3, 5}, "even": {2, 4, 6}}
+//	GroupBy([]string{"apple", "banana", "apricot"}, func(s string) string { return string(s[0]) }) returns map[string][]string{"a": {"apple", "apricot"}, "b": {"banana"}}
+//	GroupBy([]int{}, func(n int) string { return "key" }) returns an empty map.
+func GroupBy[T any, K comparable](slice []T, keyFunc func(T) K) map[K][]T {
+	grouped := make(map[K][]T)
+	for _, item := range slice {
+		key := keyFunc(item)
+		grouped[key] = append(grouped[key], item)
+	}
+	return grouped
+}
+
+// FastGroupBy applies a function to each element of a slice and groups them into a map based on the generated key.
+// It is optimized by pre-allocating the map and slice capacities for efficiency.
+// The key-generating function `keyFunc` takes an element of type T and returns a key of type K.
+// Elements with the same key are collected into a slice associated with that key in the resulting map.
+//
+// @param slice The input slice of elements of type T.
+// @param keyFunc A function that takes an element of type T and returns a key of type K.
+// @return A map where keys are of type K and values are slices of type T, grouping elements by their generated keys.
+//
+// Examples:
+//
+//	FastGroupBy([]int{1, 2, 3, 4, 5, 6}, func(n int) string { if n%2 == 0 { return "even" } return "odd" }) returns map[string][]int{"odd": {1, 3, 5}, "even": {2, 4, 6}}
+//	FastGroupBy([]string{"apple", "banana", "apricot"}, func(s string) string { return string(s[0]) }) returns map[string][]string{"a": {"apple", "apricot"}, "b": {"banana"}}
+//	FastGroupBy([]int{}, func(n int) string { return "key" }) returns an empty map.
+func FastGroupBy[T any, K comparable](slice []T, keyFunc func(T) K) map[K][]T {
+	grouped := make(map[K][]T, len(slice)) // Heuristic initial capacity for the map
+
+	for _, item := range slice {
+		key := keyFunc(item)
+		// Pre-allocate slice capacity if it's the first element for this key.
+		// This is a heuristic and might not always be optimal.
+		if _, ok := grouped[key]; !ok {
+			grouped[key] = make([]T, 0, len(slice)/2) // Heuristic initial capacity for inner slices
+		}
+		grouped[key] = append(grouped[key], item)
+	}
+	return grouped
+}
+
+// MapKeys applies a function to each key of a map and returns a new map with the transformed keys.
+// The function `f` takes a key of type K1 and returns a key of type K2.
+// The values associated with the keys remain unchanged.
+//
+// @param m The input map with keys of type K1 and values of type V.
+// @param f A function that transforms a key of type K1 into a key of type K2.
+// @return A new map with keys of type K2 and values of type V, where keys have been transformed by `f`.
+//
+// Examples:
+//
+//	MapKeys(map[string]int{"a": 1, "b": 2}, func(s string) int { return len(s) }) returns map[int]int{1: 1, 1: 2}
+//	MapKeys(map[int]string{1: "one", 2: "two"}, func(n int) string { return strconv.Itoa(n * 2) }) returns map[string]string{"2": "one", "4": "two"}
+func MapKeys[K1 comparable, K2 comparable, V any](m map[K1]V, f func(K1) K2) map[K2]V {
+	result := make(map[K2]V, len(m))
+	for k, v := range m {
+		newKey := f(k)
+		result[newKey] = v
+	}
+	return result
+}
+
+// SafeMapKeys applies a function to each key of a map and returns a new map with the transformed keys.
+// The function `f` takes a key of type K1 and returns a key of type K2.
+// The values associated with the keys remain unchanged.
+// It returns an error if the transformation function `f` encounters an error (though this specific implementation does not pass errors through).
+//
+// @param m The input map with keys of type K1 and values of type V.
+// @param f A function that transforms a key of type K1 into a key of type K2.
+// @return A new map with keys of type K2 and values of type V, where keys have been transformed by `f`, and a nil error.
+//
+// Examples:
+//
+//	SafeMapKeys(map[string]int{"a": 1, "b": 2}, func(s string) int { return len(s) }) returns (map[int]int{1: 1, 1: 2}, nil)
+//	SafeMapKeys(map[int]string{1: "one", 2: "two"}, func(n int) string { return strconv.Itoa(n * 2) }) returns (map[string]string{"2": "one", "4": "two"}, nil)
+func SafeMapKeys[K1 comparable, K2 comparable, V any](m map[K1]V, f func(K1) K2) (map[K2]V, error) {
+	result := make(map[K2]V, len(m))
+	for k, v := range m {
+		newKey := f(k)
+		result[newKey] = v
+	}
+	return result, nil
+}
+
+// Partition splits a slice into two slices based on a predicate function.
+// The first slice contains elements for which the predicate returns true, and the second slice
+// contains elements for which the predicate returns false.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return A slice containing two slices: the first for elements satisfying the predicate, the second for those that don't.
+//
+// Examples:
+//
+//	Partition([]int{1, 2, 3, 4, 5, 6}, func(n int) bool { return n%2 == 0 }) returns [][]int{{2, 4, 6}, {1, 3, 5}}
+//	Partition([]string{"apple", "banana", "cherry"}, func(s string) bool { return len(s) > 5 }) returns [][]string{{"banana", "cherry"}, {"apple"}}
+//	Partition([]int{}, func(n int) bool { return n > 0 }) returns [][]int{{}, {}}
+func Partition[T any](slice []T, predicate func(T) bool) [][]T {
+	trueSlice := make([]T, 0, len(slice)/2)   // Heuristic initial capacity
+	falseSlice := make([]T, 0, len(slice)/2) // Heuristic initial capacity
+
+	for _, item := range slice {
+		if predicate(item) {
+			trueSlice = append(trueSlice, item)
+		} else {
+			falseSlice = append(falseSlice, item)
+		}
+	}
+
+	return [][]T{trueSlice, falseSlice}
+}
+
+// FastPartition splits a slice into two slices based on a predicate function.
+// It is optimized by pre-allocating the result slices' capacities.
+// The first slice contains elements for which the predicate returns true, and the second slice
+// contains elements for which the predicate returns false.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return A slice containing two slices: the first for elements satisfying the predicate, the second for those that don't.
+//
+// Examples:
+//
+//	FastPartition([]int{1, 2, 3, 4, 5, 6}, func(n int) bool { return n%2 == 0 }) returns [][]int{{2, 4, 6}, {1, 3, 5}}
+//	FastPartition([]string{"apple", "banana", "cherry"}, func(s string) bool { return len(s) > 5 }) returns [][]string{{"banana", "cherry"}, {"apple"}}
+//	FastPartition([]int{}, func(n int) bool { return n > 0 }) returns [][]int{{}, {}}
+func FastPartition[T any](slice []T, predicate func(T) bool) [][]T {
+	trueSlice := make([]T, 0, len(slice)/2)   // Heuristic initial capacity
+	falseSlice := make([]T, 0, len(slice)/2) // Heuristic initial capacity
+
+	for _, item := range slice {
+		if predicate(item) {
+			trueSlice = append(trueSlice, item)
+		} else {
+			falseSlice = append(falseSlice, item)
+		}
+	}
+
+	return [][]T{trueSlice, falseSlice}
+}
+
+// Reduce applies a function against an accumulator and each element in the slice (from left to right) to reduce it to a single value.
+// The function `f` takes the accumulator and the current element, and returns the new accumulator value.
+// The initial value of the accumulator is provided by `initial`.
+//
+// @param slice The input slice of elements of type T.
+// @param initial The initial value of the accumulator of type U.
+// @param f A function that takes the current accumulator (type U) and the current element (type T) and returns the updated accumulator (type U).
+// @return The final accumulated value of type U.
+//
+// Examples:
+//
+//	Reduce([]int{1, 2, 3, 4, 5}, 0, func(acc, n int) int { return acc + n }) returns 15
+//	Reduce([]string{"a", "b", "c"}, "", func(acc, s string) string { return acc + s }) returns "abc"
+//	Reduce([]int{}, 0, func(acc, n int) int { return acc + n }) returns 0
+func Reduce[T any, U any](slice []T, initial U, f func(U, T) U) U {
+	accumulator := initial
+	for _, item := range slice {
+		accumulator = f(accumulator, item)
+	}
+	return accumulator
+}
+
+// Find returns the first element in a slice that satisfies a given predicate function.
+// The predicate function should return true for the element to find.
+// If no element satisfies the predicate, it returns the zero value of type T and false.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return The first element that satisfies the predicate and true, or the zero value of T and false if no such element is found.
+//
+// Examples:
+//
+//	Find([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) returns (2, true)
+//	Find([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) returns ("", false)
+//	Find([]int{}, func(n int) bool { return n > 0 }) returns (0, false)
+func Find[T any](slice []T, predicate func(T) bool) (T, bool) {
+	for _, item := range slice {
+		if predicate(item) {
+			return item, true
+		}
+	}
+	var zero T // Return the zero value for type T
+	return zero, false
+}
+
+// FindIndex returns the index of the first element in a slice that satisfies a given predicate function.
+// The predicate function should return true for the element to find.
+// If no element satisfies the predicate, it returns -1.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return The index of the first element that satisfies the predicate, or -1 if no such element is found.
+//
+// Examples:
+//
+//	FindIndex([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) returns 1
+//	FindIndex([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) returns -1
+//	FindIndex([]int{}, func(n int) bool { return n > 0 }) returns -1
+func FindIndex[T any](slice []T, predicate func(T) bool) int {
+	for i, item := range slice {
+		if predicate(item) {
+			return i
+		}
+	}
+	return -1
+}
+
+// FindLastIndex returns the index of the last element in a slice that satisfies a given predicate function.
+// The predicate function should return true for the element to find.
+// If no element satisfies the predicate, it returns -1.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return The index of the last element that satisfies the predicate, or -1 if no such element is found.
+//
+// Examples:
+//
+//	FindLastIndex([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) returns 3
+//	FindLastIndex([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) returns -1
+//	FindLastIndex([]int{}, func(n int) bool { return n > 0 }) returns -1
+func FindLastIndex[T any](slice []T, predicate func(T) bool) int {
+	for i := len(slice) - 1; i >= 0; i-- {
+		if predicate(slice[i]) {
+			return i
+		}
+	}
+	return -1
+}
+
+// Every checks if all elements in a slice satisfy a given predicate function.
+// The predicate function should return true for elements that satisfy the condition.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return true if all elements satisfy the predicate, false otherwise. Returns true for an empty slice.
+//
+// Examples:
+//
+//	Every([]int{2, 4, 6}, func(n int) bool { return n%2 == 0 }) returns true
+//	Every([]int{1, 2, 3}, func(n int) bool { return n%2 == 0 }) returns false
+//	Every([]string{"a", "b", "c"}, func(s string) bool { return s != "" }) returns true
+//	Every([]int{}, func(n int) bool { return n > 0 }) returns true
+func Every[T any](slice []T, predicate func(T) bool) bool {
+	for _, item := range slice {
+		if !predicate(item) {
+			return false
+		}
+	}
+	return true
+}
+
+// Some checks if at least one element in a slice satisfies a given predicate function.
+// The predicate function should return true for elements that satisfy the condition.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return true if at least one element satisfies the predicate, false otherwise. Returns false for an empty slice.
+//
+// Examples:
+//
+//	Some([]int{1, 2, 3}, func(n int) bool { return n%2 == 0 }) returns true
+//	Some([]int{1, 3, 5}, func(n int) bool { return n%2 == 0 }) returns false
+//	Some([]string{"", "a", "b"}, func(s string) bool { return s != "" }) returns true
+//	Some([]int{}, func(n int) bool { return n > 0 }) returns false
+func Some[T any](slice []T, predicate func(T) bool) bool {
+	for _, item := range slice {
+		if predicate(item) {
+			return true
+		}
+	}
+	return
