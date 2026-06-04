@@ -6436,3 +6436,18 @@ func Some[T any](slice []T, predicate func(T) bool) bool {
 		}
 	}
 	return
+
+// Contains checks if a slice of strings contains a specific string.
+//
+// Examples:
+//
+//	Contains([]string{"a", "b", "c"}, "b") == true
+//	Contains([]string{"a", "b", "c"}, "d") == false
+func Contains[T comparable](slice []T, item T) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
+}
