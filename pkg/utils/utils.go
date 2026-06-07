@@ -6533,3 +6533,49 @@ func FilterGeneric[T any](slice []T, predicate func(T) bool) []T {
 	}
 	return result
 }
+
+// FastFindIndex returns the index of the first element in a slice that satisfies a given predicate function.
+// This version is optimized by returning immediately once a match is found.
+// The predicate function should return true for the element to find.
+// If no element satisfies the predicate, it returns -1.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return The index of the first element that satisfies the predicate, or -1 if no such element is found.
+//
+// Examples:
+//
+//	FastFindIndex([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == 1
+//	FastFindIndex([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) == -1
+//	FastFindIndex([]int{}, func(n int) bool { return n > 0 }) == -1
+func FastFindIndex[T any](slice []T, predicate func(T) bool) int {
+	for i, item := range slice {
+		if predicate(item) {
+			return i
+		}
+	}
+	return -1
+}
+
+// FastFindLastIndex returns the index of the last element in a slice that satisfies a given predicate function.
+// This version is optimized by returning immediately once a match is found.
+// The predicate function should return true for the element to find.
+// If no element satisfies the predicate, it returns -1.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return The index of the last element that satisfies the predicate, or -1 if no such element is found.
+//
+// Examples:
+//
+//	FastFindLastIndex([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == 3
+//	FastFindLastIndex([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) == -1
+//	FastFindLastIndex([]int{}, func(n int) bool { return n > 0 }) == -1
+func FastFindLastIndex[T any](slice []T, predicate func(T) bool) int {
+	for i := len(slice) - 1; i >= 0; i-- {
+		if predicate(slice[i]) {
+			return i
+		}
+	}
+	return -1
+}
