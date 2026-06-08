@@ -6602,3 +6602,17 @@ func IsNumeric(s string) bool {
 	}
 	return true
 }
+
+
+// IsAlphanumeric checks if a string contains only letters and numbers.
+func IsAlphanumeric(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, r := range s {
+		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
+			return false
+		}
+	}
+	return true
+}
