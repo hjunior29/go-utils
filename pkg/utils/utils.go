@@ -6588,3 +6588,17 @@ func RemoveSuffix(s, suffix string) string {
 	}
 	return s
 }
+
+
+// IsNumeric checks if a string contains only numeric characters.
+func IsNumeric(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, r := range s {
+		if !unicode.IsDigit(r) {
+			return false
+		}
+	}
+	return true
+}
