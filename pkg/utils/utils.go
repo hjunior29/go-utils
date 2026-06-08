@@ -6579,3 +6579,12 @@ func FastFindLastIndex[T any](slice []T, predicate func(T) bool) int {
 	}
 	return -1
 }
+
+
+// RemoveSuffix removes the suffix from the string if present.
+func RemoveSuffix(s, suffix string) string {
+	if strings.HasSuffix(s, suffix) {
+		return s[:len(s)-len(suffix)]
+	}
+	return s
+}
