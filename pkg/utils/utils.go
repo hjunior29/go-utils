@@ -6625,3 +6625,14 @@ func DefaultIfEmpty(s, defaultVal string) string {
 	}
 	return s
 }
+
+
+// SliceContains checks if an integer slice contains a value.
+func SliceContains(slice []int, val int) bool {
+	for _, item := range slice {
+		if item == val {
+			return true
+		}
+	}
+	return false
+}
