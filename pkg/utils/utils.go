@@ -6616,3 +6616,12 @@ func IsAlphanumeric(s string) bool {
 	}
 	return true
 }
+
+
+// DefaultIfEmpty returns the default value if the string is empty.
+func DefaultIfEmpty(s, defaultVal string) string {
+	if strings.TrimSpace(s) == "" {
+		return defaultVal
+	}
+	return s
+}
