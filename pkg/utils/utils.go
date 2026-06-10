@@ -6645,3 +6645,14 @@ func ReverseSlice(slice []string) []string {
 	}
 	return slice
 }
+
+
+// FirstNonEmpty returns the first non-empty string from the arguments.
+func FirstNonEmpty(values ...string) string {
+	for _, v := range values {
+		if strings.TrimSpace(v) != "" {
+			return v
+		}
+	}
+	return ""
+}
