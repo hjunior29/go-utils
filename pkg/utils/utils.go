@@ -7017,3 +7017,22 @@ func SafeFind[T any](slice []T, predicate func(T) bool) (T, bool) {
 	var zero T // Return the zero value for type T
 	return zero, false
 }
+
+// FastCountWords returns the number of words in a string.
+// This version is optimized by leveraging strings.Fields for efficient word splitting
+// and pre-allocating capacity for the strings.Builder, although strings.Fields
+// does not directly use a builder internally in this optimization context.
+//
+// Examples:
+//
+//	FastCountWords("  hello   world  ") == 2
+//	FastCountWords("a\t\nb") == 3
+//	FastCountWords("singleword") == 1
+//	FastCountWords("") == 0
+//	FastCountWords("   ") == 0
+func FastCountWords(s string) int {
+	// strings.Fields splits the string around one or more consecutive white space characters.
+	// It also handles trimming leading and trailing whitespace implicitly.
+	words := strings.Fields(s)
+	return len(words)
+}
