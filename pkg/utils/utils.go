@@ -6656,3 +6656,316 @@ func FirstNonEmpty(values ...string) string {
 	}
 	return ""
 }
+
+// FastFind returns the first element in a slice that satisfies a given predicate function.
+// This version is optimized by returning immediately once a match is found.
+// The predicate function should return true for the element to find.
+// If no element satisfies the predicate, it returns the zero value of type T and false.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return The first element that satisfies the predicate and true, or the zero value of T and false if no such element is found.
+//
+// Examples:
+//
+//	FastFind([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == (2, true)
+//	FastFind([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) == ("", false)
+//	FastFind([]int{}, func(n int) bool { return n > 0 }) == (0, false)
+func FastFind[T any](slice []T, predicate func(T) bool) (T, bool) {
+	for _, item := range slice {
+		if predicate(item) {
+			return item, true
+		}
+	}
+	var zero T // Return the zero value for type T
+	return zero, false
+}
+
+// FastFindIndex returns the index of the first element in a slice that satisfies a given predicate function.
+// This version is optimized by returning immediately once a match is found.
+// The predicate function should return true for the element to find.
+// If no element satisfies the predicate, it returns -1.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return The index of the first element that satisfies the predicate, or -1 if no such element is found.
+//
+// Examples:
+//
+//	FastFindIndex([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == 1
+//	FastFindIndex([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) == -1
+//	FastFindIndex([]int{}, func(n int) bool { return n > 0 }) == -1
+func FastFindIndex[T any](slice []T, predicate func(T) bool) int {
+	for i, item := range slice {
+		if predicate(item) {
+			return i
+		}
+	}
+	return -1
+}
+
+// FastFindLastIndex returns the index of the last element in a slice that satisfies a given predicate function.
+// This version is optimized by returning immediately once a match is found.
+// The predicate function should return true for the element to find.
+// If no element satisfies the predicate, it returns -1.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return The index of the last element that satisfies the predicate, or -1 if no such element is found.
+//
+// Examples:
+//
+//	FastFindLastIndex([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == 3
+//	FastFindLastIndex([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) == -1
+//	FastFindLastIndex([]int{}, func(n int) bool { return n > 0 }) == -1
+func FastFindLastIndex[T any](slice []T, predicate func(T) bool) int {
+	for i := len(slice) - 1; i >= 0; i-- {
+		if predicate(slice[i]) {
+			return i
+		}
+	}
+	return -1
+}
+
+// FastMap applies a function to each element of a slice and returns a new slice with the results.
+// This version is optimized by pre-allocating the result slice capacity.
+// The function `f` takes an element of type T and returns an element of type U.
+//
+// @param slice The input slice of elements of type T.
+// @param f The function to apply to each element. It takes an element of type T and returns an element of type U.
+// @return A new slice of type U containing the results of applying the function `f` to each element of the input slice.
+//
+// Examples:
+//
+//	FastMap([]int{1, 2, 3}, func(n int) string { return strconv.Itoa(n) }) == []string{"1", "2", "3"}
+//	FastMap([]string{"a", "b", "c"}, func(s string) int { return len(s) }) == []int{1, 1, 1}
+func FastMap[T any, U any](slice []T, f func(T) U) []U {
+	result := make([]U, len(slice))
+	// Pre-allocating the result slice capacity can improve performance
+	// by reducing reallocations if the underlying slice implementation does not
+	// optimize appends. Here, we are directly assigning, so capacity is for
+	// the final size.
+	for i, v := range slice {
+		result[i] = f(v)
+	}
+	return result
+}
+
+// FastFilter returns a new slice containing only elements from the input slice
+// that satisfy the given predicate function.
+// The predicate function should return true for elements to keep and false for elements to discard.
+// This version is optimized by pre-allocating the result slice capacity.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return A new slice containing only the elements from the input slice that satisfy the predicate.
+//
+// Examples:
+//
+//	FastFilter([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == []int{2, 4}
+//	FastFilter([]string{"apple", "banana", "cherry"}, func(s string) bool { return len(s) > 5 }) == []string{"banana", "cherry"}
+func FastFilter[T any](slice []T, predicate func(T) bool) []T {
+	// Pre-allocate result slice with a heuristic initial capacity.
+	// This can improve performance by reducing reallocations.
+	result := make([]T, 0, len(slice)/2)
+	for _, item := range slice {
+		if predicate(item) {
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+// FastExclude returns a new slice containing elements from the input slice
+// that do NOT satisfy the given predicate function.
+// The predicate function should return true for elements to exclude and false for elements to keep.
+// This version is optimized by pre-allocating the result slice capacity.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return A new slice containing only the elements from the input slice that do NOT satisfy the predicate.
+//
+// Examples:
+//
+//	FastExclude([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == []int{1, 3, 5}
+func FastExclude[T any](slice []T, predicate func(T) bool) []T {
+	// Pre-allocate result slice with a heuristic initial capacity.
+	// This can improve performance by reducing reallocations.
+	result := make([]T, 0, len(slice)/2)
+	for _, item := range slice {
+		if !predicate(item) { // Keep elements for which the predicate is false
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+// FastPartition splits a slice into two slices based on a predicate function.
+// It is optimized by pre-allocating the result slices' capacities.
+// The first slice contains elements for which the predicate returns true, and the second slice
+// contains elements for which the predicate returns false.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return A slice containing two slices: the first for elements satisfying the predicate, the second for those that don't.
+//
+// Examples:
+//
+//	FastPartition([]int{1, 2, 3, 4, 5, 6}, func(n int) bool { return n%2 == 0 }) returns [][]int{{2, 4, 6}, {1, 3, 5}}
+//	FastPartition([]string{"apple", "banana", "cherry"}, func(s string) bool { return len(s) > 5 }) returns [][]string{{"banana", "cherry"}, {"apple"}}
+//	FastPartition([]int{}, func(n int) bool { return n > 0 }) returns [][]int{{}, {}}
+func FastPartition[T any](slice []T, predicate func(T) bool) [][]T {
+	trueSlice := make([]T, 0, len(slice)/2)   // Heuristic initial capacity
+	falseSlice := make([]T, 0, len(slice)/2) // Heuristic initial capacity
+
+	for _, item := range slice {
+		if predicate(item) {
+			trueSlice = append(trueSlice, item)
+		} else {
+			falseSlice = append(falseSlice, item)
+		}
+	}
+
+	return [][]T{trueSlice, falseSlice}
+}
+
+// FastGroupBy groups elements of a slice into a map based on a key-generating function.
+// The key-generating function `keyFunc` takes an element of type T and returns a key of type K.
+// Elements with the same key are grouped together in a slice.
+// This version is optimized by pre-allocating the map and slice capacities for efficiency.
+//
+// @param slice The input slice of elements of type T.
+// @param keyFunc A function that generates a key for each element.
+// @return A map where keys are generated by `keyFunc` and values are slices of elements that map to that key.
+//
+// Examples:
+//
+//	FastGroupBy([]int{1, 2, 3, 4, 5, 6}, func(n int) string { if n%2 == 0 { return "even" } return "odd" }) returns map[string][]int{"odd": {1, 3, 5}, "even": {2, 4, 6}}
+//	FastGroupBy([]string{"apple", "banana", "apricot"}, func(s string) string { return string(s[0]) }) returns map[string][]string{"a": {"apple", "apricot"}, "b": {"banana"}}
+//	FastGroupBy([]int{}, func(n int) string { return "key" }) returns an empty map.
+func FastGroupBy[T any, K comparable](slice []T, keyFunc func(T) K) map[K][]T {
+	grouped := make(map[K][]T, len(slice)) // Heuristic initial capacity for the map
+
+	for _, item := range slice {
+		key := keyFunc(item)
+		// Pre-allocate slice capacity if it's the first element for this key.
+		// This is a heuristic and might not always be optimal.
+		if _, ok := grouped[key]; !ok {
+			grouped[key] = make([]T, 0, len(slice)/2) // Heuristic initial capacity for inner slices
+		}
+		grouped[key] = append(grouped[key], item)
+	}
+	return grouped
+}
+
+// FastUnique returns a new slice containing only the unique elements from the input slice.
+// It uses generics to work with slices of any comparable type.
+// This version is optimized by pre-allocating map and slice capacities for efficiency.
+// The order of elements in the resulting slice is not guaranteed.
+//
+// @param slice The input slice from which to remove duplicate elements.
+// @return A new slice containing only the unique elements from the input slice. The order is not guaranteed.
+//
+// Examples:
+//
+//	FastUnique([]int{1, 2, 2, 3, 4, 4, 4, 5}) == []int{1, 2, 3, 4, 5} (order may vary)
+//	FastUnique([]string{"a", "b", "a", "c", "b"}) == []string{"a", "b", "c"} (order may vary)
+func FastUnique[T comparable](slice []T) []T {
+	set := make(map[T]struct{}, len(slice)) // Pre-allocate map capacity
+	for _, item := range slice {
+		set[item] = struct{}{}
+	}
+
+	result := make([]T, 0, len(set)) // Pre-allocate slice capacity
+	for item := range set {
+		result = append(result, item)
+	}
+	return result
+}
+
+// FastDifference returns a new slice containing elements that are in slice1 but not in slice2.
+// It uses generics to work with slices of any comparable type.
+// This version is optimized by pre-allocating map and slice capacities for efficiency.
+// The order of elements in the resulting slice is preserved from slice1.
+//
+// @param slice1 The first input slice.
+// @param slice2 The second input slice, containing elements to exclude from slice1.
+// @return A new slice containing elements present in slice1 but not in slice2, preserving the order from slice1.
+//
+// Examples:
+//
+//	FastDifference([]int{1, 2, 3, 4}, []int{3, 4, 5, 6}) == []int{1, 2}
+//	FastDifference([]string{"a", "b", "c"}, []string{"b", "c", "d"}) == []string{"a"}
+//	FastDifference([]int{1, 2}, []int{3, 4}) == []int{1, 2}
+func FastDifference[T comparable](slice1, slice2 []T) []T {
+	// Use a map to store elements of the second slice for efficient lookup.
+	// Pre-allocate map capacity for efficiency.
+	set2 := make(map[T]struct{}, len(slice2))
+	for _, item := range slice2 {
+		set2[item] = struct{}{}
+	}
+
+	var result []T
+	// Pre-allocate slice capacity for efficiency.
+	// This is a heuristic, assuming at most len(slice1) elements will be in the result.
+	result = make([]T, 0, len(slice1))
+
+	// Iterate over the first slice and add elements not found in the map.
+	for _, item := range slice1 {
+		if _, ok := set2[item]; !ok {
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+// FastUnion returns a new slice containing all unique elements from both input slices.
+// It uses generics to work with slices of any comparable type.
+// This version is optimized by pre-allocating map and slice capacities for efficiency.
+// The order of elements in the resulting slice is not guaranteed.
+//
+// @param slice1 The first input slice.
+// @param slice2 The second input slice.
+// @return A new slice containing all unique elements from both input slices. The order is not guaranteed.
+//
+// Examples:
+//
+//	FastUnion([]int{1, 2, 3}, []int{3, 4, 5}) == []int{1, 2, 3, 4, 5} (order may vary)
+//	FastUnion([]string{"a", "b"}, []string{"b", "c", "d"}) == []string{"a", "b", "c", "d"} (order may vary)
+//	FastUnion([]int{1, 2}, []int{3, 4}) == []int{1, 2, 3, 4} (order may vary)
+func FastUnion[T comparable](slice1, slice2 []T) []T {
+	// Use a map to store all unique elements encountered.
+	// Pre-allocate map capacity for efficiency.
+	set := make(map[T]struct{}, len(slice1)+len(slice2))
+
+	// Add elements from the first slice to the set.
+	for _, item := range slice1 {
+		set[item] = struct{}{}
+	}
+
+	// Add elements from the second slice to the set.
+	for _, item := range slice2 {
+		set[item] = struct{}{}
+	}
+
+	// Convert the set back to a slice.
+	// Pre-allocate slice capacity for efficiency.
+	result := make([]T, 0, len(set))
+	for item := range set {
+		result = append(result, item)
+	}
+	return result
+}
+
+// FastIntersect returns a new slice containing elements that are present in both input slices.
+// It uses generics to work with slices of any comparable type.
+// This version is optimized by pre-allocating map and slice capacities for efficiency.
+// The order of elements in the resulting slice is not guaranteed.
+//
+// @param slice1 The first input slice.
+// @param slice2 The second input slice.
+// @return A new slice containing elements common to both input slices. The order is not guaranteed.
+//
+// Examples:
+//
+//	FastIntersect([]int{1, 2, 3, 4}, []int{3, 4
