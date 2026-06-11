@@ -6993,3 +6993,27 @@ func FastMap[T any, U any](slice []T, f func(T) U) []U {
 	}
 	return result
 }
+
+// SafeFind returns the first element in a slice that satisfies a given predicate function, along with a boolean indicating success.
+// The predicate function should return true for the element to find.
+// If no element satisfies the predicate, it returns the zero value of type T and false.
+// This function is safe as it handles potential issues gracefully by returning a boolean indicating success.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return The first element that satisfies the predicate and true, or the zero value of T and false if no such element is found.
+//
+// Examples:
+//
+//	FastFind([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == (2, true)
+//	FastFind([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) == ("", false)
+//	FastFind([]int{}, func(n int) bool { return n > 0 }) == (0, false)
+func SafeFind[T any](slice []T, predicate func(T) bool) (T, bool) {
+	for _, item := range slice {
+		if predicate(item) {
+			return item, true
+		}
+	}
+	var zero T // Return the zero value for type T
+	return zero, false
+}
