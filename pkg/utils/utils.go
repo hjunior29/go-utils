@@ -7126,3 +7126,21 @@ func ValidateISODate(dateStr string) error {
 	}
 	return nil
 }
+
+// DefaultIfEmpty returns the default value if the string is empty or contains only whitespace.
+//
+// @param s The input string to check.
+// @param defaultVal The default string value to return if `s` is empty.
+// @return The input string `s` if it's not empty, otherwise `defaultVal`.
+//
+// Examples:
+//
+//	DefaultIfEmpty("hello", "default") == "hello"
+//	DefaultIfEmpty("   ", "default") == "default"
+//	DefaultIfEmpty("", "default") == "default"
+func DefaultIfEmpty(s, defaultVal string) string {
+	if strings.TrimSpace(s) == "" {
+		return defaultVal
+	}
+	return s
+}
