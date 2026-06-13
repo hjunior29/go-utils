@@ -7541,3 +7541,20 @@ func FastUnion[T comparable](slice1, slice2 []T) []T {
 // Examples:
 //
 //	FastIntersect([]int{1, 2, 3, 4}, []int{3, 4
+
+// SafeIndex returns the index of the first instance of substr in s, or -1 if substr is not present in s.
+// If substr is empty, it returns 0.
+// It returns an error if the substring is not found.
+//
+// Examples:
+//
+//	SafeIndex("hello world", "world") == (6, nil)
+//	SafeIndex("hello world", "goodbye") returns (-1, error)
+//	SafeIndex("hello", "") == (0, nil)
+func SafeIndex(s, substr string) (int, error) {
+	index := strings.Index(s, substr)
+	if index == -1 {
+		return -1, errors.New("substring not found")
+	}
+	return index, nil
+}
