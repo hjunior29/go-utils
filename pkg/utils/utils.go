@@ -7852,3 +7852,34 @@ func ContainsAnyGeneric[T comparable](slice []T, item T) bool {
 	}
 	return false
 }
+
+// ValidateUUID checks if a string is a valid UUID (Universally Unique Identifier).
+// A valid UUID has the format "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", where 'x' represents a hexadecimal digit.
+// It returns an error if the string does not conform to this format or contains invalid characters.
+//
+// Examples:
+//
+//	ValidateUUID("a1b2c3d4-e5f6-7890-1234-567890abcdef") == nil
+//	ValidateUUID("A1B2C3D4-E5F6-7890-1234-567890ABCDEF") == nil // Case-insensitive
+//	ValidateUUID("a1b2c3d4e5f678901234567890abcdef") returns an error // Missing hyphens
+//	ValidateUUID("g1b2c3d4-e5f6-7890-1234-567890abcdef") returns an error // Invalid character 'g'
+//	ValidateUUID("a1b2c3d4-e5f6-7890-1234-567890abcde") returns an error // Incorrect length
+func ValidateUUID(uuid string) error {
+	if len(uuid) != 36 {
+		return errors.New("invalid UUID length: must be 36 characters (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)")
+	}
+
+	for i, r := range uuid {
+		switch i {
+		case 8, 13, 18, 23: // Hyphen positions
+			if r != '-' {
+				return errors.New("invalid UUID format: hyphens missing or misplaced")
+			}
+		default: // Hexadecimal digit positions
+			if !unicode.IsDigit(r) && (r < 'a' || r > 'f') && (r < 'A' || r > 'F') {
+				return errors.New("invalid UUID format: contains non-hexadecimal characters")
+			}
+		}
+	}
+	return nil
+}
