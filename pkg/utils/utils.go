@@ -7761,3 +7761,73 @@ func SafeValidateMACAddress(mac string) (string, error) {
 	}
 	return builder.String(), nil
 }
+
+// ValidateHostname checks if a string is a valid hostname.
+// A valid hostname consists of labels separated by dots. Each label
+// must start and end with an alphanumeric character, and can contain
+// hyphens in between. Hostnames can also be IP addresses.
+// It returns an error if the string is not a valid hostname.
+//
+// Examples:
+//
+//	ValidateHostname("example.com") == nil
+//	ValidateHostname("sub.example.co.uk") == nil
+//	ValidateHostname("localhost") == nil
+//	ValidateHostname("192.168.1.1") == nil
+//	ValidateHostname("example-.com") returns an error (label ends with hyphen)
+//	ValidateHostname("-example.com") returns an error (label starts with hyphen)
+//	ValidateHostname("example..com") returns an error (empty label)
+//	ValidateHostname("example.c") returns an error (TLD too short)
+//	ValidateHostname("example.c_m") returns an error (invalid character in TLD)
+//	ValidateHostname("") returns an error
+func ValidateHostname(hostname string) error {
+	if hostname == "" {
+		return errors.New("hostname cannot be empty")
+	}
+
+	// Try to parse as an IP address first
+	if net.ParseIP(hostname) != nil {
+		return nil
+	}
+
+	// If not an IP address, validate as a hostname
+	labels := strings.Split(hostname, ".")
+
+	// Hostname must have at least one label (e.g., "localhost").
+	if len(labels) == 0 {
+		return errors.New("invalid hostname format: must have at least one label")
+	}
+
+	// Validate each label.
+	for _, label := range labels {
+		if label == "" {
+			return errors.New("invalid hostname format: labels cannot be empty")
+		}
+		if len(label) > 63 { // RFC specifies label length limit
+			return errors.New("invalid hostname format: label length exceeds 63 characters")
+		}
+		if label[0] == '-' || label[len(label)-1] == '-' {
+			return errors.New("invalid hostname format: labels cannot start or end with a hyphen")
+		}
+		for _, r := range label {
+			if !unicode.IsLetter(r) && !unicode.IsNumber(r) && r != '-' {
+				return errors.New("invalid hostname format: labels can only contain alphanumeric characters and hyphens")
+			}
+		}
+	}
+
+	// Validate the TLD (last label) if there are multiple labels.
+	if len(labels) > 1 {
+		tld := labels[len(labels)-1]
+		if len(tld) < 2 {
+			return errors.New("invalid hostname format: top-level domain (TLD) must be at least two characters long")
+		}
+		for _, r := range tld {
+			if !unicode.IsLetter(r) {
+				return errors.New("invalid hostname format: top-level domain (TLD) must contain only letters")
+			}
+		}
+	}
+
+	return nil
+}
