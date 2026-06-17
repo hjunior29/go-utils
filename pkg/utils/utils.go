@@ -7710,3 +7710,54 @@ func IsAlpha(s string) bool {
 	}
 	return true
 }
+
+// SafeValidateMACAddress checks if a string is a valid MAC address.
+// A MAC address consists of six groups of two hexadecimal digits, separated by colons or hyphens.
+// It returns the normalized MAC address (using colons, lowercase hex digits) and a nil error if valid,
+// otherwise an empty string and an error.
+//
+// Examples:
+//
+//	SafeValidateMACAddress("00:1A:2B:3C:4D:5E") == ("00:1a:2b:3c:4d:5e", nil)
+//	SafeValidateMACAddress("00-1a-2b-3c-4d-5e") == ("00:1a:2b:3c:4d:5e", nil)
+//	SafeValidateMACAddress("001A2B3C4D5E") == ("", error) // Invalid format, no separators
+//	SafeValidateMACAddress("00:1A:2B:3C:4D:5G") == ("", error) // Invalid character 'G'
+//	SafeValidateMACAddress("00:1A:2B:3C:4D") == ("", error) // Incorrect length
+func SafeValidateMACAddress(mac string) (string, error) {
+	// Normalize to colons for easier processing
+	mac = strings.ReplaceAll(mac, "-", ":")
+
+	// Split by colon
+	parts := strings.Split(mac, ":")
+
+	// Must have 6 parts
+	if len(parts) != 6 {
+		return "", errors.New("invalid MAC address format: must have 6 parts separated by colons")
+	}
+
+	var builder strings.Builder
+	builder.Grow(17) // xx:xx:xx:xx:xx:xx
+
+	for i, part := range parts {
+		// Each part must be 2 characters long
+		if len(part) != 2 {
+			return "", errors.New("invalid MAC address format: each part must be 2 hexadecimal digits")
+		}
+		// Each part must contain only hexadecimal characters
+		for _, r := range part {
+			var hexDigit rune
+			if unicode.IsDigit(r) {
+				hexDigit = r
+			} else if (r >= 'a' && r <= 'f') || (r >= 'A' && r <= 'F') {
+				hexDigit = unicode.ToLower(r) // Normalize to lowercase
+			} else {
+				return "", errors.New("invalid MAC address format: contains non-hexadecimal characters")
+			}
+			builder.WriteRune(hexDigit)
+		}
+		if i < 5 {
+			builder.WriteRune(':')
+		}
+	}
+	return builder.String(), nil
+}
