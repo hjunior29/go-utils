@@ -7883,3 +7883,19 @@ func ValidateUUID(uuid string) error {
 	}
 	return nil
 }
+
+// SafeRemovePrefix removes the prefix from the string if present.
+// It returns the modified string and a nil error. If the string does not
+// start with the prefix, it returns the original string and a nil error.
+//
+// Examples:
+//
+//	SafeRemovePrefix("hello world", "hello ") == ("world", nil)
+//	SafeRemovePrefix("hello world", "goodbye ") == ("hello world", nil)
+//	SafeRemovePrefix("hello", "") == ("", nil) // Empty prefix
+func SafeRemovePrefix(s, prefix string) (string, error) {
+	if strings.HasPrefix(s, prefix) {
+		return s[len(prefix):], nil
+	}
+	return s, nil
+}
