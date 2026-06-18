@@ -7965,3 +7965,37 @@ func FastPadLeft(s string, length int, padChar rune) string {
 	padding := strings.Repeat(string(padChar), paddingLen)
 	return padding + s
 }
+
+// SafeLongestCommonPrefix finds the longest common prefix string amongst an array of strings.
+// If there is no common prefix, an empty string is returned.
+// It returns the common prefix and a nil error.
+//
+// @param strs The slice of strings to find the common prefix for.
+// @return The longest common prefix string and a nil error, or an empty string and an error if the input is invalid.
+//
+// Examples:
+//
+//	SafeLongestCommonPrefix([]string{"flower", "flow", "flight"}) == ("fl", nil)
+//	SafeLongestCommonPrefix([]string{"dog", "racecar", "car"}) == ("", nil)
+//	SafeLongestCommonPrefix([]string{"apple", "apple", "apple"}) == ("apple", nil)
+//	SafeLongestCommonPrefix([]string{}) == ("", nil)
+func SafeLongestCommonPrefix(strs []string) (string, error) {
+	if len(strs) == 0 {
+		return "", nil
+	}
+
+	// Start with the first string as the initial prefix.
+	prefix := strs[0]
+
+	// Iterate through the rest of the strings.
+	for i := 1; i < len(strs); i++ {
+		// Shorten the prefix until it matches the beginning of the current string.
+		for !strings.HasPrefix(strs[i], prefix) {
+			if len(prefix) == 0 {
+				return "", nil // No common prefix found at all.
+			}
+			prefix = prefix[:len(prefix)-1]
+		}
+	}
+	return prefix, nil
+}
