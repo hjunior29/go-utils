@@ -7923,3 +7923,20 @@ func ValidateHex(s string) error {
 	}
 	return nil
 }
+
+// CountGeneric counts the number of occurrences of an item in a slice of any comparable type.
+//
+// Examples:
+//
+//	CountGeneric([]int{1, 2, 3, 2, 1}, 2) == 2
+//	CountGeneric([]string{"a", "b", "a", "c"}, "a") == 2
+//	CountGeneric([]float64{1.1, 2.2, 3.3}, 4.4) == 0
+func CountGeneric[T comparable](slice []T, item T) int {
+	count := 0
+	for _, element := range slice {
+		if element == item {
+			count++
+		}
+	}
+	return count
+}
