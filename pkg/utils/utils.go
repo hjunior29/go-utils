@@ -8042,3 +8042,27 @@ func IsEmpty(s string) bool {
 func IsEmptyGeneric[T any](slice []T) bool {
 	return len(slice) == 0
 }
+
+// ValidateHex checks if a string represents a valid hexadecimal number.
+// It returns an error if the string contains any characters that are not
+// hexadecimal digits (0-9, a-f, A-F) or if the string is empty.
+//
+// Examples:
+//
+//	ValidateHex("1A2B3C") == nil
+//	ValidateHex("abcdef") == nil
+//	ValidateHex("0123456789") == nil
+//	ValidateHex("1a2b3c") == nil
+//	ValidateHex("invalid hex") returns an error
+//	ValidateHex("") returns an error
+func ValidateHex(s string) error {
+	if s == "" {
+		return errors.New("string cannot be empty")
+	}
+	for _, r := range s {
+		if !unicode.IsDigit(r) && (r < 'a' || r > 'f') && (r < 'A' || r > 'F') {
+			return errors.New("string contains non-hexadecimal characters")
+		}
+	}
+	return nil
+}
