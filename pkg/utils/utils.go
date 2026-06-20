@@ -8106,3 +8106,23 @@ func SafeSlugify(s string) (string, error) {
 	result = strings.Trim(result, "-")
 	return result, nil
 }
+
+// ContainsAnyGeneric checks if a slice of any comparable type contains a specific item.
+// This function leverages Go generics to work with slices of any type that supports equality comparison.
+//
+// @param slice The slice to search within. The elements must be of a comparable type.
+// @param item The item to search for in the slice. It must be of the same type as the slice elements.
+// @return true if the item is found in the slice, false otherwise.
+//
+// Examples:
+//
+//	ContainsAnyGeneric([]int{1, 2, 3}, 2) == true
+//	ContainsAnyGeneric([]string{"a", "b", "c"}, "d") == false
+func ContainsAnyGeneric[T comparable](slice []T, item T) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
+}
