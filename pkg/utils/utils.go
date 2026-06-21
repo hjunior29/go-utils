@@ -8147,3 +8147,44 @@ func SafeReverse(s string) (string, error) {
 	}
 	return string(runes), nil
 }
+
+// FastSlugify converts a string into a URL-friendly slug.
+// It converts the string to lowercase, replaces spaces and non-alphanumeric characters with hyphens,
+// and trims leading/trailing hyphens. Multiple hyphens are reduced to a single hyphen.
+// This version is optimized by pre-allocating the strings.Builder capacity and efficiently
+// handling character replacements and trimming.
+//
+// Examples:
+//
+//	FastSlugify("Hello World!") == "hello-world"
+//	FastSlugify(" A New Topic  ") == "a-new-topic"
+//	FastSlugify("Another_Example-Here") == "another-example-here"
+//	FastSlugify("123-456") == "123-456"
+func FastSlugify(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	s = strings.ToLower(s)
+	var builder strings.Builder
+	builder.Grow(len(s)) // Pre-allocate capacity for efficiency
+	var lastCharIsHyphen bool
+
+	for i, r := range s {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) {
+			builder.WriteRune(r)
+			lastCharIsHyphen = false
+		} else if !lastCharIsHyphen {
+			// Only add a hyphen if it's not a duplicate and not at the beginning
+			if builder.Len() > 0 && i < len(s) {
+				builder.WriteRune('-')
+				lastCharIsHyphen = true
+			}
+		}
+	}
+
+	// Trim leading and trailing hyphens
+	result := builder.String()
+	result = strings.Trim(result, "-")
+	return result
+}
