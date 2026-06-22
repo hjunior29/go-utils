@@ -8205,3 +8205,27 @@ func CountGeneric[T comparable](slice []T, item T) int {
 	}
 	return count
 }
+
+// FastMap applies a function to each element of a slice and returns a new slice with the results.
+// This version is optimized by pre-allocating the result slice capacity.
+// The function `f` takes an element of type T and returns an element of type U.
+//
+// @param slice The input slice of elements of type T.
+// @param f The function to apply to each element. It takes an element of type T and returns an element of type U.
+// @return A new slice of type U containing the results of applying the function `f` to each element of the input slice.
+//
+// Examples:
+//
+//	FastMap([]int{1, 2, 3}, func(n int) string { return strconv.Itoa(n) }) == []string{"1", "2", "3"}
+//	FastMap([]string{"a", "b", "c"}, func(s string) int { return len(s) }) == []int{1, 1, 1}
+func FastMap[T any, U any](slice []T, f func(T) U) []U {
+	result := make([]U, len(slice))
+	// Pre-allocating the result slice capacity can improve performance
+	// by reducing reallocations if the underlying slice implementation does not
+	// optimize appends. Here, we are directly assigning, so capacity is for
+	// the final size.
+	for i, v := range slice {
+		result[i] = f(v)
+	}
+	return result
+}
