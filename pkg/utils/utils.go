@@ -8287,3 +8287,330 @@ func FastExtractNumbers(s string) []string {
 	}
 	return numbers
 }
+
+// ContainsGeneric checks if a slice of any comparable type contains a specific item.
+// This function leverages Go generics to work with slices of any type that supports equality comparison.
+//
+// @param slice The slice to search within. The elements must be of a comparable type.
+// @param item The item to search for within the slice. It must be of the same type as the slice elements.
+// @return true if the item is found in the slice, false otherwise.
+//
+// Examples:
+//
+//	ContainsGeneric([]int{1, 2, 3}, 2) == true
+//	ContainsGeneric([]string{"a", "b", "c"}, "d") == false
+func ContainsGeneric[T comparable](slice []T, item T) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
+}
+
+// MapGeneric applies a function to each element of a slice and returns a new slice with the results.
+// The function `f` takes an element of type T and returns an element of type U.
+//
+// @param slice The input slice of elements of type T.
+// @param f The function to apply to each element. It takes an element of type T and returns an element of type U.
+// @return A new slice of type U containing the results of applying the function `f` to each element of the input slice.
+//
+// Examples:
+//
+//	MapGeneric([]int{1, 2, 3}, func(n int) string { return strconv.Itoa(n) }) == []string{"1", "2", "3"}
+//	MapGeneric([]string{"a", "b", "c"}, func(s string) int { return len(s) }) == []int{1, 1, 1}
+func MapGeneric[T any, U any](slice []T, f func(T) U) []U {
+	result := make([]U, len(slice))
+	for i, v := range slice {
+		result[i] = f(v)
+	}
+	return result
+}
+
+// FilterGeneric returns a new slice containing only elements from the input slice
+// that satisfy the given predicate function.
+// The predicate function should return true for elements to keep and false for elements to discard.
+// This generic version works with slices of any type.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return A new slice containing only the elements from the input slice that satisfy the predicate.
+//
+// Examples:
+//
+//	FilterGeneric([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == []int{2, 4}
+//	FilterGeneric([]string{"apple", "banana", "cherry"}, func(s string) bool { return len(s) > 5 }) == []string{"banana", "cherry"}
+func FilterGeneric[T any](slice []T, predicate func(T) bool) []T {
+	// Pre-allocate result slice with a heuristic initial capacity.
+	// This can improve performance by reducing reallocations.
+	result := make([]T, 0, len(slice)/2)
+	for _, item := range slice {
+		if predicate(item) {
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+// ExcludeGeneric returns a new slice containing elements from the input slice
+// that do NOT satisfy the given predicate function.
+// The predicate function should return true for elements to exclude and false for elements to keep.
+// This generic version works with slices of any type.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return A new slice containing only the elements from the input slice that do NOT satisfy the predicate.
+//
+// Examples:
+//
+//	ExcludeGeneric([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == []int{1, 3, 5}
+func ExcludeGeneric[T any](slice []T, predicate func(T) bool) []T {
+	// Pre-allocate result slice with a heuristic initial capacity.
+	// This can improve performance by reducing reallocations.
+	result := make([]T, 0, len(slice)/2)
+	for _, item := range slice {
+		if !predicate(item) { // Keep elements for which the predicate is false
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+// UnionGeneric returns a new slice containing all unique elements from both input slices.
+// It uses generics to work with slices of any comparable type.
+// The order of elements in the resulting slice is not guaranteed.
+//
+// @param slice1 The first input slice.
+// @param slice2 The second input slice.
+// @return A new slice containing all unique elements from both input slices. The order is not guaranteed.
+//
+// Examples:
+//
+//	UnionGeneric([]int{1, 2, 3}, []int{3, 4, 5}) == []int{1, 2, 3, 4, 5} (order may vary)
+//	UnionGeneric([]string{"a", "b"}, []string{"b", "c", "d"}) == []string{"a", "b", "c", "d"} (order may vary)
+//	UnionGeneric([]int{1, 2}, []int{3, 4}) == []int{1, 2, 3, 4} (order may vary)
+func UnionGeneric[T comparable](slice1, slice2 []T) []T {
+	// Use a map to store all unique elements encountered.
+	set := make(map[T]struct{}, len(slice1)+len(slice2))
+
+	// Add elements from the first slice to the set.
+	for _, item := range slice1 {
+		set[item] = struct{}{}
+	}
+
+	// Add elements from the second slice to the set.
+	for _, item := range slice2 {
+		set[item] = struct{}{}
+	}
+
+	// Convert the set back to a slice.
+	result := make([]T, 0, len(set))
+	for item := range set {
+		result = append(result, item)
+	}
+	return result
+}
+
+// IntersectGeneric returns a new slice containing elements that are present in both input slices.
+// It uses generics to work with slices of any comparable type.
+// The order of elements in the resulting slice is not guaranteed.
+//
+// @param slice1 The first input slice.
+// @param slice2 The second input slice.
+// @return A new slice containing elements common to both input slices. The order is not guaranteed.
+//
+// Examples:
+//
+//	IntersectGeneric([]int{1, 2, 3, 4}, []int{3, 4, 5, 6}) == []int{3, 4}
+//	IntersectGeneric([]string{"a", "b", "c"}, []string{"b", "c", "d"}) == []string{"b", "c"}
+//	IntersectGeneric([]int{1, 2}, []int{3, 4}) == []int{}
+func IntersectGeneric[T comparable](slice1, slice2 []T) []T {
+	// Use a map to store elements of the first slice for efficient lookup.
+	set1 := make(map[T]struct{}, len(slice1))
+	for _, item := range slice1 {
+		set1[item] = struct{}{}
+	}
+
+	var result []T
+	// Iterate over the second slice and check if elements exist in the map.
+	for _, item := range slice2 {
+		if _, ok := set1[item]; ok {
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+// DifferenceGeneric returns a new slice containing elements that are in slice1 but not in slice2.
+// It uses generics to work with slices of any comparable type.
+// The order of elements in the resulting slice is preserved from slice1.
+//
+// @param slice1 The first input slice.
+// @param slice2 The second input slice, containing elements to exclude from slice1.
+// @return A new slice containing elements present in slice1 but not in slice2, preserving the order from slice1.
+//
+// Examples:
+//
+//	DifferenceGeneric([]int{1, 2, 3, 4}, []int{3, 4, 5, 6}) == []int{1, 2}
+//	DifferenceGeneric([]string{"a", "b", "c"}, []string{"b", "c", "d"}) == []string{"a"}
+//	DifferenceGeneric([]int{1, 2}, []int{3, 4}) == []int{1, 2}
+func DifferenceGeneric[T comparable](slice1, slice2 []T) []T {
+	// Use a map to store elements of the second slice for efficient lookup.
+	set2 := make(map[T]struct{}, len(slice2))
+	for _, item := range slice2 {
+		set2[item] = struct{}{}
+	}
+
+	var result []T
+	// Iterate over the first slice and add elements not found in the map.
+	for _, item := range slice1 {
+		if _, ok := set2[item]; !ok {
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+// DeduplicateGeneric returns a new slice containing only the unique elements from the input slice.
+// It uses generics to work with slices of any comparable type.
+// The order of elements in the resulting slice is preserved from their first appearance.
+//
+// @param slice The input slice from which to remove duplicate elements.
+// @return A new slice containing only the unique elements from the input slice, preserving the order of first appearance.
+//
+// Examples:
+//
+//	DeduplicateGeneric([]int{1, 2, 2, 3, 4, 4, 4, 5}) == []int{1, 2, 3, 4, 5}
+//	DeduplicateGeneric([]string{"a", "b", "a", "c", "b"}) == []string{"a", "b", "c"}
+func DeduplicateGeneric[T comparable](slice []T) []T {
+	seen := make(map[T]struct{}, len(slice))
+	result := make([]T, 0, len(slice))
+	for _, item := range slice {
+		if _, ok := seen[item]; !ok {
+			seen[item] = struct{}{}
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+// ReplaceAllGeneric replaces all occurrences of `old` with `new` in a slice of any comparable type.
+//
+// @param slice The input slice of elements of type T.
+// @param old The value to be replaced.
+// @param new The value to replace with.
+// @return A new slice with all occurrences of `old` replaced by `new`.
+//
+// Examples:
+//
+//	ReplaceAllGeneric([]int{1, 2, 1, 3}, 1, 10) == []int{10, 2, 10, 3}
+//	ReplaceAllGeneric([]string{"a", "b", "a", "c"}, "a", "x") == []string{"x", "b", "x", "c"}
+func ReplaceAllGeneric[T comparable](slice []T, old, new T) []T {
+	result := make([]T, len(slice))
+	for i, item := range slice {
+		if item == old {
+			result[i] = new
+		} else {
+			result[i] = item
+		}
+	}
+	return result
+}
+
+// ChunkGeneric splits a slice into smaller slices of a specified size.
+// If the last chunk is smaller than the size, it will be returned as is.
+// This function uses Go generics to work with slices of any type.
+//
+// @param slice The input slice of elements of type T.
+// @param size The desired size of each chunk. Must be greater than 0.
+// @return A slice of slices, where each inner slice is a chunk of the original slice.
+//         Returns an error if size is less than or equal to 0.
+//
+// Examples:
+//
+//	ChunkGeneric([]int{1, 2, 3, 4, 5}, 2) == [][]int{{1, 2}, {3, 4}, {5}}
+//	ChunkGeneric([]string{"a", "b", "c", "d"}, 3) == [][]string{{"a", "b", "c"}, {"d"}}
+//	ChunkGeneric([]int{1, 2, 3}, 1) == [][]int{{1}, {2}, {3}}
+//	ChunkGeneric([]int{1, 2, 3}, 5) == [][]int{{1, 2, 3}}
+//	ChunkGeneric([]int{}, 2) == [][]int{}
+//	ChunkGeneric([]int{1, 2, 3}, 0) returns an error
+func ChunkGeneric[T any](slice []T, size int) ([][]T, error) {
+	if size <= 0 {
+		return nil, errors.New("chunk size must be greater than 0")
+	}
+
+	if len(slice) == 0 {
+		return [][]T{}, nil
+	}
+
+	numChunks := (len(slice) + size - 1) / size
+	result := make([][]T, numChunks)
+	for i := 0; i < numChunks; i++ {
+		start := i * size
+		end := start + size
+		if end > len(slice) {
+			end = len(slice)
+		}
+		result[i] = slice[start:end]
+	}
+	return result, nil
+}
+
+// PartitionGeneric splits a slice into two slices based on a predicate function.
+// The first slice contains elements for which the predicate returns true, and the second slice
+// contains elements for which the predicate returns false.
+// This generic version works with slices of any type.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return A slice containing two slices: the first for elements satisfying the predicate, the second for those that don't.
+//
+// Examples:
+//
+//	PartitionGeneric([]int{1, 2, 3, 4, 5, 6}, func(n int) bool { return n%2 == 0 }) == [][]int{{2, 4, 6}, {1, 3, 5}}
+//	PartitionGeneric([]string{"apple", "banana", "cherry"}, func(s string) bool { return len(s) > 5 }) == [][]string{{"banana", "cherry"}, {"apple"}}
+//	PartitionGeneric([]int{}, func(n int) bool { return n > 0 }) == [][]int{{}, {}}
+func PartitionGeneric[T any](slice []T, predicate func(T) bool) [][]T {
+	trueSlice := make([]T, 0, len(slice)/2)   // Heuristic initial capacity
+	falseSlice := make([]T, 0, len(slice)/2) // Heuristic initial capacity
+
+	for _, item := range slice {
+		if predicate(item) {
+			trueSlice = append(trueSlice, item)
+		} else {
+			falseSlice = append(falseSlice, item)
+		}
+	}
+
+	return [][]T{trueSlice, falseSlice}
+}
+
+// GroupByGeneric groups elements of a slice into a map based on a key-generating function.
+// The key-generating function `keyFunc` takes an element of type T and returns a key of type K.
+// Elements with the same key are grouped together in a slice.
+// This generic version works with slices of any type and maps with comparable key types.
+//
+// @param slice The input slice of elements of type T.
+// @param keyFunc A function that generates a key for each element.
+// @return A map where keys are generated by `keyFunc` and values are slices of elements that map to that key.
+//
+// Examples:
+//
+//	GroupByGeneric([]int{1, 2, 3, 4, 5, 6}, func(n int) string { if n%2 == 0 { return "even" } return "odd" }) == map[string][]int{"odd": {1, 3, 5}, "even": {2, 4, 6}}
+//	GroupByGeneric([]string{"apple", "banana", "apricot"}, func(s string) string { return string(s[0]) }) == map[string][]string{"a": {"apple", "apricot"}, "b": {"banana"}}
+//	GroupByGeneric([]int{}, func(n int) string { return "key" }) == map[string][]int{}
+func GroupByGeneric[T any, K comparable](slice []T, keyFunc func(T) K) map[K][]T {
+	grouped := make(map[K][]T)
+	for _, item := range slice {
+		key := keyFunc(item)
+		grouped[key] = append(grouped[key], item)
+	}
+	return grouped
+}
+
+// EveryGeneric checks if all elements in a slice satisfy a given predicate function.
+// The predicate function should return true for elements that satisfy the condition.
+// This generic version works with slices of any type.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and
