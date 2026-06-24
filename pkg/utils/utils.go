@@ -8643,3 +8643,49 @@ func ToTitleCase(s string) string {
 	}
 	return string(runes)
 }
+
+// SomeGeneric checks if at least one element in a slice satisfies a given predicate function.
+// The predicate function should return true for elements that satisfy the condition.
+// This generic version works with slices of any type.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return true if at least one element satisfies the predicate, false otherwise. Returns false for an empty slice.
+//
+// Examples:
+//
+//	SomeGeneric([]int{1, 2, 3}, func(n int) bool { return n%2 == 0 }) == true
+//	SomeGeneric([]int{1, 3, 5}, func(n int) bool { return n%2 == 0 }) == false
+//	SomeGeneric([]string{"", "a", "b"}, func(s string) bool { return s != "" }) == true
+//	SomeGeneric([]int{}, func(n int) bool { return n > 0 }) == false // An empty slice vacuously satisfies no condition.
+func SomeGeneric[T any](slice []T, predicate func(T) bool) bool {
+	for _, item := range slice {
+		if predicate(item) {
+			return true
+		}
+	}
+	return false
+}
+
+// NoneGeneric checks if no elements in a slice satisfy a given predicate function.
+// The predicate function should return true for elements that satisfy the condition.
+// This generic version works with slices of any type.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return true if no elements satisfy the predicate, false otherwise. Returns true for an empty slice.
+//
+// Examples:
+//
+//	NoneGeneric([]int{1, 3, 5}, func(n int) bool { return n%2 == 0 }) == true
+//	NoneGeneric([]int{2, 4, 6}, func(n int) bool { return n%2 == 0 }) == false
+//	NoneGeneric([]string{"", "a", "b"}, func(s string) bool { return s == "" }) == false
+//	NoneGeneric([]int{}, func(n int) bool { return n > 0 }) == true // An empty slice vacuously satisfies no condition.
+func NoneGeneric[T any](slice []T, predicate func(T) bool) bool {
+	for _, item := range slice {
+		if predicate(item) {
+			return false
+		}
+	}
+	return true
+}
