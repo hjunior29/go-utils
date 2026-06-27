@@ -8895,3 +8895,29 @@ func ValidateHex(s string) error {
 	}
 	return nil
 }
+
+// FastContainsGeneric checks if a slice of any comparable type contains a specific item.
+// This version is optimized by using a map for lookups, which provides O(1) average time complexity
+// for checking existence, compared to O(n) for a linear scan.
+//
+// @param slice The slice to search within. The elements must be of a comparable type.
+// @param item The item to search for in the slice. It must be of the same type as the slice elements.
+// @return true if the item is found in the slice, false otherwise.
+//
+// Examples:
+//
+//	FastContainsGeneric([]int{1, 2, 3}, 2) == true
+//	FastContainsGeneric([]string{"a", "b", "c"}, "d") == false
+func FastContainsGeneric[T comparable](slice []T, item T) bool {
+	if len(slice) == 0 {
+		return false
+	}
+	// Use a map for O(1) average time complexity lookups.
+	// This is more efficient than a linear scan for larger slices.
+	set := make(map[T]struct{}, len(slice))
+	for _, s := range slice {
+		set[s] = struct{}{}
+	}
+	_, ok := set[item]
+	return ok
+}
