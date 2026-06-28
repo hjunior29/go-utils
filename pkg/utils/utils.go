@@ -9023,3 +9023,16 @@ func SubtractGeneric[T comparable](slice1, slice2 []T) []T {
 	}
 	return result
 }
+
+// SafeUnquote returns the unquoted version of a string, interpreting 1-byte C-style escape sequences.
+// It returns an error if the string is not a valid quoted string.
+//
+// Examples:
+//
+//	SafeUnquote(`"hello"`) == ("hello", nil)
+//	SafeUnquote(`"hello\nworld"`) == ("hello\nworld", nil)
+//	SafeUnquote(`"invalid escape\z"`) returns ("", error)
+//	SafeUnquote(`"unclosed string`) returns ("", error)
+func SafeUnquote(s string) (string, error) {
+	return strconv.Unquote(s)
+}
