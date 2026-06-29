@@ -9135,3 +9135,452 @@ func ToPascalCase(s string) string {
 
 	return builder.String()
 }
+
+// ToCamelCase converts a string from snake_case or kebab-case to camelCase.
+// It handles strings that are already in camelCase or PascalCase by simply returning them.
+// It also handles strings that are all uppercase (like acronyms) by returning them as is.
+//
+// @param s The input string to convert.
+// @return The camelCased string.
+//
+// Examples:
+//
+//	ToCamelCase("hello_world") == "helloWorld"
+//	ToCamelCase("hello-world") == "helloWorld"
+//	ToCamelCase("HelloWorld") == "HelloWorld"
+//	ToCamelCase("helloWorld") == "helloWorld"
+//	ToCamelCase("URL") == "URL"
+//	ToCamelCase("API_KEY") == "APIKey"
+func ToCamelCase(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	// Handle already camelCase or PascalCase strings, or all caps acronyms.
+	// This regex checks if there's a lowercase letter followed by an uppercase letter,
+	// or if the string is entirely uppercase.
+	if regexp.MustCompile(`[a-z][A-Z]`).MatchString(s) || regexp.MustCompile(`^[A-Z]+$`).MatchString(s) {
+		return s
+	}
+
+	var builder strings.Builder
+	capitalizeNext := false
+
+	for i, r := range s {
+		if r == '_' || r == '-' {
+			capitalizeNext = true
+		} else {
+			if capitalizeNext {
+				builder.WriteRune(unicode.ToUpper(r))
+				capitalizeNext = false
+			} else {
+				// If it's the first character and it's uppercase, keep it uppercase.
+				// Otherwise, convert to lowercase.
+				if i == 0 && unicode.IsUpper(r) {
+					builder.WriteRune(r)
+				} else {
+					builder.WriteRune(unicode.ToLower(r))
+				}
+			}
+		}
+	}
+
+	return builder.String()
+}
+
+// ToKebabCase converts a string from camelCase or PascalCase to kebab-case.
+// It also handles snake_case by converting underscores to hyphens.
+// It converts the entire string to lowercase.
+//
+// @param s The input string to convert.
+// @return The kebab-cased string.
+//
+// Examples:
+//
+//	ToKebabCase("helloWorld") == "hello-world"
+//	ToKebabCase("HelloWorld") == "hello-world"
+//	ToKebabCase("hello_world") == "hello-world"
+//	ToKebabCase("APIKey") == "api-key"
+//	ToKebabCase("URL") == "url"
+func ToKebabCase(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	var builder strings.Builder
+	var lastCharWasUpper bool
+
+	for i, r := range s {
+		if r == '_' {
+			builder.WriteRune('-')
+			lastCharWasUpper = false // Reset for potential consecutive underscores or acronyms
+		} else if unicode.IsUpper(r) {
+			// If it's an uppercase letter and not the first character, and the previous character was lowercase,
+			// or if it's part of an acronym followed by another uppercase letter, insert a hyphen.
+			if i > 0 && (unicode.IsLower(rune(s[i-1])) || (lastCharWasUpper && i < len(s)-1 && unicode.IsUpper(rune(s[i+1])))) {
+				builder.WriteRune('-')
+			}
+			builder.WriteRune(unicode.ToLower(r))
+			lastCharWasUpper = true
+		} else {
+			builder.WriteRune(unicode.ToLower(r))
+			lastCharWasUpper = false
+		}
+	}
+
+	return builder.String()
+}
+
+// ToPascalCase converts a string from snake_case or kebab-case to PascalCase.
+// It also handles camelCase by capitalizing the first letter.
+// It converts the entire string to lowercase before processing.
+//
+// @param s The input string to convert.
+// @return The PascalCased string.
+//
+// Examples:
+//
+//	ToPascalCase("hello_world") == "HelloWorld"
+//	ToPascalCase("hello-world") == "HelloWorld"
+//	ToPascalCase("helloWorld") == "HelloWorld"
+//	ToPascalCase("URL") == "URL"
+//	ToPascalCase("api_key") == "ApiKey"
+func ToPascalCase(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	// Convert to lowercase first to simplify handling different cases.
+	s = strings.ToLower(s)
+
+	var builder strings.Builder
+	capitalizeNext := true
+
+	for _, r := range s {
+		if r == '_' || r == '-' {
+			capitalizeNext = true
+		} else {
+			if capitalizeNext {
+				builder.WriteRune(unicode.ToUpper(r))
+				capitalizeNext = false
+			} else {
+				builder.WriteRune(r)
+			}
+		}
+	}
+
+	return builder.String()
+}
+
+// ToSnakeCase converts a string from camelCase or kebab-case to snake_case.
+// It also handles PascalCase by capitalizing the first letter.
+// It converts the entire string to lowercase.
+//
+// @param s The input string to convert.
+// @return The snake_cased string.
+//
+// Examples:
+//
+//	ToSnakeCase("helloWorld") == "hello_world"
+//	ToSnakeCase("HelloWorld") == "hello_world"
+//	ToSnakeCase("hello-world") == "hello_world"
+//	ToSnakeCase("APIKey") == "api_key"
+//	ToSnakeCase("URL") == "url"
+func ToSnakeCase(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	var builder strings.Builder
+	var lastCharWasUpper bool
+
+	for i, r := range s {
+		if r == '-' {
+			builder.WriteRune('_')
+			lastCharWasUpper = false
+		} else if unicode.IsUpper(r) {
+			// If it's an uppercase letter and not the first character, and the previous character was lowercase,
+			// or if it's part of an acronym followed by another uppercase letter, insert an underscore.
+			if i > 0 && (unicode.IsLower(rune(s[i-1])) || (lastCharWasUpper && i < len(s)-1 && unicode.IsUpper(rune(s[i+1])))) {
+				builder.WriteRune('_')
+			}
+			builder.WriteRune(unicode.ToLower(r))
+			lastCharWasUpper = true
+		} else {
+			builder.WriteRune(unicode.ToLower(r))
+			lastCharWasUpper = false
+		}
+	}
+
+	return builder.String()
+}
+
+// ToKebabCase converts a string from camelCase or PascalCase to kebab-case.
+// It also handles snake_case by converting underscores to hyphens.
+// It converts the entire string to lowercase.
+//
+// @param s The input string to convert.
+// @return The kebab-cased string.
+//
+// Examples:
+//
+//	ToKebabCase("helloWorld") == "hello-world"
+//	ToKebabCase("HelloWorld") == "hello-world"
+//	ToKebabCase("hello_world") == "hello-world"
+//	ToKebabCase("APIKey") == "api-key"
+//	ToKebabCase("URL") == "url"
+func ToKebabCase(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	var builder strings.Builder
+	var lastCharWasUpper bool
+
+	for i, r := range s {
+		if r == '_' {
+			builder.WriteRune('-')
+			lastCharWasUpper = false // Reset for potential consecutive underscores or acronyms
+		} else if unicode.IsUpper(r) {
+			// If it's an uppercase letter and not the first character, and the previous character was lowercase,
+			// or if it's part of an acronym followed by another uppercase letter, insert a hyphen.
+			if i > 0 && (unicode.IsLower(rune(s[i-1])) || (lastCharWasUpper && i < len(s)-1 && unicode.IsUpper(rune(s[i+1])))) {
+				builder.WriteRune('-')
+			}
+			builder.WriteRune(unicode.ToLower(r))
+			lastCharWasUpper = true
+		} else {
+			builder.WriteRune(unicode.ToLower(r))
+			lastCharWasUpper = false
+		}
+	}
+
+	return builder.String()
+}
+
+// ToSnakeCase converts a string from camelCase or kebab-case to snake_case.
+// It also handles PascalCase by capitalizing the first letter.
+// It converts the entire string to lowercase.
+//
+// @param s The input string to convert.
+// @return The snake_cased string.
+//
+// Examples:
+//
+//	ToSnakeCase("helloWorld") == "hello_world"
+//	ToSnakeCase("HelloWorld") == "hello_world"
+//	ToSnakeCase("hello-world") == "hello_world"
+//	ToSnakeCase("APIKey") == "api_key"
+//	ToSnakeCase("URL") == "url"
+func ToSnakeCase(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	var builder strings.Builder
+	var lastCharWasUpper bool
+
+	for i, r := range s {
+		if r == '-' {
+			builder.WriteRune('_')
+			lastCharWasUpper = false
+		} else if unicode.IsUpper(r) {
+			// If it's an uppercase letter and not the first character, and the previous character was lowercase,
+			// or if it's part of an acronym followed by another uppercase letter, insert an underscore.
+			if i > 0 && (unicode.IsLower(rune(s[i-1])) || (lastCharWasUpper && i < len(s)-1 && unicode.IsUpper(rune(s[i+1])))) {
+				builder.WriteRune('_')
+			}
+			builder.WriteRune(unicode.ToLower(r))
+			lastCharWasUpper = true
+		} else {
+			builder.WriteRune(unicode.ToLower(r))
+			lastCharWasUpper = false
+		}
+	}
+
+	return builder.String()
+}
+
+// ToScreamingSnakeCase converts a string from camelCase, PascalCase, or kebab-case to SCREAMING_SNAKE_CASE.
+// It also handles snake_case by ensuring all characters are uppercase and separated by underscores.
+//
+// @param s The input string to convert.
+// @return The SCREAMING_SNAKE_cased string.
+//
+// Examples:
+//
+//	ToScreamingSnakeCase("helloWorld") == "HELLO_WORLD"
+//	ToScreamingSnakeCase("HelloWorld") == "HELLO_WORLD"
+//	ToScreamingSnakeCase("hello-world") == "HELLO_WORLD"
+//	ToScreamingSnakeCase("APIKey") == "API_KEY"
+//	ToScreamingSnakeCase("URL") == "URL"
+func ToScreamingSnakeCase(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	var builder strings.Builder
+	var lastCharWasUpper bool
+
+	for i, r := range s {
+		if r == '-' {
+			builder.WriteRune('_')
+			lastCharWasUpper = false
+		} else if unicode.IsUpper(r) {
+			// If it's an uppercase letter and not the first character, and the previous character was lowercase,
+			// or if it's part of an acronym followed by another uppercase letter, insert an underscore.
+			if i > 0 && (unicode.IsLower(rune(s[i-1])) || (lastCharWasUpper && i < len(s)-1 && unicode.IsUpper(rune(s[i+1])))) {
+				builder.WriteRune('_')
+			}
+			builder.WriteRune(unicode.ToUpper(r))
+			lastCharWasUpper = true
+		} else {
+			builder.WriteRune(unicode.ToUpper(r))
+			lastCharWasUpper = false
+		}
+	}
+
+	return builder.String()
+}
+
+// ToCamelCase converts a string from snake_case or kebab-case to camelCase.
+// It handles strings that are already in camelCase or PascalCase by simply returning them.
+// It also handles strings that are all uppercase (like acronyms) by returning them as is.
+//
+// @param s The input string to convert.
+// @return The camelCased string.
+//
+// Examples:
+//
+//	ToCamelCase("hello_world") == "helloWorld"
+//	ToCamelCase("hello-world") == "helloWorld"
+//	ToCamelCase("HelloWorld") == "HelloWorld"
+//	ToCamelCase("helloWorld") == "helloWorld"
+//	ToCamelCase("URL") == "URL"
+//	ToCamelCase("API_KEY") == "APIKey"
+func ToCamelCase(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	// Handle already camelCase or PascalCase strings, or all caps acronyms.
+	// This regex checks if there's a lowercase letter followed by an uppercase letter,
+	// or if the string is entirely uppercase.
+	if regexp.MustCompile(`[a-z][A-Z]`).MatchString(s) || regexp.MustCompile(`^[A-Z]+$`).MatchString(s) {
+		return s
+	}
+
+	var builder strings.Builder
+	capitalizeNext := false
+
+	for i, r := range s {
+		if r == '_' || r == '-' {
+			capitalizeNext = true
+		} else {
+			if capitalizeNext {
+				builder.WriteRune(unicode.ToUpper(r))
+				capitalizeNext = false
+			} else {
+				// If it's the first character and it's uppercase, keep it uppercase.
+				// Otherwise, convert to lowercase.
+				if i == 0 && unicode.IsUpper(r) {
+					builder.WriteRune(r)
+				} else {
+					builder.WriteRune(unicode.ToLower(r))
+				}
+			}
+		}
+	}
+
+	return builder.String()
+}
+
+// ToTitleCase converts a string to title case, capitalizing the first letter of each word.
+// Words are delimited by spaces. It handles Unicode characters correctly.
+//
+// @param s The input string to convert to title case.
+// @return The string converted to title case.
+//
+// Examples:
+//
+//	ToTitleCase("hello world") == "Hello World"
+//	ToTitleCase("a song of ice and fire") == "A Song Of Ice And Fire"
+//	ToTitleCase("HELLO WORLD") == "Hello World"
+//	ToTitleCase("") == ""
+//	ToTitleCase("  leading spaces") == "  Leading Spaces"
+func ToTitleCase(s string) string {
+	if s == "" {
+		return s
+	}
+	runes := []rune(s)
+	capitalizeNext := true
+	for i, r := range runes {
+		if unicode.IsSpace(r) {
+			capitalizeNext = true
+		} else if capitalizeNext {
+			runes[i] = unicode.ToUpper(r)
+			capitalizeNext = false
+		} else {
+			runes[i] = unicode.ToLower(r)
+		}
+	}
+	return string(runes)
+}
+
+// IsAlpha checks if a string contains only alphabetic characters.
+// It returns true if the string is not empty and all characters are letters.
+// It returns false otherwise, including for empty strings.
+//
+// @param s The input string to check.
+// @return true if the string contains only alphabetic characters, false otherwise.
+//
+// Examples:
+//
+//	IsAlpha("HelloWorld") == true
+//	IsAlpha("Hello World") == false // Contains a space
+//	IsAlpha("Hello123") == false   // Contains digits
+//	IsAlpha("") == false           // Empty string
+func IsAlpha(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, r := range s {
+		if !unicode.IsLetter(r) {
+			return false
+		}
+	}
+	return true
+}
+
+// IsNumeric checks if a string contains only numeric characters.
+//
+// @param s The input string to check.
+// @return true if the string contains only numeric characters and is not empty, false otherwise.
+//
+// Examples:
+//
+//	IsNumeric("12345") == true
+//	IsNumeric("0") == true
+//	IsNumeric("123a45") == false
+//	IsNumeric("") == false
+func IsNumeric(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, r := range s {
+		if !unicode.IsDigit(r) {
+			return false
+		}
+	}
+	return true
+}
+
+// IsAlphanumeric checks if a string contains only letters and numbers.
+//
+// @param s The input string to check.
+// @return true if the string contains only alphanumeric characters and is not empty, false otherwise.
+//
+// Examples:
+//
+//	IsAlphanumeric("HelloWorld123") == true
+//	IsAlphanumeric("Hello World") == false // Contains a
