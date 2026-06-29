@@ -9078,3 +9078,19 @@ func IsHex(s string) bool {
 func IsEmptyOrWhitespace(s string) bool {
 	return strings.TrimSpace(s) == ""
 }
+
+// TrimStartHyphen removes leading hyphens from a string.
+// If the string does not start with a hyphen, it is returned as is.
+//
+// @param s The input string to trim hyphens from.
+// @return The string with leading hyphens removed.
+//
+// Examples:
+//
+//	TrimStartHyphen("---hello") == "hello"
+//	TrimStartHyphen("hello") == "hello"
+//	TrimStartHyphen("-") == ""
+//	TrimStartHyphen("") == ""
+func TrimStartHyphen(s string) string {
+	return strings.TrimLeft(s, "-")
+}
