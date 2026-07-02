@@ -9719,3 +9719,28 @@ func ValidateSSN(ssn string) error {
 	}
 	return nil
 }
+
+// FastFilterGeneric returns a new slice containing only elements from the input slice
+// that satisfy the given predicate function.
+// The predicate function should return true for elements to keep and false for elements to discard.
+// This version is optimized by pre-allocating the result slice capacity.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return A new slice containing only the elements from the input slice that satisfy the predicate.
+//
+// Examples:
+//
+//	FastFilterGeneric([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == []int{2, 4}
+//	FastFilterGeneric([]string{"apple", "banana", "cherry"}, func(s string) bool { return len(s) > 5 }) == []string{"banana", "cherry"}
+func FastFilterGeneric[T any](slice []T, predicate func(T) bool) []T {
+	// Pre-allocate result slice with a heuristic initial capacity.
+	// This can improve performance by reducing reallocations.
+	result := make([]T, 0, len(slice)/2)
+	for _, item := range slice {
+		if predicate(item) {
+			result = append(result, item)
+		}
+	}
+	return result
+}
