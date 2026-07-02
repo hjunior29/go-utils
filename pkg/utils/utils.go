@@ -9744,3 +9744,27 @@ func FastFilterGeneric[T any](slice []T, predicate func(T) bool) []T {
 	}
 	return result
 }
+
+// ValidatePhoneNumber checks if a string is a valid phone number.
+// It uses a regular expression to validate common phone number formats,
+// allowing for optional country code, area code in parentheses, spaces, hyphens, and digits.
+// This validation is basic and might not cover all international formats or complex cases.
+// It returns an error if the string is not a valid phone number.
+//
+// Examples:
+//
+//	ValidatePhoneNumber("123-456-7890") == nil
+//	ValidatePhoneNumber("(123) 456-7890") == nil
+//	ValidatePhoneNumber("1234567890") == nil
+//	ValidatePhoneNumber("+1 123 456 7890") == nil
+//	ValidatePhoneNumber("123-456") returns an error
+//	ValidatePhoneNumber("abc") returns an error
+func ValidatePhoneNumber(phone string) error {
+	// This regex allows for optional country code, area code in parentheses, spaces, hyphens, and digits.
+	// It's a simplified pattern for common formats.
+	const phoneRegex = `^\+?(\d{1,3})?[-. ]?\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$`
+	if !regexp.MustCompile(phoneRegex).MatchString(phone) {
+		return errors.New("invalid phone number format")
+	}
+	return nil
+}
