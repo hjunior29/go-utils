@@ -10230,3 +10230,24 @@ func RemoveAccents(s string) string {
 	}
 	return builder.String()
 }
+
+// SafeContainsGeneric checks if a slice of any comparable type contains a specific item.
+// This function leverages Go generics to work with slices of any type that supports equality comparison.
+// It returns true if the item is found in the slice, and false otherwise. It also returns a nil error.
+//
+// @param slice The slice to search within. The elements must be of a comparable type.
+// @param item The item to search for within the slice. It must be of the same type as the slice elements.
+// @return A boolean indicating whether the item was found in the slice, and a nil error.
+//
+// Examples:
+//
+//	SafeContainsGeneric([]int{1, 2, 3}, 2) == (true, nil)
+//	SafeContainsGeneric([]string{"a", "b", "c"}, "d") == (false, nil)
+func SafeContainsGeneric[T comparable](slice []T, item T) (bool, error) {
+	for _, s := range slice {
+		if s == item {
+			return true, nil
+		}
+	}
+	return false, nil
+}
