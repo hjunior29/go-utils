@@ -10251,3 +10251,46 @@ func SafeContainsGeneric[T comparable](slice []T, item T) (bool, error) {
 	}
 	return false, nil
 }
+
+// SafeSlugify converts a string into a URL-friendly slug.
+// It converts the string to lowercase, replaces spaces and non-alphanumeric characters with hyphens,
+// and trims leading/trailing hyphens. Multiple hyphens are reduced to a single hyphen.
+// It returns the generated slug and a nil error. If the input string is empty, it returns an empty string and nil error.
+//
+// @param s The input string to convert into a slug.
+// @return The URL-friendly slug string and a nil error if successful. Returns an empty string and nil error if the input string is empty.
+//
+// Examples:
+//
+//	SafeSlugify("Hello World!") == ("hello-world", nil)
+//	SafeSlugify(" A New Topic  ") == ("a-new-topic", nil)
+//	SafeSlugify("Another_Example-Here") == ("another-example-here", nil)
+//	SafeSlugify("123-456") == ("123-456", nil)
+//	SafeSlugify("") == ("", nil)
+func SafeSlugify(s string) (string, error) {
+	if s == "" {
+		return "", nil
+	}
+
+	s = strings.ToLower(s)
+	var builder strings.Builder
+	var lastCharIsHyphen bool
+
+	for i, r := range s {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) {
+			builder.WriteRune(r)
+			lastCharIsHyphen = false
+		} else if !lastCharIsHyphen {
+			// Only add a hyphen if it's not a duplicate and not at the beginning
+			if builder.Len() > 0 && i < len(s) {
+				builder.WriteRune('-')
+				lastCharIsHyphen = true
+			}
+		}
+	}
+
+	// Trim leading and trailing hyphens
+	result := builder.String()
+	result = strings.Trim(result, "-")
+	return result, nil
+}
