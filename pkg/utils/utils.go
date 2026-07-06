@@ -10337,3 +10337,30 @@ func ToSnakeCase(s string) string {
 
 	return builder.String()
 }
+
+// ValidateCountryCode checks if a string is a valid ISO 3166-1 alpha-2 country code.
+// It returns an error if the string is not a valid 2-letter uppercase country code.
+//
+// Examples:
+//
+//	ValidateCountryCode("US") == nil
+//	ValidateCountryCode("CA") == nil
+//	ValidateCountryCode("gb") == nil // Case-insensitive
+//	ValidateCountryCode("USA") returns an error (too long)
+//	ValidateCountryCode("U") returns an error (too short)
+//	ValidateCountryCode("12") returns an error (not letters)
+//	ValidateCountryCode("") returns an error
+func ValidateCountryCode(code string) error {
+	if len(code) != 2 {
+		return errors.New("invalid country code length: must be 2 characters")
+	}
+	for _, r := range code {
+		if !unicode.IsLetter(r) {
+			return errors.New("invalid country code format: must contain only letters")
+		}
+	}
+	// Although this function doesn't check against a definitive list of all country codes,
+	// it enforces the standard format. A more comprehensive validation would involve
+	// comparing against a known set of valid codes.
+	return nil
+}
