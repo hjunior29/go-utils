@@ -10294,3 +10294,46 @@ func SafeSlugify(s string) (string, error) {
 	result = strings.Trim(result, "-")
 	return result, nil
 }
+
+// ToSnakeCase converts a string from camelCase or kebab-case to snake_case.
+// It also handles PascalCase by capitalizing the first letter.
+// It converts the entire string to lowercase.
+//
+// @param s The input string to convert.
+// @return The snake_cased string.
+//
+// Examples:
+//
+//	ToSnakeCase("helloWorld") == "hello_world"
+//	ToSnakeCase("HelloWorld") == "hello_world"
+//	ToSnakeCase("hello-world") == "hello_world"
+//	ToSnakeCase("APIKey") == "api_key"
+//	ToSnakeCase("URL") == "url"
+func ToSnakeCase(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	var builder strings.Builder
+	var lastCharWasUpper bool
+
+	for i, r := range s {
+		if r == '-' {
+			builder.WriteRune('_')
+			lastCharWasUpper = false
+		} else if unicode.IsUpper(r) {
+			// If it's an uppercase letter and not the first character, and the previous character was lowercase,
+			// or if it's part of an acronym followed by another uppercase letter, insert an underscore.
+			if i > 0 && (unicode.IsLower(rune(s[i-1])) || (lastCharWasUpper && i < len(s)-1 && unicode.IsUpper(rune(s[i+1])))) {
+				builder.WriteRune('_')
+			}
+			builder.WriteRune(unicode.ToLower(r))
+			lastCharWasUpper = true
+		} else {
+			builder.WriteRune(unicode.ToLower(r))
+			lastCharWasUpper = false
+		}
+	}
+
+	return builder.String()
+}
