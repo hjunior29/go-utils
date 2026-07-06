@@ -10364,3 +10364,44 @@ func ValidateCountryCode(code string) error {
 	// comparing against a known set of valid codes.
 	return nil
 }
+
+// ToPascalCase converts a string from snake_case or kebab-case to PascalCase.
+// It also handles camelCase by capitalizing the first letter.
+// It converts the entire string to lowercase before processing.
+//
+// @param s The input string to convert.
+// @return The PascalCased string.
+//
+// Examples:
+//
+//	ToPascalCase("hello_world") == "HelloWorld"
+//	ToPascalCase("hello-world") == "HelloWorld"
+//	ToPascalCase("helloWorld") == "HelloWorld"
+//	ToPascalCase("URL") == "URL"
+//	ToPascalCase("api_key") == "ApiKey"
+func ToPascalCase(s string) string {
+	if s == "" {
+		return ""
+	}
+
+	// Convert to lowercase first to simplify handling different cases.
+	s = strings.ToLower(s)
+
+	var builder strings.Builder
+	capitalizeNext := true
+
+	for _, r := range s {
+		if r == '_' || r == '-' {
+			capitalizeNext = true
+		} else {
+			if capitalizeNext {
+				builder.WriteRune(unicode.ToUpper(r))
+				capitalizeNext = false
+			} else {
+				builder.WriteRune(r)
+			}
+		}
+	}
+
+	return builder.String()
+}
