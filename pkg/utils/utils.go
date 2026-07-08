@@ -10405,3 +10405,51 @@ func ToPascalCase(s string) string {
 
 	return builder.String()
 }
+
+// ValidatePasswordStrength checks if a password meets certain strength criteria.
+// It checks for a minimum length (8 characters), and the presence of at least one
+// uppercase letter, one lowercase letter, and one digit.
+// It returns an error if the password does not meet the criteria.
+//
+// Examples:
+//
+//	ValidatePasswordStrength("Password123") == nil
+//	ValidatePasswordStrength("password123") returns an error (missing uppercase)
+//	ValidatePasswordStrength("PASSWORD123") returns an error (missing lowercase)
+//	ValidatePasswordStrength("Password") returns an error (missing digit)
+//	ValidatePasswordStrength("Pass1") returns an error (too short)
+//	ValidatePasswordStrength("") returns an error (empty string)
+func ValidatePasswordStrength(password string) error {
+	if len(password) < 8 {
+		return errors.New("password must be at least 8 characters long")
+	}
+
+	var (
+		hasUpper    bool
+		hasLower    bool
+		hasDigit    bool
+	)
+
+	for _, r := range password {
+		switch {
+		case unicode.IsUpper(r):
+			hasUpper = true
+		case unicode.IsLower(r):
+			hasLower = true
+		case unicode.IsDigit(r):
+			hasDigit = true
+		}
+	}
+
+	if !hasUpper {
+		return errors.New("password must contain at least one uppercase letter")
+	}
+	if !hasLower {
+		return errors.New("password must contain at least one lowercase letter")
+	}
+	if !hasDigit {
+		return errors.New("password must contain at least one digit")
+	}
+
+	return nil
+}
