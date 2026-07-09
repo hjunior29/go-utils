@@ -10506,3 +10506,27 @@ func ToTitleCase(s string) string {
 	}
 	return string(runes)
 }
+
+// SafeIsAlpha checks if a string contains only alphabetic characters.
+// It returns true and a nil error if the string is not empty and all characters are letters.
+// It returns false and an error otherwise, including for empty strings or strings with non-alphabetic characters.
+//
+// @param s The input string to check.
+// @return true and nil error if the string contains only alphabetic characters, false and an error otherwise.
+//
+// Examples:
+//
+//	SafeIsAlpha("HelloWorld") == (true, nil)
+//	SafeIsAlpha("Hello World") == (false, errors.New("string contains non-alphabetic characters"))
+//	SafeIsAlpha("") == (false, errors.New("string cannot be empty"))
+func SafeIsAlpha(s string) (bool, error) {
+	if s == "" {
+		return false, errors.New("string cannot be empty")
+	}
+	for _, r := range s {
+		if !unicode.IsLetter(r) {
+			return false, errors.New("string contains non-alphabetic characters")
+		}
+	}
+	return true, nil
+}
