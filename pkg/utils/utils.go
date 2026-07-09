@@ -10553,3 +10553,27 @@ func SafeIsAlphanumeric(s string) (bool, error) {
 	}
 	return true, nil
 }
+
+// SafeIsNumeric checks if a string contains only numeric characters.
+// It returns true and a nil error if the string is valid, otherwise false and an error.
+//
+// @param s The input string to check.
+// @return true and nil error if the string contains only numeric characters and is not empty, false and an error otherwise.
+//
+// Examples:
+//
+//	SafeIsNumeric("12345") == (true, nil)
+//	SafeIsNumeric("0") == (true, nil)
+//	SafeIsNumeric("123a45") == (false, errors.New("string contains non-numeric characters"))
+//	SafeIsNumeric("") == (false, errors.New("string cannot be empty"))
+func SafeIsNumeric(s string) (bool, error) {
+	if s == "" {
+		return false, errors.New("string cannot be empty")
+	}
+	for _, r := range s {
+		if !unicode.IsDigit(r) {
+			return false, errors.New("string contains non-numeric characters")
+		}
+	}
+	return true, nil
+}
