@@ -10530,3 +10530,26 @@ func SafeIsAlpha(s string) (bool, error) {
 	}
 	return true, nil
 }
+
+// SafeIsAlphanumeric checks if a string contains only alphanumeric characters (letters and digits).
+// It returns true and a nil error if the string is valid, otherwise false and an error.
+//
+// @param s The input string to validate.
+// @return true and nil error if the string is valid, false and an error otherwise.
+//
+// Examples:
+//
+//	SafeIsAlphanumeric("HelloWorld123") == (true, nil)
+//	SafeIsAlphanumeric("Hello World") == (false, errors.New("string contains non-alphanumeric characters"))
+//	SafeIsAlphanumeric("") == (false, errors.New("string cannot be empty"))
+func SafeIsAlphanumeric(s string) (bool, error) {
+	if s == "" {
+		return false, errors.New("string cannot be empty")
+	}
+	for _, r := range s {
+		if !unicode.IsLetter(r) && !unicode.IsNumber(r) {
+			return false, errors.New("string contains non-alphanumeric characters")
+		}
+	}
+	return true, nil
+}
