@@ -10577,3 +10577,14 @@ func SafeIsNumeric(s string) (bool, error) {
 	}
 	return true, nil
 }
+
+// IsEmptyGeneric checks if a slice of any type is empty.
+//
+// Examples:
+//
+//	IsEmptyGeneric([]int{}) == true
+//	IsEmptyGeneric([]string{"a", "b"}) == false
+//	IsEmptyGeneric([]interface{}{}) == true
+func IsEmptyGeneric[T any](slice []T) bool {
+	return len(slice) == 0
+}
