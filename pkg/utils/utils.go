@@ -10741,3 +10741,25 @@ func SafeContainsGeneric[T comparable](slice []T, item T) (bool, error) {
 	}
 	return false, nil
 }
+
+// FindLastIndex returns the index of the last element in a slice that satisfies a given predicate function.
+// The predicate function should return true for the element to find.
+// If no element satisfies the predicate, it returns -1.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return The index of the last element that satisfies the predicate, or -1 if no such element is found.
+//
+// Examples:
+//
+//	FindLastIndex([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == 3
+//	FindLastIndex([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) == -1
+//	FindLastIndex([]int{}, func(n int) bool { return n > 0 }) == -1
+func FindLastIndex[T any](slice []T, predicate func(T) bool) int {
+	for i := len(slice) - 1; i >= 0; i-- {
+		if predicate(slice[i]) {
+			return i
+		}
+	}
+	return -1
+}
