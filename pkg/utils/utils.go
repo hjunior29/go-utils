@@ -11100,3 +11100,8 @@ func FastMap[T any, U any](slice []T, f func(T) U) []U {
 // This function is safe as it handles potential issues gracefully by returning a boolean indicating success.
 //
 //
+
+// IsEmptyGeneric checks if a slice of any type is empty.
+func IsEmptyGeneric[T any](slice []T) bool {
+	return len(slice) == 0
+}
