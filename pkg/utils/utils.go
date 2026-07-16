@@ -11634,3 +11634,18 @@ func ContainsGeneric[T comparable](slice []T, item T) bool {
 	}
 	return false
 }
+
+// IsEmpty checks if a string is empty or contains only whitespace.
+// It uses strings.TrimSpace to remove leading/trailing whitespace before checking.
+//
+// @param s The input string to check.
+// @return true if the string is empty or contains only whitespace, false otherwise.
+//
+// Examples:
+//
+//	IsEmpty("") == true
+//	IsEmpty("   ") == true
+//	IsEmpty("hello") == false
+func IsEmpty(s string) bool {
+	return strings.TrimSpace(s) == ""
+}
