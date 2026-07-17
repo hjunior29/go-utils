@@ -11649,3 +11649,25 @@ func ContainsGeneric[T comparable](slice []T, item T) bool {
 func IsEmpty(s string) bool {
 	return strings.TrimSpace(s) == ""
 }
+
+// SafeContainsGeneric checks if a slice of any comparable type contains a specific item.
+// This function leverages Go generics to work with slices of any type that supports equality comparison.
+// It returns true and a nil error if the item is found in the slice.
+// It returns false and a nil error if the item is not found.
+//
+// @param slice The slice to search within. The elements must be of a comparable type.
+// @param item The item to search for within the slice. It must be of the same type as the slice elements.
+// @return true and a nil error if the item is found in the slice, false and a nil error otherwise.
+//
+// Examples:
+//
+//	SafeContainsGeneric([]int{1, 2, 3}, 2) == (true, nil)
+//	SafeContainsGeneric([]string{"a", "b", "c"}, "d") == (false, nil)
+func SafeContainsGeneric[T comparable](slice []T, item T) (bool, error) {
+	for _, s := range slice {
+		if s == item {
+			return true, nil
+		}
+	}
+	return false, nil
+}
