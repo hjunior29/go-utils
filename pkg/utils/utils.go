@@ -11757,3 +11757,22 @@ func FastContainsGeneric[T comparable](slice []T, item T) bool {
 	_, ok := set[item]
 	return ok
 }
+
+// RemoveSuffix removes the suffix from the string if present.
+// If the string does not end with the suffix, it is returned as is.
+//
+// @param s The input string from which to remove the suffix.
+// @param suffix The suffix to remove from the string.
+// @return The string with the suffix removed if present, otherwise the original string.
+//
+// Examples:
+//
+//	RemoveSuffix("hello world", " world") == "hello"
+//	RemoveSuffix("hello world", " goodbye") == "hello world"
+//	RemoveSuffix("hello", "") == "hello"
+func RemoveSuffix(s, suffix string) string {
+	if strings.HasSuffix(s, suffix) {
+		return s[:len(s)-len(suffix)]
+	}
+	return s
+}
