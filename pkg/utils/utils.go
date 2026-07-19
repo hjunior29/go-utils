@@ -11801,3 +11801,24 @@ func IsAlpha(s string) bool {
 	}
 	return true
 }
+
+// SafeContains checks if a slice of any comparable type contains a specific item.
+// This function leverages Go generics to work with slices of any type that supports equality comparison.
+// It returns true if the item is found in the slice, and false otherwise. It also returns a nil error.
+//
+// @param slice The slice to search within. The elements must be of a comparable type.
+// @param item The item to search for within the slice. It must be of the same type as the slice elements.
+// @return true and a nil error if the item is found in the slice, false and a nil error otherwise.
+//
+// Examples:
+//
+//	SafeContains([]int{1, 2, 3}, 2) == (true, nil)
+//	SafeContains([]string{"a", "b", "c"}, "d") == (false, nil)
+func SafeContains[T comparable](slice []T, item T) (bool, error) {
+	for _, s := range slice {
+		if s == item {
+			return true, nil
+		}
+	}
+	return false, nil
+}
