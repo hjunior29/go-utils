@@ -11684,3 +11684,50 @@ func SafeContainsGeneric[T comparable](slice []T, item T) (bool, error) {
 func SafeUnquote(s string) (string, error) {
 	return strconv.Unquote(s)
 }
+
+// SafeUnzipGeneric takes a slice of slices and returns a slice of slices where each inner slice
+// contains elements at the same index from the original inner slices.
+// It assumes all inner slices have the same length. If the input is empty or
+// contains empty inner slices, it returns an empty slice and a nil error.
+// It returns an error if the inner slices have different lengths.
+//
+// Examples:
+//
+//	SafeUnzipGeneric([][]int{{1, 2, 3}, {4, 5, 6}}) == ([][]int{{1, 4}, {2, 5}, {3, 6}}, nil)
+//	SafeUnzipGeneric([][]string{{"a", "b"}, {"c", "d"}}) == ([][]string{{"a", "c"}, {"b", "d"}}, nil)
+//	SafeUnzipGeneric([][]int{}) == ([][]int{}, nil)
+//	SafeUnzipGeneric([][]int{{}}) == ([][]int{}, nil)
+//	SafeUnzipGeneric([][]int{{1, 2}, {3}}) returns ([][]int{}, error) // inner slices have different lengths
+func SafeUnzipGeneric[T any](slices [][]T) ([][]T, error) {
+	if len(slices) == 0 {
+		return [][]T{}, nil
+	}
+
+	numInner := len(slices[0])
+	for i := 1; i < len(slices); i++ {
+		if len(slices[i]) != numInner {
+			return nil, errors.New("inner slices have different lengths")
+		}
+	}
+
+	if numInner == 0 {
+		return [][]T{}, nil
+	}
+
+	numOuter := len(slices)
+
+	// Initialize the result slice with the correct dimensions.
+	result := make([][]T, numInner)
+	for i := range result {
+		result[i] = make([]T, numOuter)
+	}
+
+	// Populate the result slice by transposing the input.
+	for i := 0; i < numOuter; i++ {
+		for j := 0; j < numInner; j++ {
+			result[j][i] = slices[i][j]
+		}
+	}
+
+	return result, nil
+}
