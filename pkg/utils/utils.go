@@ -11822,3 +11822,295 @@ func SafeContains[T comparable](slice []T, item T) (bool, error) {
 	}
 	return false, nil
 }
+
+// SafeKeys returns a slice of all keys in a map, along with a nil error.
+// The order of keys in the returned slice is not guaranteed.
+//
+// @param m The input map.
+// @return A slice containing all keys from the input map, and a nil error.
+//
+// Examples:
+//
+//	SafeKeys(map[string]int{"a": 1, "b": 2}) == ([]string{"a", "b"}, nil) (order may vary)
+//	SafeKeys(map[int]string{1: "one", 2: "two"}) == ([]int{1, 2}, nil) (order may vary)
+//	SafeKeys(map[string]int{}) == ([]string{}, nil)
+func SafeKeys[K comparable, V any](m map[K]V) ([]K, error) {
+	keys := make([]K, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys, nil
+}
+
+// SafeValues returns a slice of all values in a map, along with a nil error.
+// The order of values in the returned slice is not guaranteed and corresponds
+// to the order of keys returned by iterating over the map.
+//
+// @param m The input map.
+// @return A slice containing all values from the input map, and a nil error.
+//
+// Examples:
+//
+//	SafeValues(map[string]int{"a": 1, "b": 2}) == ([]int{1, 2}, nil) (order may vary)
+//	SafeValues(map[int]string{1: "one", 2: "two"}) == ([]string{"one", "two"}, nil) (order may vary)
+//	SafeValues(map[string]int{}) == ([]int{}, nil)
+func SafeValues[K comparable, V any](m map[K]V) ([]V, error) {
+	values := make([]V, 0, len(m))
+	for _, v := range m {
+		values = append(values, v)
+	}
+	return values, nil
+}
+
+// SafeReduce applies a function against an accumulator and each element in the slice (from left to right) to reduce it to a single value.
+// The function `f` takes the accumulator and the current element, and returns the new accumulator value.
+// The initial value of the accumulator is provided by `initial`.
+// It returns the accumulated value and a nil error.
+//
+// @param slice The input slice of elements of type T.
+// @param initial The initial value of the accumulator of type U.
+// @param f A function that takes the current accumulator (type U) and the current element (type T) and returns the updated accumulator (type U).
+// @return The final accumulated value of type U and a nil error.
+//
+// Examples:
+//
+//	SafeReduce([]int{1, 2, 3, 4, 5}, 0, func(acc, n int) int { return acc + n }) == (15, nil)
+//	SafeReduce([]string{"a", "b", "c"}, "", func(acc, s string) string { return acc + s }) == ("abc", nil)
+//	SafeReduce([]int{}, 0, func(acc, n int) int { return acc + n }) == (0, nil)
+func SafeReduce[T any, U any](slice []T, initial U, f func(U, T) U) (U, error) {
+	accumulator := initial
+	for _, item := range slice {
+		accumulator = f(accumulator, item)
+	}
+	return accumulator, nil
+}
+
+// SafeEvery checks if all elements in a slice satisfy a given predicate function.
+// The predicate function should return true for elements that satisfy the condition.
+// It returns true and a nil error if all elements satisfy the predicate.
+// It returns false and a nil error if any element does not satisfy the predicate.
+// It returns true and a nil error for an empty slice (vacuously true).
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return true and a nil error if all elements satisfy the predicate, false and a nil error otherwise.
+//
+// Examples:
+//
+//	SafeEvery([]int{2, 4, 6}, func(n int) bool { return n%2 == 0 }) == (true, nil)
+//	SafeEvery([]int{1, 2, 3}, func(n int) bool { return n%2 == 0 }) == (false, nil)
+//	SafeEvery([]string{"a", "b", "c"}, func(s string) bool { return s != "" }) == (true, nil)
+//	SafeEvery([]int{}, func(n int) bool { return n > 0 }) == (true, nil)
+func SafeEvery[T any](slice []T, predicate func(T) bool) (bool, error) {
+	for _, item := range slice {
+		if !predicate(item) {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+// SafeSome checks if at least one element in a slice satisfies a given predicate function.
+// The predicate function should return true for elements that satisfy the condition.
+// It returns true and a nil error if at least one element satisfies the predicate.
+// It returns false and a nil error if no element satisfies the predicate.
+// It returns false and a nil error for an empty slice.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return true and a nil error if at least one element satisfies the predicate, false and a nil error otherwise.
+//
+// Examples:
+//
+//	SafeSome([]int{1, 2, 3}, func(n int) bool { return n%2 == 0 }) == (true, nil)
+//	SafeSome([]int{1, 3, 5}, func(n int) bool { return n%2 == 0 }) == (false, nil)
+//	SafeSome([]string{"", "a", "b"}, func(s string) bool { return s != "" }) == (true, nil)
+//	SafeSome([]int{}, func(n int) bool { return n > 0 }) == (false, nil)
+func SafeSome[T any](slice []T, predicate func(T) bool) (bool, error) {
+	for _, item := range slice {
+		if predicate(item) {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// SafeNone checks if no elements in a slice satisfy a given predicate function.
+// The predicate function should return true for elements that satisfy the condition.
+// It returns true and a nil error if no elements satisfy the predicate.
+// It returns false and a nil error if any element satisfies the predicate.
+// It returns true and a nil error for an empty slice (vacuously true).
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return true and a nil error if no elements satisfy the predicate, false and a nil error otherwise.
+//
+// Examples:
+//
+//	SafeNone([]int{1, 3, 5}, func(n int) bool { return n%2 == 0 }) == (true, nil)
+//	SafeNone([]int{2, 4, 6}, func(n int) bool { return n%2 == 0 }) == (false, nil)
+//	SafeNone([]string{"", "a", "b"}, func(s string) bool { return s == "" }) == (false, nil)
+//	SafeNone([]int{}, func(n int) bool { return n > 0 }) == (true, nil)
+func SafeNone[T any](slice []T, predicate func(T) bool) (bool, error) {
+	for _, item := range slice {
+		if predicate(item) {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+// SafeFind returns the first element in a slice that satisfies a given predicate function, along with a boolean indicating success.
+// The predicate function should return true for the element to find.
+// If no element satisfies the predicate, it returns the zero value of type T and false.
+// This function is safe as it handles potential issues gracefully by returning a boolean indicating success.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return The first element that satisfies the predicate and true, or the zero value of T and false if no such element is found.
+//
+// Examples:
+//
+//	SafeFind([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == (2, true)
+//	SafeFind([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) == ("", false)
+//	SafeFind([]int{}, func(n int) bool { return n > 0 }) == (0, false)
+func SafeFind[T any](slice []T, predicate func(T) bool) (T, bool) {
+	for _, item := range slice {
+		if predicate(item) {
+			return item, true
+		}
+	}
+	var zero T // Return the zero value for type T
+	return zero, false
+}
+
+// SafeFindIndex returns the index of the first element in a slice that satisfies a given predicate function.
+// It returns the index and a nil error if the element is found.
+// It returns -1 and a nil error if no element satisfies the predicate.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return The index of the first element that satisfies the predicate and a nil error, or -1 and a nil error if no such element is found.
+//
+// Examples:
+//
+//	SafeFindIndex([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == (1, nil)
+//	SafeFindIndex([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) == (-1, nil)
+//	SafeFindIndex([]int{}, func(n int) bool { return n > 0 }) == (-1, nil)
+func SafeFindIndex[T any](slice []T, predicate func(T) bool) (int, error) {
+	for i, item := range slice {
+		if predicate(item) {
+			return i, nil
+		}
+	}
+	return -1, nil
+}
+
+// SafeFindLastIndex returns the index of the last element in a slice that satisfies a given predicate function.
+// It returns the index and a nil error if the element is found.
+// It returns -1 and a nil error if no element satisfies the predicate.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return The index of the last element that satisfies the predicate and a nil error, or -1 and a nil error if no such element is found.
+//
+// Examples:
+//
+//	SafeFindLastIndex([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == (3, nil)
+//	SafeFindLastIndex([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) == (-1, nil)
+//	SafeFindLastIndex([]int{}, func(n int) bool { return n > 0 }) == (-1, nil)
+func SafeFindLastIndex[T any](slice []T, predicate func(T) bool) (int, error) {
+	for i := len(slice) - 1; i >= 0; i-- {
+		if predicate(slice[i]) {
+			return i, nil
+		}
+	}
+	return -1, nil
+}
+
+// SafeMap applies a function to each element of a slice and returns a new slice with the results.
+// It returns the resulting slice and a nil error.
+// The function `f` takes an element of type T and returns an element of type U.
+//
+// @param slice The input slice of elements of type T.
+// @param f The function to apply to each element. It takes an element of type T and returns an element of type U.
+// @return A new slice of type U containing the results of applying the function `f` to each element of the input slice, and a nil error.
+//
+// Examples:
+//
+//	SafeMap([]int{1, 2, 3}, func(n int) string { return strconv.Itoa(n) }) == ([]string{"1", "2", "3"}, nil)
+//	SafeMap([]string{"a", "b", "c"}, func(s string) int { return len(s) }) == ([]int{1, 1, 1}, nil)
+func SafeMap[T any, U any](slice []T, f func(T) U) ([]U, error) {
+	result := make([]U, len(slice))
+	for i, v := range slice {
+		result[i] = f(v)
+	}
+	return result, nil
+}
+
+// SafeFilter returns a new slice containing only elements from the input slice
+// that satisfy the given predicate function.
+// The predicate function should return true for elements to keep and false for elements to discard.
+// It returns the filtered slice and a nil error.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return A new slice containing only the elements from the input slice that satisfy the predicate, and a nil error.
+//
+// Examples:
+//
+//	SafeFilter([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == ([]int{2, 4}, nil)
+//	SafeFilter([]string{"apple", "banana", "cherry"}, func(s string) bool { return len(s) > 5 }) == ([]string{"banana", "cherry"}, nil)
+func SafeFilter[T any](slice []T, predicate func(T) bool) ([]T, error) {
+	result := make([]T, 0, len(slice)/2) // Pre-allocate result slice with a heuristic initial capacity.
+	for _, item := range slice {
+		if predicate(item) {
+			result = append(result, item)
+		}
+	}
+	return result, nil
+}
+
+// SafeExclude returns a new slice containing elements from the input slice
+// that do NOT satisfy the given predicate function.
+// The predicate function should return true for elements to exclude and false for elements to keep.
+// It returns the resulting slice and a nil error.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return A new slice containing only the elements from the input slice that do NOT satisfy the predicate, and a nil error.
+//
+// Examples:
+//
+//	SafeExclude([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == ([]int{1, 3, 5}, nil)
+func SafeExclude[T any](slice []T, predicate func(T) bool) ([]T, error) {
+	result := make([]T, 0, len(slice)/2) // Pre-allocate result slice with a heuristic initial capacity.
+	for _, item := range slice {
+		if !predicate(item) { // Keep elements for which the predicate is false
+			result = append(result, item)
+		}
+	}
+	return result, nil
+}
+
+// SafePartition splits a slice into two slices based on a predicate function.
+// It returns the two partitioned slices and a nil error.
+// The first slice contains elements for which the predicate returns true, and the second slice
+// contains elements for which the predicate returns false.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return A slice containing two slices: the first for elements satisfying the predicate, the second for those that don't, and a nil error.
+//
+// Examples:
+//
+//	SafePartition([]int{1, 2, 3, 4, 5, 6}, func(n int) bool { return n%2 == 0 }) == ([][]int{{2, 4, 6}, {1, 3, 5}}, nil)
+//	SafePartition([]string{"apple", "banana", "cherry"}, func(s string) bool { return len(s) > 5 }) == ([][]string{{"banana", "cherry"}, {"apple"}}, nil)
+//	SafePartition([]int{}, func(n int) bool { return n > 0 }) == ([][]int{{}, {}}, nil)
+func SafePartition[T any](slice []T, predicate func(T) bool) ([][]T, error) {
+	trueSlice := make([]T, 0, len(slice)/2)   // Heuristic initial capacity
+	falseSlice := make([]T, 0, len(slice)/2) // Heuristic initial capacity
+
+	for _, item := range slice {
+		if predicate(item) {
+			trueSlice = append(true
