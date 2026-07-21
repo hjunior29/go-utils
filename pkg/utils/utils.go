@@ -12184,3 +12184,28 @@ func ToTitleCase(s string) string {
 	}
 	return string(runes)
 }
+
+// SplitOnce splits a string into two parts at the first occurrence of the separator.
+// It returns the part before the separator and the part after the separator.
+// If the separator is not found, it returns the original string and an empty string.
+// If the separator is empty, it returns an empty string and the original string.
+//
+// @param s The string to split.
+// @param sep The separator string.
+// @return A slice containing two strings: the part before the separator and the part after.
+//
+// Examples:
+//
+//	SplitOnce("hello,world", ",") == []string{"hello", "world"}
+//	SplitOnce("helloworld", ",") == []string{"helloworld", ""}
+//	SplitOnce("hello,world", "") == []string{"", "hello,world"}
+func SplitOnce(s, sep string) []string {
+	if sep == "" {
+		return []string{"", s}
+	}
+	index := strings.Index(s, sep)
+	if index == -1 {
+		return []string{s, ""}
+	}
+	return []string{s[:index], s[index+len(sep):]}
+}
