@@ -12695,3 +12695,58 @@ func SafeReverse(s string) (string, error) {
 	}
 	return string(runes), nil
 }
+
+// ValidateStrongPassword checks if a password meets certain strength criteria.
+// It checks for a minimum length (8 characters), and the presence of at least one
+// uppercase letter, one lowercase letter, one digit, and one special character.
+// It returns an error if the password does not meet the criteria.
+//
+// Examples:
+//
+//	ValidateStrongPassword("Password123!") == nil
+//	ValidatePasswordStrength("password123!") returns an error (missing uppercase)
+//	ValidatePasswordStrength("PASSWORD123!") returns an error (missing lowercase)
+//	ValidatePasswordStrength("Password!") returns an error (missing digit)
+//	ValidatePasswordStrength("Pass1!") returns an error (too short)
+//	ValidatePasswordStrength("Password123") returns an error (missing special character)
+//	ValidatePasswordStrength("") returns an error (empty string)
+func ValidateStrongPassword(password string) error {
+	if len(password) < 8 {
+		return errors.New("password must be at least 8 characters long")
+	}
+
+	var (
+		hasUpper    bool
+		hasLower    bool
+		hasDigit    bool
+		hasSpecial  bool
+	)
+
+	for _, r := range password {
+		switch {
+		case unicode.IsUpper(r):
+			hasUpper = true
+		case unicode.IsLower(r):
+			hasLower = true
+		case unicode.IsDigit(r):
+			hasDigit = true
+		case unicode.IsPunct(r) || unicode.IsSymbol(r): // Check for common punctuation and symbols
+			hasSpecial = true
+		}
+	}
+
+	if !hasUpper {
+		return errors.New("password must contain at least one uppercase letter")
+	}
+	if !hasLower {
+		return errors.New("password must contain at least one lowercase letter")
+	}
+	if !hasDigit {
+		return errors.New("password must contain at least one digit")
+	}
+	if !hasSpecial {
+		return errors.New("password must contain at least one special character")
+	}
+
+	return nil
+}
