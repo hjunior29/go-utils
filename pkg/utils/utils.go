@@ -12674,3 +12674,24 @@ func SafeNone[T any](slice []T, predicate func(T) bool) (bool, error) {
 //	SafeFind([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == (2, true)
 //	SafeFind([]string{"a", "b", "c"}, func(s string) bool { return s == "d" }) == ("", false)
 //	SafeFind([]int{},
+
+// SafeReverse returns the reverse of a string.
+// If the string is empty, it returns an empty string and nil error.
+// It handles Unicode characters correctly by operating on runes.
+// It returns an error if the string cannot be reversed for any reason (though this is unlikely for standard strings).
+//
+// Examples:
+//
+//	SafeReverse("hello") == ("olleh", nil)
+//	SafeReverse("你好") == ("好你", nil)
+//	SafeReverse("") == ("", nil)
+func SafeReverse(s string) (string, error) {
+	if s == "" {
+		return "", nil
+	}
+	runes := []rune(s)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+	return string(runes), nil
+}
