@@ -12750,3 +12750,18 @@ func ValidateStrongPassword(password string) error {
 
 	return nil
 }
+
+// SafeTrimStart removes leading whitespace from a string.
+// It returns the trimmed string and a nil error.
+//
+// @param s The input string to trim.
+// @return The string with leading whitespace removed, and a nil error.
+//
+// Examples:
+//
+//	SafeTrimStart("  hello world") == ("hello world", nil)
+//	SafeTrimStart("hello world") == ("hello world", nil)
+//	SafeTrimStart("") == ("", nil)
+func SafeTrimStart(s string) (string, error) {
+	return strings.TrimLeft(s, " \t\n\r\f\v"), nil
+}
