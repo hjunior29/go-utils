@@ -12834,3 +12834,18 @@ func ValidatePassword(password string) error {
 
 	return nil
 }
+
+// IsEmptyOrWhitespace checks if a string is empty or contains only whitespace characters.
+// It returns true if the string is empty or consists solely of whitespace.
+//
+// @param s The input string to check.
+// @return true if the string is empty or contains only whitespace, false otherwise.
+//
+// Examples:
+//
+//	IsEmptyOrWhitespace("") == true
+//	IsEmptyOrWhitespace("   ") == true
+//	IsEmptyOrWhitespace("hello") == false
+func IsEmptyOrWhitespace(s string) bool {
+	return strings.TrimSpace(s) == ""
+}
