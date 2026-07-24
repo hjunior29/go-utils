@@ -12787,3 +12787,50 @@ func ValidateIMEI(imei string) error {
 	}
 	return nil
 }
+
+// ValidatePassword checks if a password meets basic strength criteria: minimum length of 8 characters,
+// at least one uppercase letter, one lowercase letter, and one digit.
+// It returns an error if the password does not meet the criteria.
+//
+// Examples:
+//
+//	ValidatePassword("Password123") == nil
+//	ValidatePassword("password123") returns an error (missing uppercase)
+//	ValidatePassword("PASSWORD123") returns an error (missing lowercase)
+//	ValidatePassword("Password") returns an error (missing digit)
+//	ValidatePassword("Pass1") returns an error (too short)
+//	ValidatePassword("") returns an error (empty string)
+func ValidatePassword(password string) error {
+	if len(password) < 8 {
+		return errors.New("password must be at least 8 characters long")
+	}
+
+	var (
+		hasUpper bool
+		hasLower bool
+		hasDigit bool
+	)
+
+	for _, r := range password {
+		switch {
+		case unicode.IsUpper(r):
+			hasUpper = true
+		case unicode.IsLower(r):
+			hasLower = true
+		case unicode.IsDigit(r):
+			hasDigit = true
+		}
+	}
+
+	if !hasUpper {
+		return errors.New("password must contain at least one uppercase letter")
+	}
+	if !hasLower {
+		return errors.New("password must contain at least one lowercase letter")
+	}
+	if !hasDigit {
+		return errors.New("password must contain at least one digit")
+	}
+
+	return nil
+}
