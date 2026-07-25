@@ -12906,3 +12906,24 @@ func SafeIsEmptyGeneric[T any](slice []T) (bool, error) {
 func SafeAppend(s1, s2 string) (string, error) {
 	return s1 + s2, nil
 }
+
+// TakeWhile returns a new slice containing elements from the input slice
+// from the beginning until the predicate function returns false.
+// The predicate function should return true for elements to keep and false for elements to discard.
+//
+// Examples:
+//
+//	TakeWhile([]int{1, 2, 3, 4, 5}, func(n int) bool { return n < 3 }) == []int{1, 2}
+//	TakeWhile([]string{"a", "b", "c"}, func(s string) bool { return s != "d" }) == []string{"a", "b", "c"}
+//	TakeWhile([]int{1, 2, 3}, func(n int) bool { return n > 5 }) == []int{}
+func TakeWhile[T any](slice []T, predicate func(T) bool) []T {
+	var result []T
+	for _, item := range slice {
+		if predicate(item) {
+			result = append(result, item)
+		} else {
+			break // Stop as soon as the predicate returns false
+		}
+	}
+	return result
+}
