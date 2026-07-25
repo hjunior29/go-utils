@@ -12878,3 +12878,15 @@ func ToTitleCase(s string) string {
 	}
 	return string(runes)
 }
+
+// SafeIsEmptyGeneric checks if a slice of any type is empty.
+// It returns true and a nil error if the slice is empty, false and a nil error otherwise.
+//
+// Examples:
+//
+//	SafeIsEmptyGeneric([]int{}) == (true, nil)
+//	SafeIsEmptyGeneric([]string{"a", "b"}) == (false, nil)
+//	SafeIsEmptyGeneric([]interface{}{}) == (true, nil)
+func SafeIsEmptyGeneric[T any](slice []T) (bool, error) {
+	return len(slice) == 0, nil
+}
