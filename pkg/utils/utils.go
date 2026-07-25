@@ -12890,3 +12890,19 @@ func ToTitleCase(s string) string {
 func SafeIsEmptyGeneric[T any](slice []T) (bool, error) {
 	return len(slice) == 0, nil
 }
+
+// SafeAppend concatenates two strings and returns the result along with a nil error.
+// It provides a safe way to append strings, guaranteeing a string return value.
+//
+// @param s1 The first string.
+// @param s2 The second string to append.
+// @return The concatenated string (s1 + s2) and a nil error.
+//
+// Examples:
+//
+//	SafeAppend("hello", "world") == ("helloworld", nil)
+//	SafeAppend("", "world") == ("world", nil)
+//	SafeAppend("hello", "") == ("hello", nil)
+func SafeAppend(s1, s2 string) (string, error) {
+	return s1 + s2, nil
+}
