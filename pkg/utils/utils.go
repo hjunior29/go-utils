@@ -12927,3 +12927,25 @@ func TakeWhile[T any](slice []T, predicate func(T) bool) []T {
 	}
 	return result
 }
+
+// FastTakeWhile returns a new slice containing elements from the input slice
+// from the beginning until the predicate function returns false.
+// The predicate function should return true for elements to keep and false for elements to discard.
+// This version is optimized by pre-allocating the result slice capacity.
+//
+// Examples:
+//
+//	FastTakeWhile([]int{1, 2, 3, 4, 5}, func(n int) bool { return n < 3 }) == []int{1, 2}
+//	FastTakeWhile([]string{"a", "b", "c"}, func(s string) bool { return s != "d" }) == []string{"a", "b", "c"}
+//	FastTakeWhile([]int{1, 2, 3}, func(n int) bool { return n > 5 }) == []int{}
+func FastTakeWhile[T any](slice []T, predicate func(T) bool) []T {
+	result := make([]T, 0, len(slice)/2) // Pre-allocate result slice with a heuristic initial capacity.
+	for _, item := range slice {
+		if predicate(item) {
+			result = append(result, item)
+		} else {
+			break // Stop as soon as the predicate returns false
+		}
+	}
+	return result
+}
