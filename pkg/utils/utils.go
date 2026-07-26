@@ -13049,3 +13049,32 @@ func ToKebabCase(s string) string {
 
 	return builder.String()
 }
+
+// FastDropWhile returns a new slice containing elements from the input slice
+// after the predicate function starts returning false.
+// The predicate function should return true for elements to discard and false for elements to keep.
+// This version is optimized by pre-allocating the result slice capacity.
+//
+// Examples:
+//
+//	FastDropWhile([]int{1, 2, 3, 4, 5}, func(n int) bool { return n < 3 }) == []int{3, 4, 5}
+//	FastDropWhile([]string{"a", "b", "c"}, func(s string) bool { return s != "d" }) == []string{}
+//	FastDropWhile([]int{1, 2, 3}, func(n int) bool { return n > 5 }) == []int{1, 2, 3}
+func FastDropWhile[T any](slice []T, predicate func(T) bool) []T {
+	// Find the index where the predicate first returns false
+	firstFalseIndex := -1
+	for i, item := range slice {
+		if !predicate(item) {
+			firstFalseIndex = i
+			break
+		}
+	}
+
+	// If the predicate was always true, return an empty slice
+	if firstFalseIndex == -1 {
+		return []T{}
+	}
+
+	// Return the slice from the first element that satisfied the predicate to the end
+	return slice[firstFalseIndex:]
+}
