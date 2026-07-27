@@ -13176,3 +13176,22 @@ func SafeSplitOnceGeneric[T comparable](slice []T, sep []T) ([][]T, error) {
 
 	return [][]T{slice, {}}, nil // Separator not found
 }
+
+// Compact returns a new slice with all nil or empty string values removed.
+// It iterates through the slice and appends only non-empty strings to a new slice.
+//
+// Examples:
+//
+//	Compact([]string{"a", "", "b", " ", "c"}) == []string{"a", "b", "c"}
+//	Compact([]string{"", " ", "\t"}) == []string{}
+//	Compact([]string{"hello", "world"}) == []string{"hello", "world"}
+//	Compact([]string{}) == []string{}
+func Compact(slice []string) []string {
+	result := make([]string, 0, len(slice))
+	for _, s := range slice {
+		if strings.TrimSpace(s) != "" {
+			result = append(result, s)
+		}
+	}
+	return result
+}
