@@ -13195,3 +13195,23 @@ func Compact(slice []string) []string {
 	}
 	return result
 }
+
+// FastCompact returns a new slice with all nil or empty string values removed.
+// It iterates through the slice and appends only non-empty strings to a new slice.
+// This version is optimized by pre-allocating the result slice's capacity.
+//
+// Examples:
+//
+//	FastCompact([]string{"a", "", "b", " ", "c"}) == []string{"a", "b", "c"}
+//	FastCompact([]string{"", " ", "\t"}) == []string{}
+//	FastCompact([]string{"hello", "world"}) == []string{"hello", "world"}
+//	FastCompact([]string{}) == []string{}
+func FastCompact(slice []string) []string {
+	result := make([]string, 0, len(slice)) // Pre-allocate capacity
+	for _, s := range slice {
+		if strings.TrimSpace(s) != "" {
+			result = append(result, s)
+		}
+	}
+	return result
+}
