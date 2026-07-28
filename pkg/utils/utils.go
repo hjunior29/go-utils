@@ -13253,3 +13253,19 @@ func ValidatePhoneNumber(phone string) error {
 	}
 	return nil
 }
+
+// SafeTrimPrefix removes the prefix from the string if present.
+// It returns the modified string and a nil error. If the string does not
+// start with the prefix, it returns the original string and a nil error.
+//
+// Examples:
+//
+//	SafeTrimPrefix("hello world", "hello ") == ("world", nil)
+//	SafeTrimPrefix("hello world", "goodbye ") == ("hello world", nil)
+//	SafeTrimPrefix("hello", "") == ("", nil) // Empty prefix
+func SafeTrimPrefix(s, prefix string) (string, error) {
+	if strings.HasPrefix(s, prefix) {
+		return s[len(prefix):], nil
+	}
+	return s, nil
+}
