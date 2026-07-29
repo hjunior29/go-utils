@@ -13374,3 +13374,19 @@ func SafeContainsGeneric[T comparable](slice []T, item T) (bool, error) {
 	}
 	return false, nil
 }
+
+// TrimRightHyphen removes trailing hyphens from a string.
+// If the string does not end with a hyphen, it is returned as is.
+//
+// @param s The input string to trim hyphens from.
+// @return The string with trailing hyphens removed.
+//
+// Examples:
+//
+//	TrimRightHyphen("hello---") == "hello"
+//	TrimRightHyphen("hello") == "hello"
+//	TrimRightHyphen("-") == ""
+//	TrimRightHyphen("") == ""
+func TrimRightHyphen(s string) string {
+	return strings.TrimRight(s, "-")
+}
