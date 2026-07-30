@@ -13405,3 +13405,18 @@ func TrimRightHyphen(s string) string {
 func SafeTrimStart(s string) (string, error) {
 	return strings.TrimLeft(s, " \t\n\r\f\v"), nil
 }
+
+// SafeTrimRight removes trailing whitespace from a string.
+// It returns the trimmed string and a nil error.
+//
+// @param s The input string to trim.
+// @return The string with trailing whitespace removed, and a nil error.
+//
+// Examples:
+//
+//	SafeTrimRight("hello world  ") == ("hello world", nil)
+//	SafeTrimRight("hello world") == ("hello world", nil)
+//	SafeTrimRight("") == ("", nil)
+func SafeTrimRight(s string) (string, error) {
+	return strings.TrimRight(s, " \t\n\r\f\v"), nil
+}
