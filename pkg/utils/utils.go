@@ -13442,3 +13442,33 @@ func SafeMapKeys[K1 comparable, K2 comparable, V any](m map[K1]V, f func(K1) K2)
 	}
 	return result, nil
 }
+
+// FastIsAlpha checks if a string contains only alphabetic characters.
+// It returns true if the string is not empty and all characters are letters.
+// It returns false otherwise, including for empty strings.
+// This version is optimized by avoiding unnecessary rune slice conversions when the string is short or already invalid.
+//
+// @param s The input string to check.
+// @return true if the string contains only alphabetic characters, false otherwise.
+//
+// Examples:
+//
+//	FastIsAlpha("HelloWorld") == true
+//	FastIsAlpha("Hello World") == false // Contains a space
+//	FastIsAlpha("Hello123") == false   // Contains digits
+//	FastIsAlpha("") == false           // Empty string
+func FastIsAlpha(s string) bool {
+	if s == "" {
+		return false
+	}
+	// Iterate directly over the string's bytes and check if they are ASCII letters.
+	// For full Unicode support, the original range loop over runes is preferred.
+	// However, for ASCII-only optimization, this can be faster.
+	// Given the existing functions handle Unicode, we'll stick to rune iteration.
+	for _, r := range s {
+		if !unicode.IsLetter(r) {
+			return false
+		}
+	}
+	return true
+}
