@@ -13420,3 +13420,25 @@ func SafeTrimStart(s string) (string, error) {
 func SafeTrimRight(s string) (string, error) {
 	return strings.TrimRight(s, " \t\n\r\f\v"), nil
 }
+
+// SafeMapKeys applies a function to each key of a map and returns a new map with the transformed keys.
+// The function `f` takes a key of type K1 and returns a key of type K2.
+// The values associated with the keys remain unchanged.
+// It returns the new map and a nil error.
+//
+// @param m The input map with keys of type K1 and values of type V.
+// @param f A function that transforms a key of type K1 into a key of type K2.
+// @return A new map with keys of type K2 and values of type V, where keys have been transformed by `f`, and a nil error.
+//
+// Examples:
+//
+//	SafeMapKeys(map[string]int{"a": 1, "b": 2}, func(s string) int { return len(s) }) == (map[int]int{1: 1, 1: 2}, nil)
+//	SafeMapKeys(map[int]string{1: "one", 2: "two"}, func(n int) string { return strconv.Itoa(n * 2) }) == (map[string]string{"2": "one", "4": "two"}, nil)
+func SafeMapKeys[K1 comparable, K2 comparable, V any](m map[K1]V, f func(K1) K2) (map[K2]V, error) {
+	result := make(map[K2]V, len(m))
+	for k, v := range m {
+		newKey := f(k)
+		result[newKey] = v
+	}
+	return result, nil
+}
