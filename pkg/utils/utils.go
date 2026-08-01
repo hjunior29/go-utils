@@ -13945,3 +13945,44 @@ func ToScreamingSnakeCase(s string) string {
 
 	return builder.String()
 }
+
+// SafeUUID validates if a string is a valid UUID (Globally Unique Identifier).
+// A valid UUID has the format "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", where 'x' represents a hexadecimal digit.
+// It returns the validated UUID (in lowercase) and a nil error if the string is a valid UUID.
+// Otherwise, it returns an empty string and an error indicating the reason for invalidity.
+//
+// Examples:
+//
+//	SafeUUID("a1b2c3d4-e5f6-7890-1234-567890abcdef") == ("a1b2c3d4-e5f6-7890-1234-567890abcdef", nil)
+//	SafeUUID("A1B2C3D4-E5F6-7890-1234-567890ABCDEF") == ("a1b2c3d4-e5f6-7890-1234-567890abcdef", nil) // Case-insensitive, returned lowercase
+//	SafeUUID("g1b2c3d4-e5f6-7890-1234-567890abcdef") returns ("", error) // Invalid character 'g'
+//	SafeUUID("a1b2c3d4-e5f6-7890-1234-567890abcde") returns ("", error) // Incorrect length
+func SafeUUID(uuid string) (string, error) {
+	if len(uuid) != 36 {
+		return "", errors.New("invalid UUID length: must be 36 characters (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)")
+	}
+
+	var builder strings.Builder
+	builder.Grow(36) // Pre-allocate capacity for the UUID string
+
+	for i, r := range uuid {
+		switch i {
+		case 8, 13, 18, 23: // Hyphen positions
+			if r != '-' {
+				return "", errors.New("invalid UUID format: hyphens missing or misplaced")
+			}
+			builder.WriteRune(r)
+		default: // Hexadecimal digit positions
+			var hexDigit rune
+			if unicode.IsDigit(r) {
+				hexDigit = r
+			} else if (r >= 'a' && r <= 'f') || (r >= 'A' && r <= 'F') {
+				hexDigit = unicode.ToLower(r) // Normalize to lowercase
+			} else {
+				return "", errors.New("invalid UUID format: contains non-hexadecimal characters")
+			}
+			builder.WriteRune(hexDigit)
+		}
+	}
+	return builder.String(), nil
+}
