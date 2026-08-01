@@ -13526,3 +13526,380 @@ func ValidateSSN(ssn string) error {
 	}
 	return nil
 }
+
+// SafeNormalizeSpaces replaces multiple whitespace characters in a string with a single space.
+// It also trims leading and trailing whitespace.
+// It returns the normalized string and a nil error.
+//
+// Examples:
+//
+//	SafeNormalizeSpaces("  hello   world  ") == ("hello world", nil)
+//	SafeNormalizeSpaces("a\t\nb") == ("a b", nil)
+//	SafeNormalizeSpaces("single") == ("single", nil)
+//	SafeNormalizeSpaces("") == ("", nil)
+func SafeNormalizeSpaces(s string) (string, error) {
+	if s == "" {
+		return "", nil
+	}
+
+	var builder strings.Builder
+	var lastCharIsSpace bool
+
+	for _, r := range s {
+		if unicode.IsSpace(r) {
+			if !lastCharIsSpace {
+				builder.WriteRune(' ')
+				lastCharIsSpace = true
+			}
+		} else {
+			builder.WriteRune(r)
+			lastCharIsSpace = false
+		}
+	}
+
+	// Trim leading and trailing spaces
+	result := builder.String()
+	return strings.TrimSpace(result), nil
+}
+
+// SafeWrap returns a new string where the input string `s` is wrapped by `prefix` and `suffix`.
+// If either `prefix` or `suffix` is empty, it's treated as if it were not provided.
+// It returns the wrapped string and a nil error. It returns an error if both prefix and suffix are empty and the input string `s` is also empty.
+//
+// @param s The string to wrap.
+// @param prefix The string to prepend.
+// @param suffix The string to append.
+// @return The wrapped string and a nil error, or an error if inputs are invalid.
+//
+// Examples:
+//
+//	SafeWrap("world", "hello ", "!") == ("hello world!", nil)
+//	SafeWrap("text", "", "...") == ("text...", nil)
+//	SafeWrap("content", "[", "]") == ("[content]", nil)
+//	SafeWrap("data", "", "") == ("data", nil)
+//	SafeWrap("", "", "") returns ("", errors.New("cannot wrap an empty string with empty prefix and suffix"))
+func SafeWrap(s, prefix, suffix string) (string, error) {
+	if s == "" && prefix == "" && suffix == "" {
+		return "", errors.New("cannot wrap an empty string with empty prefix and suffix")
+	}
+	return prefix + s + suffix, nil
+}
+
+// SafeCountLines counts the number of lines in a string.
+// A line is considered to be terminated by a newline character (\n).
+// An empty string has 0 lines. A string with no newline characters has 1 line.
+// It returns the line count and a nil error.
+//
+// Examples:
+//
+//	SafeCountLines("hello\nworld") == (2, nil)
+//	SafeCountLines("hello") == (1, nil)
+//	SafeCountLines("") == (0, nil)
+//	SafeCountLines("\n") == (1, nil)
+//	SafeCountLines("line1\nline2\n") == (2, nil)
+func SafeCountLines(s string) (int, error) {
+	if s == "" {
+		return 0, nil
+	}
+	count := 1 // Start with 1 line assuming at least one non-empty string
+	for _, r := range s {
+		if r == '\n' {
+			count++
+		}
+	}
+	// If the string ends with a newline, the last increment might have counted an extra "empty" line
+	// after the final newline. strings.Split handles this by not including an empty string at the end.
+	// For consistency, we'll mimic that behavior by checking if the string ends with a newline.
+	if strings.HasSuffix(s, "\n") && count > 1 {
+		// If it ends with a newline and we counted more than one line,
+		// the last increment was for an empty line after the final newline.
+		// We should not count this empty line.
+		return count - 1, nil
+	}
+	return count, nil
+}
+
+// SafeBeforeFirst returns the substring before the first occurrence of the separator.
+// If the separator is not found, it returns the entire string and a nil error.
+// If the separator is empty, it returns an empty string and a nil error.
+// It returns an error if the separator is empty and the string is not empty,
+// as this behavior is ambiguous and handled by strings.Index.
+//
+// Examples:
+//
+//	SafeBeforeFirst("hello world", " ") == ("hello", nil)
+//	SafeBeforeFirst("hello", "x") == ("hello", nil)
+//	SafeBeforeFirst("hello", "") == ("", nil)
+//	SafeBeforeFirst("a,b,c", "") returns ("", errors.New("separator cannot be empty if string is not empty"))
+func SafeBeforeFirst(s, sep string) (string, error) {
+	if sep == "" && s != "" {
+		return "", errors.New("separator cannot be empty if string is not empty")
+	}
+	if sep == "" {
+		return "", nil
+	}
+	index := strings.Index(s, sep)
+	if index == -1 {
+		return s, nil
+	}
+	return s[:index], nil
+}
+
+// SafeAfterFirst returns the substring after the first occurrence of the separator.
+// If the separator is not found, it returns the original string and a nil error.
+// If the separator is empty, it returns an empty string and a nil error.
+// It returns an error if the separator is empty and the string is not empty,
+// as this behavior is ambiguous and handled by strings.Index.
+//
+// Examples:
+//
+//	SafeAfterFirst("hello world", " ") == ("world", nil)
+//	SafeAfterFirst("hello", "x") == ("hello", nil)
+//	SafeAfterFirst("hello", "") == ("", nil)
+//	SafeAfterFirst("a,b,c", "") returns ("", errors.New("separator cannot be empty if string is not empty"))
+func SafeAfterFirst(s, sep string) (string, error) {
+	if sep == "" && s != "" {
+		return "", errors.New("separator cannot be empty if string is not empty")
+	}
+	if sep == "" {
+		return "", nil
+	}
+	index := strings.Index(s, sep)
+	if index == -1 {
+		return s, nil
+	}
+	return s[:index], nil
+}
+
+// SafeAfterLast returns the substring after the last occurrence of the separator.
+// If the separator is not found, it returns an empty string and a nil error.
+// If the separator is empty, it returns the original string and a nil error.
+// It returns an error if there's an issue with the operation, though standard string operations rarely error.
+//
+// Examples:
+//
+//	SafeAfterLast("hello world", " ") == ("world", nil)
+//	SafeAfterLast("hello", "x") == ("", nil)
+//	SafeAfterLast("hello", "") == ("hello", nil)
+func SafeAfterLast(s, sep string) (string, error) {
+	if sep == "" {
+		return s, nil
+	}
+	index := strings.LastIndex(s, sep)
+	if index == -1 {
+		return "", nil
+	}
+	return s[index+len(sep):], nil
+}
+
+// SafeBetween returns the string between the first and last occurrences of a specified substring.
+// If the start substring is not found, or the end substring is not found after the start,
+// it returns an empty string and a nil error.
+// If the start or end substrings are empty, it may lead to unexpected behavior or empty results,
+// but no error is returned unless the substrings are invalid in a way that `strings.Index` would error (which is rare).
+//
+// Examples:
+//
+//	SafeBetween("hello [world]!", "[", "]") == ("world", nil)
+//	SafeBetween("no delimiters here", "[", "]") == ("", nil)
+//	SafeBetween("start middle end", "start", "end") == (" middle ", nil)
+//	SafeBetween("start", "start", "end") == ("", nil)
+//	SafeBetween("end", "start", "end") == ("", nil)
+func SafeBetween(s, start, end string) (string, error) {
+	startIndex := strings.Index(s, start)
+	if startIndex == -1 {
+		return "", nil
+	}
+	// Adjust startIndex to be after the start delimiter
+	startIndex += len(start)
+
+	endIndex := strings.Index(s[startIndex:], end)
+	if endIndex == -1 {
+		return "", nil
+	}
+	return s[startIndex : startIndex+endIndex], nil
+}
+
+// SafeSplit splits a string around each instance of the separator, returning a slice of substrings.
+// If the separator is an empty string, Split splits after each UTF-8 sequence.
+// It returns an error if the separator is empty and the string is not empty.
+//
+// Examples:
+//
+//	SafeSplit("a,b,c", ",") == ([]string{"a", "b", "c"}, nil)
+//	SafeSplit("a,b,c", "") returns ("", error) // separator is empty and string is not empty
+//	SafeSplit("", ",") == ([]string{""}, nil)
+//	SafeSplit("", "") == ([]string{}, nil)
+func SafeSplit(s, sep string) ([]string, error) {
+	if sep == "" && s != "" {
+		return nil, errors.New("separator cannot be empty if string is not empty")
+	}
+	return strings.Split(s, sep), nil
+}
+
+// SafeSplitOnce splits a string into two parts at the first occurrence of the separator.
+// It returns the part before the separator and the part after the separator.
+// If the separator is not found, it returns the original string and an empty string.
+// If the separator is empty, it returns an empty string and the original string.
+// It returns an error if the separator is empty and the string is not empty,
+// as this behavior is ambiguous and handled by strings.Split.
+//
+// @param s The string to split.
+// @param sep The separator string.
+// @return A slice containing two strings: the part before the separator and the part after, or an error.
+//
+// Examples:
+//
+//	SafeSplitOnce("hello,world", ",") == ([]string{"hello", "world"}, nil)
+//	SafeSplitOnce("helloworld", ",") == ([]string{"helloworld", ""}, nil)
+//	SafeSplitOnce("hello,world", "") == ([]string{"", "hello,world"}, nil)
+//	SafeSplitOnce("a,b,c", "") returns ("", errors.New("separator cannot be empty if string is not empty"))
+func SafeSplitOnce(s, sep string) ([]string, error) {
+	if sep == "" && s != "" {
+		return nil, errors.New("separator cannot be empty if string is not empty")
+	}
+	if sep == "" {
+		return []string{"", s}, nil
+	}
+	index := strings.Index(s, sep)
+	if index == -1 {
+		return []string{s, ""}, nil
+	}
+	return []string{s[:index], s[index+len(sep):]}, nil
+}
+
+// SafeSplitOnceAfter splits a string into two parts at the first occurrence of the separator,
+// returning the part before the separator and the part after it (including the separator).
+// If the separator is not found, it returns the original string and an empty string.
+// If the separator is empty, it returns an empty string and the original string.
+// It returns an error if the separator is empty and the string is not empty, as this behavior
+// is ambiguous and handled by strings.Split.
+//
+// @param s The string to split.
+// @param sep The separator string.
+// @return A slice containing two strings: the part before the separator and the part after (including the separator), or an error.
+//
+// Examples:
+//
+//	SafeSplitOnceAfter("hello,world", ",") == ([]string{"hello", ",world"}, nil)
+//	SafeSplitOnceAfter("helloworld", ",") == ([]string{"helloworld", ""}, nil)
+//	SafeSplitOnceAfter("hello,world", "") == ([]string{"", "hello,world"}, nil)
+//	SafeSplitOnceAfter("a,b,c", "") returns ("", errors.New("separator cannot be empty if string is not empty"))
+func SafeSplitOnceAfter(s, sep string) ([]string, error) {
+	if sep == "" && s != "" {
+		return nil, errors.New("separator cannot be empty if string is not empty")
+	}
+	if sep == "" {
+		return []string{"", s}, nil
+	}
+	index := strings.Index(s, sep)
+	if index == -1 {
+		return []string{s, ""}, nil
+	}
+	return []string{s[:index], s[index:]}, nil
+}
+
+// SafeTrimAll removes all whitespace characters (spaces, tabs, newlines, etc.) from a string.
+// It uses a strings.Builder for efficient string concatenation.
+// It returns the processed string and a nil error.
+//
+// Examples:
+//
+//	SafeTrimAll("  hello \t world \n") == ("helloworld", nil)
+//	SafeTrimAll("", " ") == ("", nil)
+func SafeTrimAll(s string) (string, error) {
+	var builder strings.Builder
+	builder.Grow(len(s)) // Pre-allocate capacity for efficiency
+	for _, r := range s {
+		if !unicode.IsSpace(r) {
+			builder.WriteRune(r)
+		}
+	}
+	return builder.String(), nil
+}
+
+// SafeNormalizeSpaces replaces multiple whitespace characters in a string with a single space.
+// It also trims leading and trailing whitespace.
+// It returns the normalized string and a nil error.
+//
+// Examples:
+//
+//	SafeNormalizeSpaces("  hello   world  ") == ("hello world", nil)
+//	SafeNormalizeSpaces("a\t\nb") == ("a b", nil)
+//	SafeNormalizeSpaces("single") == ("single", nil)
+//	SafeNormalizeSpaces("") == ("", nil)
+func SafeNormalizeSpaces(s string) (string, error) {
+	if s == "" {
+		return "", nil
+	}
+
+	var builder strings.Builder
+	var lastCharIsSpace bool
+
+	for _, r := range s {
+		if unicode.IsSpace(r) {
+			if !lastCharIsSpace {
+				builder.WriteRune(' ')
+				lastCharIsSpace = true
+			}
+		} else {
+			builder.WriteRune(r)
+			lastCharIsSpace = false
+		}
+	}
+
+	// Trim leading and trailing spaces
+	result := builder.String()
+	return strings.TrimSpace(result), nil
+}
+
+// SafeWrap returns a new string where the input string `s` is wrapped by `prefix` and `suffix`.
+// If either `prefix` or `suffix` is empty, it's treated as if it were not provided.
+// It returns the wrapped string and a nil error. It returns an error if both prefix and suffix are empty and the input string `s` is also empty.
+//
+// @param s The string to wrap.
+// @param prefix The string to prepend.
+// @param suffix The string to append.
+// @return The wrapped string and a nil error, or an error if inputs are invalid.
+//
+// Examples:
+//
+//	SafeWrap("world", "hello ", "!") == ("hello world!", nil)
+//	SafeWrap("text", "", "...") == ("text...", nil)
+//	SafeWrap("content", "[", "]") == ("[content]", nil)
+//	SafeWrap("data", "", "") == ("data", nil)
+//	SafeWrap("", "", "") returns ("", errors.New("cannot wrap an empty string with empty prefix and suffix"))
+func SafeWrap(s, prefix, suffix string) (string, error) {
+	if s == "" && prefix == "" && suffix == "" {
+		return "", errors.New("cannot wrap an empty string with empty prefix and suffix")
+	}
+	return prefix + s + suffix, nil
+}
+
+// SafeCountLines counts the number of lines in a string.
+// A line is considered to be terminated by a newline character (\n).
+// An empty string has 0 lines. A string with no newline characters has 1 line.
+// It returns the line count and a nil error.
+//
+// Examples:
+//
+//	SafeCountLines("hello\nworld") == (2, nil)
+//	SafeCountLines("hello") == (1, nil)
+//	SafeCountLines("") == (0, nil)
+//	SafeCountLines("\n") == (1, nil)
+//	SafeCountLines("line1\nline2\n") == (2, nil)
+func SafeCountLines(s string) (int, error) {
+	if s == "" {
+		return 0, nil
+	}
+	count := 1 // Start with 1 line assuming at least one non-empty string
+	for _, r := range s {
+		if r == '\n' {
+			count++
+		}
+	}
+	// If the string ends with a newline, the last increment might have counted an extra "empty" line
+	// after the final newline. strings.Split handles this by not including an empty string at the end.
+	// For consistency, we'll mimic that behavior by checking if the string ends with a newline.
+	if strings.HasSuffix(s, "\n") && count > 1 {
+		// If it ends with a newline and we counted more than one
