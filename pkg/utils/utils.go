@@ -14506,3 +14506,37 @@ func SafeExtractNumbers(s string) ([]string, error) {
 	}
 	return numbers, nil
 }
+
+// SafeExtractNumbers returns all sequences of digits found in a string.
+// It iterates through the string, building a new string containing only digits.
+// It returns the extracted numbers as a slice of strings and a nil error.
+//
+// @param s The input string to search within.
+// @return A slice of strings, where each string is a sequence of digits found in the input string, and a nil error.
+//         Returns an empty slice and nil error if no digits are found.
+//
+// Examples:
+//
+//	SafeExtractNumbers("abc123def456ghi789") == ([]string{"123", "456", "789"}, nil)
+//	SafeExtractNumbers("no digits here") == ([]string{}, nil)
+//	SafeExtractNumbers("123") == ([]string{"123"}, nil)
+//	SafeExtractNumbers(" leading 1 digit and 2 more") == ([]string{"1", "2"}, nil)
+func SafeExtractNumbers(s string) ([]string, error) {
+	var numbers []string
+	var builder strings.Builder
+	for _, r := range s {
+		if unicode.IsDigit(r) {
+			builder.WriteRune(r)
+		} else {
+			if builder.Len() > 0 {
+				numbers = append(numbers, builder.String())
+				builder.Reset()
+			}
+		}
+	}
+	// Add the last number if the string ends with digits
+	if builder.Len() > 0 {
+		numbers = append(numbers, builder.String())
+	}
+	return numbers, nil
+}
