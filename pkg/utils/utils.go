@@ -14569,3 +14569,35 @@ func ToTitleCase(s string) string {
 	}
 	return string(runes)
 }
+
+// ToTitleCase converts a string to title case, capitalizing the first letter of each word.
+// Words are delimited by spaces. It handles Unicode characters correctly.
+//
+// @param s The input string to convert to title case.
+// @return The string converted to title case.
+//
+// Examples:
+//
+//	ToTitleCase("hello world") == "Hello World"
+//	ToTitleCase("a song of ice and fire") == "A Song Of Ice And Fire"
+//	ToTitleCase("HELLO WORLD") == "Hello World"
+//	ToTitleCase("") == ""
+//	ToTitleCase("  leading spaces") == "  Leading Spaces"
+func ToTitleCase(s string) string {
+	if s == "" {
+		return s
+	}
+	runes := []rune(s)
+	capitalizeNext := true
+	for i, r := range runes {
+		if unicode.IsSpace(r) {
+			capitalizeNext = true
+		} else if capitalizeNext {
+			runes[i] = unicode.ToUpper(r)
+			capitalizeNext = false
+		} else {
+			runes[i] = unicode.ToLower(r)
+		}
+	}
+	return string(runes)
+}
