@@ -14601,3 +14601,352 @@ func ToTitleCase(s string) string {
 	}
 	return string(runes)
 }
+
+// SafeValidateColor checks if a string is a valid hexadecimal color code.
+// A valid color code starts with '#' followed by 3 or 6 hexadecimal digits (0-9, a-f, A-F).
+// It returns the color code (normalized to lowercase hex with '#') and a nil error if it's valid,
+// otherwise an empty string and an error.
+//
+// @param color The string to validate as a hexadecimal color code.
+// @return The normalized color code and a nil error if valid, otherwise an empty string and an error.
+//
+// Examples:
+//
+//	SafeValidateColor("#FFFFFF") == ("#ffffff", nil)
+//	SafeValidateColor("#fff") == ("#fff", nil)
+//	SafeValidateColor("#ff00aa") == ("#ff00aa", nil)
+//	SafeValidateColor("#F0A") == ("#f0a", nil) // Returned lowercase
+//	SafeValidateColor("FFFFFF") returns ("", error) // missing '#'
+//	SafeValidateColor("#FFFFF") returns ("", error) // invalid length
+//	SafeValidateColor("#GGGGGG") returns ("", error) // invalid characters
+//	SafeValidateColor("") returns ("", error)
+func SafeValidateColor(color string) (string, error) {
+	if color == "" {
+		return "", errors.New("color string cannot be empty")
+	}
+
+	if !strings.HasPrefix(color, "#") {
+		return "", errors.New("color must start with '#'")
+	}
+
+	hexPart := color[1:] // Remove the '#' prefix
+	length := len(hexPart)
+
+	if length != 3 && length != 6 {
+		return "", errors.New("color code must be 3 or 6 hexadecimal digits long")
+	}
+
+	var builder strings.Builder
+	builder.Grow(length + 1) // +1 for the '#'
+	builder.WriteRune('#')
+
+	for _, r := range hexPart {
+		var hexDigit rune
+		if unicode.IsDigit(r) {
+			hexDigit = r
+		} else if (r >= 'a' && r <= 'f') || (r >= 'A' && r <= 'F') {
+			hexDigit = unicode.ToLower(r) // Normalize to lowercase
+		} else {
+			return "", errors.New("color code contains non-hexadecimal characters")
+		}
+		builder.WriteRune(hexDigit)
+	}
+	return builder.String(), nil
+}
+
+// SafeValidateUUID checks if a string is a valid GUID (Globally Unique Identifier).
+// A valid GUID has the format "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", where 'x' represents a hexadecimal digit.
+// It returns the validated GUID (in lowercase) and a nil error if the string is a valid GUID.
+// Otherwise, it returns an empty string and an error indicating the reason for invalidity.
+//
+// @param uuid The string to validate as a GUID.
+// @return The validated GUID (in lowercase) and a nil error if valid, otherwise an empty string and an error.
+//
+// Examples:
+//
+//	SafeValidateUUID("a1b2c3d4-e5f6-7890-1234-567890abcdef") == ("a1b2c3d4-e5f6-7890-1234-567890abcdef", nil)
+//	SafeValidateUUID("A1B2C3D4-E5F6-7890-1234-567890ABCDEF") == ("a1b2c3d4-e5f6-7890-1234-567890abcdef", nil) // Case-insensitive, returned lowercase
+//	SafeValidateUUID("g1b2c3d4-e5f6-7890-1234-567890abcdef") returns ("", error) // Invalid character 'g'
+//	SafeValidateUUID("a1b2c3d4-e5f6-7890-1234-567890abcde") returns ("", error) // Incorrect length
+func SafeValidateUUID(uuid string) (string, error) {
+	if len(uuid) != 36 {
+		return "", errors.New("invalid UUID length: must be 36 characters (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)")
+	}
+
+	var builder strings.Builder
+	builder.Grow(36) // Pre-allocate capacity for the UUID string
+
+	for i, r := range uuid {
+		switch i {
+		case 8, 13, 18, 23: // Hyphen positions
+			if r != '-' {
+				return "", errors.New("invalid UUID format: hyphens missing or misplaced")
+			}
+			builder.WriteRune(r)
+		default: // Hexadecimal digit positions
+			var hexDigit rune
+			if unicode.IsDigit(r) {
+				hexDigit = r
+			} else if (r >= 'a' && r <= 'f') || (r >= 'A' && r <= 'F') {
+				hexDigit = unicode.ToLower(r) // Normalize to lowercase
+			} else {
+				return "", errors.New("invalid UUID format: contains non-hexadecimal characters")
+			}
+			builder.WriteRune(hexDigit)
+		}
+	}
+	return builder.String(), nil
+}
+
+// SafeValidateIP checks if a string is a valid IPv4 or IPv6 address.
+// It uses Go's net.ParseIP function for validation.
+// It returns the boolean result of the validation and an error if the input is malformed in a way
+// that ParseIP cannot handle (though typically ParseIP returns nil for invalid IPs without an error).
+//
+// @param ipStr The string to validate as an IP address.
+// @return true and a nil error if the string is a valid IP address, false and a nil error otherwise.
+//
+// Examples:
+//
+//	SafeValidateIP("192.168.1.1") == (true, nil)
+//	SafeValidateIP("2001:0db8:85a3:0000:0000:8a2e:0370:7334") == (true, nil)
+//	SafeValidateIP("invalid-ip") == (false, nil) // net.ParseIP returns nil, not an error for invalid formats
+//	SafeValidateIP("192.168.1.256") == (false, nil) // net.ParseIP returns nil
+func SafeValidateIP(ipStr string) (bool, error) {
+	if net.ParseIP(ipStr) == nil {
+		// net.ParseIP returns nil if the string is not a valid IP address.
+		// It does not typically return an error for invalid IP formats.
+		return false, nil
+	}
+	return true, nil
+}
+
+// SafeSlugify converts a string into a URL-friendly slug.
+// It converts the string to lowercase, replaces spaces and non-alphanumeric characters with hyphens,
+// and trims leading/trailing hyphens. Multiple hyphens are reduced to a single hyphen.
+// It returns the generated slug and a nil error. If the input string is empty, it returns an empty string and nil error.
+//
+// @param s The input string to convert into a slug.
+// @return The URL-friendly slug string and a nil error if successful. Returns an empty string and nil error if the input string is empty.
+//
+// Examples:
+//
+//	SafeSlugify("Hello World!") == ("hello-world", nil)
+//	SafeSlugify(" A New Topic  ") == ("a-new-topic", nil)
+//	SafeSlugify("Another_Example-Here") == ("another-example-here", nil)
+//	SafeSlugify("123-456") == ("123-456", nil)
+//	SafeSlugify("") == ("", nil)
+func SafeSlugify(s string) (string, error) {
+	if s == "" {
+		return "", nil
+	}
+
+	s = strings.ToLower(s)
+	var builder strings.Builder
+	var lastCharIsHyphen bool
+
+	for i, r := range s {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) {
+			builder.WriteRune(r)
+			lastCharIsHyphen = false
+		} else if !lastCharIsHyphen {
+			// Only add a hyphen if it's not a duplicate and not at the beginning
+			if builder.Len() > 0 && i < len(s) {
+				builder.WriteRune('-')
+				lastCharIsHyphen = true
+			}
+		}
+	}
+
+	// Trim leading and trailing hyphens
+	result := builder.String()
+	result = strings.Trim(result, "-")
+	return result, nil
+}
+
+// SafeCountLines counts the number of lines in a string.
+// A line is considered to be terminated by a newline character (\n).
+// An empty string has 0 lines. A string with no newline characters has 1 line.
+// It returns the line count and a nil error.
+//
+// @param s The input string.
+// @return The number of lines in the string and a nil error.
+//
+// Examples:
+//
+//	SafeCountLines("hello\nworld") == (2, nil)
+//	SafeCountLines("hello") == (1, nil)
+//	SafeCountLines("") == (0, nil)
+//	SafeCountLines("\n") == (1, nil)
+//	SafeCountLines("line1\nline2\n") == (2, nil)
+func SafeCountLines(s string) (int, error) {
+	if s == "" {
+		return 0, nil
+	}
+	count := 1 // Start with 1 line assuming at least one non-empty string
+	for _, r := range s {
+		if r == '\n' {
+			count++
+		}
+	}
+	// If the string ends with a newline, the last increment might have counted an extra "empty" line
+	// after the final newline. strings.Split handles this by not including an empty string at the end.
+	// For consistency, we'll mimic that behavior by checking if the string ends with a newline.
+	if strings.HasSuffix(s, "\n") && count > 1 {
+		// If it ends with a newline and we counted more than one line,
+		// the last increment was for an empty line after the final newline.
+		// We should not count this empty line.
+		return count - 1, nil
+	}
+	return count, nil
+}
+
+// SafeBeforeFirst returns the substring before the first occurrence of the separator.
+// If the separator is not found, it returns the entire string and a nil error.
+// If the separator is empty, it returns an empty string and a nil error.
+// It returns an error if the separator is empty and the string is not empty,
+// as this behavior is ambiguous and handled by strings.Index.
+//
+// @param s The string to search within.
+// @param sep The separator string.
+// @return The substring before the first occurrence of the separator, or the entire string if not found, and a nil error. Returns an empty string and nil error if the separator is empty. Returns an error if the separator is empty and the string is not empty.
+//
+// Examples:
+//
+//	SafeBeforeFirst("hello world", " ") == ("hello", nil)
+//	SafeBeforeFirst("hello", "x") == ("hello", nil)
+//	SafeBeforeFirst("hello", "") == ("", nil)
+//	SafeBeforeFirst("a,b,c", "") returns ("", errors.New("separator cannot be empty if string is not empty"))
+func SafeBeforeFirst(s, sep string) (string, error) {
+	if sep == "" && s != "" {
+		return "", errors.New("separator cannot be empty if string is not empty")
+	}
+	if sep == "" {
+		return "", nil
+	}
+	index := strings.Index(s, sep)
+	if index == -1 {
+		return s, nil
+	}
+	return s[:index], nil
+}
+
+// SafeAfterFirst returns the substring after the first occurrence of the separator.
+// If the separator is not found, it returns the original string and a nil error.
+// If the separator is empty, it returns an empty string and a nil error.
+// It returns an error if the separator is empty and the string is not empty,
+// as this behavior is ambiguous and handled by strings.Index.
+//
+// Examples:
+//
+//	SafeAfterFirst("hello world", " ") == ("world", nil)
+//	SafeAfterFirst("hello", "x") == ("hello", nil)
+//	SafeAfterFirst("hello", "") == ("", nil)
+//	SafeAfterFirst("a,b,c", "") returns ("", errors.New("separator cannot be empty if string is not empty"))
+func SafeAfterFirst(s, sep string) (string, error) {
+	if sep == "" && s != "" {
+		return "", errors.New("separator cannot be empty if string is not empty")
+	}
+	if sep == "" {
+		return "", nil
+	}
+	index := strings.Index(s, sep)
+	if index == -1 {
+		return s, nil
+	}
+	return s[:index], nil
+}
+
+// SafeAfterLast returns the substring after the last occurrence of the separator.
+// If the separator is not found, it returns an empty string and a nil error.
+// If the separator is empty, it returns the original string and a nil error.
+// It returns an error if there's an issue with the operation, though standard string operations rarely error.
+//
+// Examples:
+//
+//	SafeAfterLast("hello world", " ") == ("world", nil)
+//	SafeAfterLast("hello", "x") == ("", nil)
+//	SafeAfterLast("hello", "") == ("hello", nil)
+func SafeAfterLast(s, sep string) (string, error) {
+	if sep == "" {
+		return s, nil
+	}
+	index := strings.LastIndex(s, sep)
+	if index == -1 {
+		return "", nil
+	}
+	return s[index+len(sep):], nil
+}
+
+// SafeBetween returns the string between the first and last occurrences of a specified substring.
+// If the start substring is not found, or the end substring is not found after the start,
+// it returns an empty string and a nil error.
+// If the start or end substrings are empty, it may lead to unexpected behavior or empty results,
+// but no error is returned unless the substrings are invalid in a way that `strings.Index` would error (which is rare).
+//
+// @param s The input string to search within.
+// @param start The starting substring delimiter.
+// @param end The ending substring delimiter.
+// @return The string found between the start and end delimiters, and a nil error. Returns an empty string and nil error if delimiters are not found or if the resulting substring is empty.
+//
+// Examples:
+//
+//	SafeBetween("hello [world]!", "[", "]") == ("world", nil)
+//	SafeBetween("no delimiters here", "[", "]") == ("", nil)
+//	SafeBetween("start middle end", "start", "end") == (" middle ", nil)
+//	SafeBetween("start", "start", "end") == ("", nil)
+//	SafeBetween("end", "start", "end") == ("", nil)
+func SafeBetween(s, start, end string) (string, error) {
+	startIndex := strings.Index(s, start)
+	if startIndex == -1 {
+		return "", nil
+	}
+	// Adjust startIndex to be after the start delimiter
+	startIndex += len(start)
+
+	endIndex := strings.Index(s[startIndex:], end)
+	if endIndex == -1 {
+		return "", nil
+	}
+	return s[startIndex : startIndex+endIndex], nil
+}
+
+// SafeClamp restricts an integer value to be within a specified range [min, max].
+// If val < min, it returns min. If val > max, it returns max.
+// It returns an error if min > max.
+// This function is safe as it returns an error for invalid range configurations.
+//
+// @param val The integer value to clamp.
+// @param min The minimum allowed value.
+// @param max The maximum allowed value.
+// @return The clamped integer value and a nil error if the range is valid, otherwise 0 and an error.
+//
+// Examples:
+//
+//	SafeClamp(5, 0, 10) == (5, nil)
+//	SafeClamp(-5, 0, 10) == (0, nil)
+//	SafeClamp(15, 0, 10) == (10, nil)
+//	SafeClamp(5, 10, 0) returns (0, error)
+func SafeClamp(val, min, max int) (int, error) {
+	if min > max {
+		return 0, errors.New("min cannot be greater than max")
+	}
+	if val < min {
+		return min, nil
+	}
+	if val > max {
+		return max, nil
+	}
+	return val, nil
+}
+
+// SafeAppend concatenates two strings and returns the result along with a nil error.
+// It provides a safe way to append strings, guaranteeing a string return value.
+//
+// @param s1 The first string.
+// @param s2 The second string to append.
+// @return The concatenated string (s1 + s2) and a nil error.
+//
+// Examples:
+//
+//	SafeAppend("hello", "world") == ("helloworld
