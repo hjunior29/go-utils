@@ -14950,3 +14950,20 @@ func SafeClamp(val, min, max int) (int, error) {
 // Examples:
 //
 //	SafeAppend("hello", "world") == ("helloworld
+
+// FastTrimAll removes all whitespace characters (spaces, tabs, newlines, etc.) from a string.
+// It uses a strings.Builder for efficient string concatenation and pre-allocates capacity.
+//
+// Examples:
+//
+//	FastTrimAll("  hello \t world \n") == "helloworld"
+func FastTrimAll(s string) string {
+	var builder strings.Builder
+	builder.Grow(len(s)) // Pre-allocate capacity for efficiency
+	for _, r := range s {
+		if !unicode.IsSpace(r) {
+			builder.WriteRune(r)
+		}
+	}
+	return builder.String()
+}
