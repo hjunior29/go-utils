@@ -14967,3 +14967,38 @@ func FastTrimAll(s string) string {
 	}
 	return builder.String()
 }
+
+// ValidateUsername checks if a string is a valid username.
+// A valid username must:
+// - Not be empty.
+// - Contain only alphanumeric characters and underscores (_).
+// - Start with an alphabetic character.
+// - Be between 3 and 20 characters long (inclusive).
+// It returns an error if the username is invalid.
+//
+// Examples:
+//
+//	ValidateUsername("valid_user123") == nil
+//	ValidateUsername("user") == nil
+//	ValidateUsername("a_very_long_username_that_exceeds_limit") returns an error (too long)
+//	ValidateUsername("123invalid") returns an error (starts with a digit)
+//	ValidateUsername("invalid-user") returns an error (contains hyphen)
+//	ValidateUsername("user name") returns an error (contains space)
+//	ValidateUsername("") returns an error (empty string)
+func ValidateUsername(username string) error {
+	if username == "" {
+		return errors.New("username cannot be empty")
+	}
+	if len(username) < 3 || len(username) > 20 {
+		return errors.New("username must be between 3 and 20 characters long")
+	}
+	if !unicode.IsLetter(rune(username[0])) {
+		return errors.New("username must start with an alphabetic character")
+	}
+	for _, r := range username {
+		if !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '_' {
+			return errors.New("username can only contain alphanumeric characters and underscores")
+		}
+	}
+	return nil
+}
