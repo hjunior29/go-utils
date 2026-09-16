@@ -15093,3 +15093,26 @@ func ValidateWeekday(s string) error {
 		return errors.New("invalid weekday name")
 	}
 }
+
+// SafeValidateIP checks if a string is a valid IPv4 or IPv6 address.
+// It uses Go's net.ParseIP function for validation.
+// It returns the boolean result of the validation and an error if the input is malformed in a way
+// that ParseIP cannot handle (though typically ParseIP returns nil for invalid IPs without an error).
+//
+// @param ipStr The string to validate as an IP address.
+// @return true and a nil error if the string is a valid IP address, false and a nil error otherwise.
+//
+// Examples:
+//
+//	SafeValidateIP("192.168.1.1") == (true, nil)
+//	SafeValidateIP("2001:0db8:85a3:0000:0000:8a2e:0370:7334") == (true, nil)
+//	SafeValidateIP("invalid-ip") == (false, nil) // net.ParseIP returns nil, not an error for invalid formats
+//	SafeValidateIP("192.168.1.256") == (false, nil) // net.ParseIP returns nil
+func SafeValidateIP(ipStr string) (bool, error) {
+	if net.ParseIP(ipStr) == nil {
+		// net.ParseIP returns nil if the string is not a valid IP address.
+		// It does not typically return an error for invalid IP formats.
+		return false, nil
+	}
+	return true, nil
+}
