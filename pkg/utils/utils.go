@@ -15177,3 +15177,30 @@ func ContainsAnyGeneric[T comparable](slice []T, item T) bool {
 	}
 	return false
 }
+
+// IsHex checks if a string represents a valid hexadecimal number.
+// It returns true if the string contains only hexadecimal digits (0-9, a-f, A-F)
+// and is not empty. It returns false otherwise.
+//
+// @param s The string to validate.
+// @return true if the string is a valid hexadecimal number, false otherwise.
+//
+// Examples:
+//
+//	IsHex("1A2B3C") == true
+//	IsHex("abcdef") == true
+//	IsHex("0123456789") == true
+//	IsHex("1a2b3c") == true
+//	IsHex("invalid hex") == false
+//	IsHex("") == false
+func IsHex(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, r := range s {
+		if !unicode.IsDigit(r) && (r < 'a' || r > 'f') && (r < 'A' || r > 'F') {
+			return false
+		}
+	}
+	return true
+}
