@@ -16064,3 +16064,19 @@ func GroupByGeneric[T any, K comparable](slice []T, keyFunc func(T) K) map[K][]T
 //
 // @param slice The input slice of elements of type T.
 // @param predicate A function that takes an element
+
+// ValidateLengthOfThree checks if a string's length is exactly three.
+// It returns an error if the length is not three.
+//
+// Examples:
+//
+//	ValidateLengthOfThree("abc") == nil
+//	ValidateLengthOfThree("ab") returns an error
+//	ValidateLengthOfThree("abcd") returns an error
+//	ValidateLengthOfThree("") returns an error
+func ValidateLengthOfThree(s string) error {
+	if len([]rune(s)) != 3 { // Use runes to handle multi-byte characters
+		return errors.New("string must be exactly 3 characters long")
+	}
+	return nil
+}
