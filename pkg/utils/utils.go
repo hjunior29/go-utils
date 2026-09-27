@@ -16894,3 +16894,20 @@ func GroupBy[T any, K comparable](slice []T, keyFunc func(T) K) map[K][]T {
 	}
 	return grouped
 }
+
+// SafeParseInt parses a string `s` to an integer `val`.
+// It returns the parsed integer and a nil error on success.
+// It returns 0 and an error if the string is not a valid integer.
+//
+// Examples:
+//
+//	SafeParseInt("123") == (123, nil)
+//	SafeParseInt("abc") == (0, error)
+//	SafeParseInt("") == (0, error)
+func SafeParseInt(s string) (int, error) {
+	val, err := strconv.Atoi(s)
+	if err != nil {
+		return 0, err
+	}
+	return val, nil
+}
