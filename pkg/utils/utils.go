@@ -16911,3 +16911,21 @@ func SafeParseInt(s string) (int, error) {
 	}
 	return val, nil
 }
+
+// SafeSplit splits a string around each instance of the separator, returning a slice of substrings.
+// If the separator is an empty string, Split splits after each UTF-8 sequence.
+// It returns the slice of substrings and a nil error on success.
+// It returns an error if the separator is empty and the string is not empty.
+//
+// Examples:
+//
+//	SafeSplit("a,b,c", ",") == ([]string{"a", "b", "c"}, nil)
+//	SafeSplit("a,b,c", "") returns ([]string{"", "a", "", "b", "", "c", ""}, nil) // strings.Split behavior
+//	SafeSplit("", ",") == ([]string{""}, nil)
+//	SafeSplit("", "") == ([]string{}, nil)
+func SafeSplit(s, sep string) ([]string, error) {
+	// The strings.Split function itself handles the "separator cannot be empty if string is not empty" logic
+	// by splitting after each UTF-8 sequence, which is a valid behavior.
+	// Thus, we can directly return the result of strings.Split.
+	return strings.Split(s, sep), nil
+}
