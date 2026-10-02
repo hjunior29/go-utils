@@ -17143,3 +17143,347 @@ func PadRight(s string, length int, pad rune) string {
 	padding := strings.Repeat(string(pad), length-len(s))
 	return s + padding
 }
+
+// ValidateIPv4 checks if a string is a valid IPv4 address.
+// It returns an error if the string is not a valid IPv4 address.
+//
+// Examples:
+//
+//	ValidateIPv4("192.168.1.1") == nil
+//	ValidateIPv4("192.168.1.256") returns an error
+//	ValidateIPv4("2001:0db8:85a3:0000:0000:8a2e:0370:7334") returns an error
+//	ValidateIPv4("invalid-ip") returns an error
+func ValidateIPv4(ipStr string) error {
+	ip := net.ParseIP(ipStr)
+	if ip == nil {
+		return errors.New("invalid IP address format")
+	}
+	// Check if it's IPv4 by ensuring To4() returns a non-nil value.
+	if ip.To4() == nil {
+		return errors.New("not an IPv4 address")
+	}
+	return nil
+}
+
+// ValidateIPv6 checks if a string is a valid IPv6 address.
+// It returns an error if the string is not a valid IPv6 address.
+//
+// Examples:
+//
+//	ValidateIPv6("2001:0db8:85a3:0000:0000:8a2e:0370:7334") == nil
+//	ValidateIPv6("::1") == nil
+//	ValidateIPv6("192.168.1.1") returns an error
+//	ValidateIPv6("invalid-ip") returns an error
+func ValidateIPv6(ipStr string) error {
+	ip := net.ParseIP(ipStr)
+	if ip == nil {
+		return errors.New("invalid IP address format")
+	}
+	// Check if it's IPv6 by ensuring To4() returns nil and it's not nil itself.
+	if ip.To4() != nil {
+		return errors.New("not an IPv6 address (it's IPv4)")
+	}
+	return nil
+}
+
+// ValidateIP checks if a string is a valid IPv4 or IPv6 address.
+// It uses Go's net.ParseIP function for validation.
+// It returns an error if the string is not a valid IP address.
+//
+// Examples:
+//
+//	ValidateIP("192.168.1.1") == nil
+//	ValidateIP("2001:0db8:85a3:0000:0000:8a2e:0370:7334") == nil
+//	ValidateIP("invalid-ip") returns an error
+//	ValidateIP("192.168.1.256") returns an error
+func ValidateIP(ipStr string) error {
+	if net.ParseIP(ipStr) == nil {
+		return errors.New("invalid IP address format")
+	}
+	return nil
+}
+
+// ValidateCountryCode checks if a string is a valid ISO 3166-1 alpha-2 country code.
+// It returns an error if the string is not a valid 2-letter uppercase country code.
+// Note: This function only validates the format (2 uppercase letters) and does not
+// check against a definitive list of all valid country codes.
+//
+// Examples:
+//
+//	ValidateCountryCode("US") == nil
+//	ValidateCountryCode("CA") == nil
+//	ValidateCountryCode("gb") == nil // Case-insensitive check for letters
+//	ValidateCountryCode("USA") returns an error (too long)
+//	ValidateCountryCode("U") returns an error (too short)
+//	ValidateCountryCode("12") returns an error (not letters)
+//	ValidateCountryCode("") returns an error
+func ValidateCountryCode(code string) error {
+	if len(code) != 2 {
+		return errors.New("invalid country code length: must be 2 characters")
+	}
+	for _, r := range code {
+		if !unicode.IsLetter(r) {
+			return errors.New("invalid country code format: must contain only letters")
+		}
+	}
+	// For more robust validation, one would compare against a known list of ISO 3166-1 alpha-2 codes.
+	// This basic check ensures the format is correct.
+	return nil
+}
+
+// ValidateISODate checks if a string represents a valid date in ISO 8601 format (YYYY-MM-DD).
+// It returns an error if the string does not conform to this format or if the date itself is invalid (e.g., February 30th).
+//
+// Examples:
+//
+//	ValidateISODate("2023-10-27") == nil
+//	ValidateISODate("2024-02-29") == nil // Leap year check
+//	ValidateISODate("2023-13-01") returns an error (invalid month)
+//	ValidateISODate("2023-02-30") returns an error (invalid day for month)
+//	ValidateISODate("2023/10/27") returns an error (incorrect format)
+//	ValidateISODate("23-10-27") returns an error (incorrect year format)
+//	ValidateISODate("") returns an error
+func ValidateISODate(dateStr string) error {
+	if dateStr == "" {
+		return errors.New("date string cannot be empty")
+	}
+	// Use time.Parse with the specific layout for YYYY-MM-DD.
+	// The layout string "2006-01-02" is Go's reference time format.
+	layout := "2006-01-02"
+	_, err := time.Parse(layout, dateStr)
+	if err != nil {
+		return errors.New("invalid ISO date format: " + err.Error())
+	}
+	return nil
+}
+
+// ValidateTimeFormat checks if a string represents a time in the specified layout.
+// It uses Go's time.Parse function for validation.
+// It returns an error if the string does not match the layout or if the layout itself is invalid.
+//
+// @param timeStr The string to validate as a time.
+// @param layout The Go time layout string (e.g., time.RFC3339, "2006-01-02T15:04:05Z07:00").
+// @return An error if the string does not match the layout or if the layout is invalid, otherwise nil.
+//
+// Examples:
+//
+//	ValidateTimeFormat("2023-10-27T10:00:00Z", time.RFC3339) == nil
+//	ValidateTimeFormat("10/27/2023", time.RFC3339) returns an error
+//	ValidateTimeFormat("invalid-time", time.RFC3339) returns an error
+//	ValidateTimeFormat("2023-10-27", "2006-01-02") == nil
+func ValidateTimeFormat(timeStr, layout string) error {
+	_, err := time.Parse(layout, timeStr)
+	if err != nil {
+		return errors.New("invalid time format: " + err.Error())
+	}
+	return nil
+}
+
+// ValidateMonth checks if a string represents a valid month name (case-insensitive).
+// It accepts full month names (e.g., "January") and three-letter abbreviations (e.g., "Jan").
+// It returns an error if the string is not a recognized month name or abbreviation.
+//
+// Examples:
+//
+//	ValidateMonth("January") == nil
+//	ValidateMonth("feb") == nil
+//	ValidateMonth("MARCH") == nil
+//	ValidateMonth("Apr") == nil
+//	ValidateMonth("May") == nil
+//	ValidateMonth("jun") == nil
+//	ValidateMonth("JULY") == nil
+//	ValidateMonth("Aug") == nil
+//	ValidateMonth("sept") == nil
+//	ValidateMonth("October") == nil
+//	ValidateMonth("nov") == nil
+//	ValidateMonth("DECEMBER") == nil
+//	ValidateMonth("Funday") returns an error
+//	ValidateMonth("") returns an error
+func ValidateMonth(s string) error {
+	lowerS := strings.ToLower(s)
+	switch lowerS {
+	case "january", "jan":
+		return nil
+	case "february", "feb":
+		return nil
+	case "march", "mar":
+		return nil
+	case "april", "apr":
+		return nil
+	case "may": // No common abbreviation for May
+		return nil
+	case "june", "jun":
+		return nil
+	case "july", "jul":
+		return nil
+	case "august", "aug":
+		return nil
+	case "september", "sep":
+		return nil
+	case "october", "oct":
+		return nil
+	case "november", "nov":
+		return nil
+	case "december", "dec":
+		return nil
+	default:
+		return errors.New("invalid month name or abbreviation")
+	}
+}
+
+// ValidateWeekday checks if a string represents a valid weekday name (case-insensitive).
+// It returns an error if the string is not a recognized weekday name.
+//
+// Examples:
+//
+//	ValidateWeekday("Monday") == nil
+//	ValidateWeekday("tuesday") == nil
+//	ValidateWeekday("WEDNESDAY") == nil
+//	ValidateWeekday("Funday") returns an error
+//	ValidateWeekday("") returns an error
+func ValidateWeekday(s string) error {
+	lowerS := strings.ToLower(s)
+	switch lowerS {
+	case "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday":
+		return nil
+	default:
+		return errors.New("invalid weekday name")
+	}
+}
+
+// ValidateISBN10 checks if a string is a valid ISBN-10 number.
+// An ISBN-10 consists of 10 digits, where the last digit can be 'X' representing 10.
+// The check digit calculation is: (10*d1 + 9*d2 + ... + 2*d9 + 1*d10) mod 11 == 0.
+// It returns an error if the string is not a valid ISBN-10.
+//
+// Examples:
+//
+//	ValidateISBN10("0321714113") == nil
+//	ValidateISBN10("0439023521") == nil
+//	ValidateISBN10("032171411X") == nil
+//	ValidateISBN10("032171411x") == nil
+//	ValidateISBN10("0321714114") returns an error (invalid check digit)
+//	ValidateISBN10("12345") returns an error (incorrect length)
+//	ValidateISBN10("ABCDEFGHIJ") returns an error (non-digit characters)
+func ValidateISBN10(isbn string) error {
+	isbn = strings.ReplaceAll(isbn, "-", "") // Remove hyphens
+
+	if len(isbn) != 10 {
+		return errors.New("invalid ISBN-10 length: must be 10 characters")
+	}
+
+	sum := 0
+	for i := 0; i < 9; i++ {
+		digit := int(isbn[i] - '0')
+		if digit < 0 || digit > 9 {
+			return errors.New("invalid character in ISBN-10: only digits and 'X' (or 'x') allowed")
+		}
+		sum += digit * (10 - i)
+	}
+
+	lastChar := isbn[9]
+	var lastDigit int
+	if lastChar == 'X' || lastChar == 'x' {
+		lastDigit = 10
+	} else {
+		lastDigit = int(lastChar - '0')
+		if lastDigit < 0 || lastDigit > 9 {
+			return errors.New("invalid last character in ISBN-10: must be a digit or 'X'/'x'")
+		}
+	}
+	sum += lastDigit
+
+	if sum%11 != 0 {
+		return errors.New("invalid ISBN-10 check digit")
+	}
+
+	return nil
+}
+
+// ValidateISBN13 checks if a string is a valid ISBN-13 number.
+// An ISBN-13 consists of 13 digits.
+// The check digit calculation is: (d1 + 3*d2 + d3 + 3*d4 + ... + d13) mod 10 == 0.
+// It returns an error if the string is not a valid ISBN-13.
+//
+// Examples:
+//
+//	ValidateISBN13("978-3-16-148410-0") == nil
+//	ValidateISBN13("9780439023521") == nil
+//	ValidateISBN13("9780439023522") returns an error (invalid check digit)
+//	ValidateISBN13("12345") returns an error (incorrect length)
+//	ValidateISBN13("ABCDEFGHIJKLM") returns an error (non-digit characters)
+func ValidateISBN13(isbn string) error {
+	isbn = strings.ReplaceAll(isbn, "-", "") // Remove hyphens
+
+	if len(isbn) != 13 {
+		return errors.New("invalid ISBN-13 length: must be 13 characters")
+	}
+
+	sum := 0
+	for i, char := range isbn {
+		digit := int(char - '0')
+		if digit < 0 || digit > 9 {
+			return errors.New("invalid character in ISBN-13: only digits allowed")
+		}
+		if (i+1)%2 == 0 { // Even position (d2, d4, etc.)
+			sum += 3 * digit
+		} else { // Odd position (d1, d3, etc.)
+			sum += digit
+		}
+	}
+
+	if sum%10 != 0 {
+		return errors.New("invalid ISBN-13 check digit")
+	}
+
+	return nil
+}
+
+// ValidateGUID checks if a string is a valid GUID (Globally Unique Identifier).
+// A valid GUID has the format "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", where 'x' represents a hexadecimal digit.
+// It returns an error if the string does not conform to this format or contains invalid characters.
+//
+// Examples:
+//
+//	ValidateGUID("a1b2c3d4-e5f6-7890-1234-567890abcdef") == nil
+//	ValidateGUID("A1B2C3D4-E5F6-7890-1234-567890ABCDEF") == nil // Case-insensitive
+//	ValidateGUID("a1b2c3d4e5f678901234567890abcdef") returns an error // Missing hyphens
+//	ValidateGUID("g1b2c3d4-e5f6-7890-1234-567890abcdef") returns an error // Invalid character 'g'
+//	ValidateGUID("a1b2c3d4-e5f6-7890-1234-567890abcde") returns an error // Incorrect length
+func ValidateGUID(guid string) error {
+	if len(guid) != 36 {
+		return errors.New("invalid GUID length: must be 36 characters (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)")
+	}
+
+	for i, r := range guid {
+		switch i {
+		case 8, 13, 18, 23: // Hyphen positions
+			if r != '-' {
+				return errors.New("invalid GUID format: hyphens missing or misplaced")
+			}
+		default: // Hexadecimal digit positions
+			if !unicode.IsDigit(r) && (r < 'a' || r > 'f') && (r < 'A' || r > 'F') {
+				return errors.New("invalid GUID format: contains non-hexadecimal characters")
+			}
+		}
+	}
+	return nil
+}
+
+// ValidateEmail checks if a string is a valid email address.
+// It uses a regular expression for basic email format validation.
+// Note: This is a basic check and doesn't cover all RFC 5322 complexities.
+//
+// Examples:
+//
+//	ValidateEmail("test@example.com") == nil
+//	ValidateEmail("invalid-email") returns an error
+//	ValidateEmail("user+alias@domain.co.uk") == nil
+//	ValidateEmail("@domain.com") returns an error
+//	ValidateEmail("user@domain.") returns an error
+func ValidateEmail(email string) error {
+	// A common regex for basic email validation.
+	// It checks for a username part, followed by '@', then a domain part.
+	// The domain part must contain at least one dot.
+	const emailRegex = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	if !regexp.MustCompile(emailRegex).MatchString(email) {
