@@ -17531,3 +17531,28 @@ func FastMapGeneric[T any, U any](slice []T, f func(T) U) []U {
 	}
 	return result
 }
+
+// SafeFilterGeneric returns a new slice containing only elements from the input slice
+// that satisfy the given predicate function.
+// The predicate function should return true for elements to keep and false for elements to discard.
+// This generic version works with slices of any type and returns the filtered slice and a nil error.
+//
+// @param slice The input slice of elements of type T.
+// @param predicate A function that takes an element of type T and returns a boolean.
+// @return A new slice containing only the elements from the input slice that satisfy the predicate, and a nil error.
+//
+// Examples:
+//
+//	SafeFilterGeneric([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 }) == ([]int{2, 4}, nil)
+//	SafeFilterGeneric([]string{"apple", "banana", "cherry"}, func(s string) bool { return len(s) > 5 }) == ([]string{"banana", "cherry"}, nil)
+func SafeFilterGeneric[T any](slice []T, predicate func(T) bool) ([]T, error) {
+	// Pre-allocate result slice with a heuristic initial capacity.
+	// This can improve performance by reducing reallocations.
+	result := make([]T, 0, len(slice)/2)
+	for _, item := range slice {
+		if predicate(item) {
+			result = append(result, item)
+		}
+	}
+	return result, nil
+}
