@@ -17487,3 +17487,23 @@ func ValidateEmail(email string) error {
 	// The domain part must contain at least one dot.
 	const emailRegex = `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
 	if !regexp.MustCompile(emailRegex).MatchString(email) {
+
+// ContainsAnyGeneric checks if a slice of any comparable type contains a specific item.
+// This function leverages Go generics to work with slices of any type that supports equality comparison.
+//
+// @param slice The slice to search within. The elements must be of a comparable type.
+// @param item The item to search for in the slice. It must be of the same type as the slice elements.
+// @return true if the item is found in the slice, false otherwise.
+//
+// Examples:
+//
+//	ContainsAnyGeneric([]int{1, 2, 3}, 2) == true
+//	ContainsAnyGeneric([]string{"a", "b", "c"}, "d") == false
+func ContainsAnyGeneric[T comparable](slice []T, item T) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
+}
