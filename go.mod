@@ -1,3 +1,3 @@
 module github.com/hjunior29/go-utils
 
-go 1.22
+go 1.24.0

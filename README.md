@@ -1,11 +1,16 @@
-# Go Utils
+# go-utils
 
-A collection of Go utility functions for common operations.
+A small, tested Go utility library. Each utility lives in its own source file and has automated tests.
 
-## Installation
+## Requirements
 
-```bash
-go get github.com/hjunior29/go-utils
+Go 1.24 or newer.
+
+## Build and test
+
+```sh
+go build ./...
+go test -count=1 ./...
 ```
 
 ## Usage
@@ -13,18 +18,21 @@ go get github.com/hjunior29/go-utils
 ```go
 import "github.com/hjunior29/go-utils/pkg/utils"
 
-// String utilities
-reversed := utils.Reverse("hello")     // "olleh"
-capitalized := utils.Capitalize("go")  // "Go"
-
-// Slice utilities
-found := utils.Contains([]string{"a", "b"}, "a") // true
-
-// Math utilities
-max := utils.Max(5, 10) // 10
-min := utils.Min(5, 10) // 5
+reversed := utils.ReverseString("hello") // "olleh"
 ```
+
+## Initial utilities
+
+- `ReverseString` reverses Unicode code points.
+- `WordCount` counts whitespace-separated words.
+- `ClampInt` clamps an integer to inclusive bounds and rejects reversed bounds.
+
+## Adding utilities
+
+Use English for code, comments, documentation, and tests. Add one utility per file with meaningful tests covering normal, empty, boundary, and invalid input where applicable. Do not add dependencies without review.
+
+Run the complete build and test suite before submitting changes. Keep public exports synchronized when adding modules.
 
 ## License
 
-[MIT](LICENSE)
+MIT
