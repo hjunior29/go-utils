@@ -9,6 +9,8 @@ Go 1.24 or newer.
 ## Build and test
 
 ```sh
+gofmt -w pkg/utils
+go vet ./...
 go build ./...
 go test -count=1 ./...
 ```
@@ -21,11 +23,13 @@ import "github.com/hjunior29/go-utils/pkg/utils"
 reversed := utils.ReverseString("hello") // "olleh"
 ```
 
-## Initial utilities
+## Utilities
 
 - `ReverseString` reverses Unicode code points.
 - `WordCount` counts whitespace-separated words.
 - `ClampInt` clamps an integer to inclusive bounds and rejects reversed bounds.
+
+- `DeduplicateInts` removes repeated integers while preserving first occurrence order.
 
 ## Adding utilities
 
